@@ -205,7 +205,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\welbert\\Documents\\github\\study-bank\\prisma\\generated\\client",
+      "value": "C:\\Users\\Welbert\\Documents\\github\\study-bank\\prisma\\generated\\client",
       "fromEnvVar": null
     },
     "config": {
@@ -218,14 +218,12 @@ const config = {
         "native": true
       }
     ],
-    "previewFeatures": [
-      "clientExtensions"
-    ],
-    "sourceFilePath": "C:\\Users\\welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
+    "previewFeatures": [],
+    "sourceFilePath": "C:\\Users\\Welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
+    "rootEnvPath": "../../../.env",
     "schemaEnvPath": "../../../.env"
   },
   "relativePath": "../..",
@@ -235,17 +233,16 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "postgresql://neondb_owner:npg_lFUr1phE2bHe@ep-red-bush-acghc6kl-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require"
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file\ngenerator client {\n  provider        = \"prisma-client-js\"\n  output          = \"./generated/client\"\n  previewFeatures = [\"clientExtensions\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel DailyDashboard {\n  id        String   @id @default(cuid())\n  date      DateTime @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  objetivos         Objetivo[]\n  cronograma        Atividade[]\n  metricas          MetricaDisciplina[]\n  proximosConteudos String[]\n}\n\nmodel Objetivo {\n  id          String         @id @default(cuid())\n  descricao   String\n  completo    Boolean        @default(false)\n  dashboardId String\n  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])\n}\n\nenum AtividadeStatus {\n  completed\n  in_progress\n  pending\n}\n\nmodel Atividade {\n  id          String          @id @default(cuid())\n  horario     String\n  atividade   String\n  status      AtividadeStatus @default(pending)\n  dashboardId String\n  dashboard   DailyDashboard  @relation(fields: [dashboardId], references: [id])\n\n  disciplinaId String?\n  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])\n}\n\nmodel MetricaDisciplina {\n  id          String         @id @default(cuid())\n  nome        String\n  progresso   Int\n  cor         String\n  dashboardId String\n  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])\n\n  disciplinaId String?\n  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])\n\n  // Histórico de progresso da disciplina\n  historico HistoricoProgresso[]\n}\n\nmodel HistoricoProgresso {\n  id           String            @id @default(cuid())\n  data         DateTime          @default(now())\n  progresso    Int\n  observacoes  String?\n  disciplinaId String\n  disciplina   MetricaDisciplina @relation(fields: [disciplinaId], references: [id])\n}\n\nmodel Disciplina {\n  id        String   @id @default(cuid())\n  nome      String\n  cor       String   @default(\"bg-blue-500\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  conteudos  Conteudo[]\n  metricas   MetricaDisciplina[]\n  atividades Atividade[]\n  horarios   HorarioEstudo[]\n}\n\nmodel Conteudo {\n  id           String     @id @default(cuid())\n  titulo       String\n  descricao    String?\n  ordem        Int\n  completo     Boolean    @default(false)\n  disciplinaId String\n  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])\n  createdAt    DateTime   @default(now())\n  updatedAt    DateTime   @updatedAt\n}\n\nmodel HorarioEstudo {\n  id        String   @id @default(cuid())\n  diaSemana Int // 0-6 (Domingo-Sábado)\n  inicio    String // formato \"HH:mm\"\n  fim       String // formato \"HH:mm\"\n  ativo     Boolean  @default(true)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  disciplinaId String\n  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])\n}\n",
-  "inlineSchemaHash": "8211ca9b76752f07f658612dc758531ee3c09ba3a4d2a53ceea9d78ae8adb168",
+  "inlineSchema": "// This is your Prisma schema file\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel DailyDashboard {\n  id        String   @id @default(cuid())\n  date      DateTime @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  objetivos         Objetivo[]\n  cronograma        Atividade[]\n  metricas          MetricaDisciplina[]\n  proximosConteudos String[]\n}\n\nmodel Objetivo {\n  id          String         @id @default(cuid())\n  descricao   String\n  completo    Boolean        @default(false)\n  dashboardId String\n  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])\n}\n\nenum AtividadeStatus {\n  completed\n  in_progress\n  pending\n}\n\nmodel Atividade {\n  id          String          @id @default(cuid())\n  horario     String\n  atividade   String\n  status      AtividadeStatus @default(pending)\n  dashboardId String\n  dashboard   DailyDashboard  @relation(fields: [dashboardId], references: [id])\n\n  disciplinaId String?\n  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])\n}\n\nmodel MetricaDisciplina {\n  id          String         @id @default(cuid())\n  nome        String\n  progresso   Int\n  cor         String\n  dashboardId String\n  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])\n\n  disciplinaId String?\n  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])\n\n  // Histórico de progresso da disciplina\n  historico HistoricoProgresso[]\n}\n\nmodel HistoricoProgresso {\n  id           String            @id @default(cuid())\n  data         DateTime          @default(now())\n  progresso    Int\n  observacoes  String?\n  disciplinaId String\n  disciplina   MetricaDisciplina @relation(fields: [disciplinaId], references: [id])\n}\n\nmodel Disciplina {\n  id        String   @id @default(cuid())\n  nome      String\n  cor       String   @default(\"bg-blue-500\")\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  conteudos  Conteudo[]\n  metricas   MetricaDisciplina[]\n  atividades Atividade[]\n  horarios   HorarioEstudo[]\n}\n\nmodel Conteudo {\n  id           String     @id @default(cuid())\n  titulo       String\n  descricao    String?\n  ordem        Int\n  completo     Boolean    @default(false)\n  disciplinaId String\n  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])\n  createdAt    DateTime   @default(now())\n  updatedAt    DateTime   @updatedAt\n}\n\nmodel HorarioEstudo {\n  id        String   @id @default(cuid())\n  diaSemana Int // 0-6 (Domingo-Sábado)\n  inicio    String // formato \"HH:mm\"\n  fim       String // formato \"HH:mm\"\n  ativo     Boolean  @default(true)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  disciplinaId String\n  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])\n}\n",
+  "inlineSchemaHash": "662dfb7b216e1c28c51e8512bf512449cf276a4427396fd38da204e7eeda46c6",
   "copyEngine": true
 }
 
