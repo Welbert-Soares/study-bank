@@ -1,103 +1,334 @@
-import Image from "next/image";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const studyPlan = [
+    {
+      day: 'Segunda',
+      discipline1: 'Tecnologia da Informação',
+      discipline2: 'Língua Inglesa',
+      writing: 'Estudo de temas e estrutura',
+    },
+    {
+      day: 'Terça',
+      discipline1: 'Língua Portuguesa',
+      discipline2: 'Probabilidade e Estatística',
+      writing: 'Escrever uma redação',
+    },
+    {
+      day: 'Quarta',
+      discipline1: 'Tecnologia da Informação',
+      discipline2: 'Atualidades do Mercado',
+      writing: 'Correção/redação anterior',
+    },
+    {
+      day: 'Quinta',
+      discipline1: 'Conhecimentos Bancários',
+      discipline2: 'Matemática',
+      writing: 'Estudo de temas e estrutura',
+    },
+    {
+      day: 'Sexta',
+      discipline1: 'Tecnologia da Informação',
+      discipline2: 'Língua Portuguesa',
+      writing: 'Escrever uma redação',
+    },
+    {
+      day: 'Sábado',
+      discipline1: 'Revisão (todas as disciplinas)',
+      discipline2: 'Simulado parcial',
+      writing: 'Correção/redação anterior',
+    },
+    {
+      day: 'Domingo',
+      discipline1: 'Descanso ou revisão leve',
+      discipline2: '-',
+      writing: '-',
+    },
+  ]
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  return (
+    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <Card className="border-none shadow-none bg-transparent">
+          <CardHeader>
+            <CardTitle className="text-4xl font-bold text-blue-900 mb-4">
+              Banco do Brasil - Concurso TI
+            </CardTitle>
+            <div className="flex flex-wrap gap-4">
+              <Button
+                variant="default"
+                size="lg"
+                className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
+                asChild
+              >
+                <a
+                  href="https://www.notion.so/154e31f45426811f95d3e4522fdf9298?v=154e31f45426810c9af4000c7a64e002"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  📊 Kanban Board (Notion)
+                </a>
+              </Button>
+              <Button
+                variant="default"
+                size="lg"
+                className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
+                asChild
+              >
+                <a
+                  href="https://quizlet.com/user/Welbert_Soares/folders/banco-do-brasil?i=6jvs8z&x=1xqt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  🗂️ Flashcards (Quizlet)
+                </a>
+              </Button>
+            </div>
+          </CardHeader>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>📚 Plano de Estudos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg overflow-hidden border bg-white">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50 hover:bg-gray-50">
+                        <TableHead className="py-3">Dia</TableHead>
+                        <TableHead className="py-3">Disciplina 1</TableHead>
+                        <TableHead className="py-3">Disciplina 2</TableHead>
+                        <TableHead className="py-3">Redação</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {studyPlan.map((day) => (
+                        <TableRow key={day.day} className="hover:bg-gray-50">
+                          <TableCell className="font-medium py-3">
+                            {day.day}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            {day.discipline1}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            {day.discipline2}
+                          </TableCell>
+                          <TableCell className="py-3">{day.writing}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>📊 Sistema de Gestão</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">
+                      📋 Dashboards Diários
+                    </h3>
+                    <div className="space-y-2">
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-blue-50"
+                      >
+                        Objetivos e metas
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-blue-50"
+                      >
+                        Cronograma detalhado
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-blue-50"
+                      >
+                        Diagnóstico rápido
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-blue-50"
+                      >
+                        Progresso das atividades
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">
+                      📈 Métricas de Progresso
+                    </h3>
+                    <div className="space-y-2">
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-green-50"
+                      >
+                        Desempenho por disciplina
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-green-50"
+                      >
+                        Histórico de simulados
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-green-50"
+                      >
+                        Tempo de estudo
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="w-full justify-start p-2 hover:bg-green-50"
+                      >
+                        Metas semanais
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-8">
+            <Card className="shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>🎯 Ciclo de Revisão</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-3">Diário</h3>
+                  <div className="space-y-2">
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-blue-50"
+                    >
+                      Flash cards dos temas
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-blue-50"
+                    >
+                      Resolução de exercícios
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-blue-50"
+                    >
+                      Atualização do dashboard
+                    </Badge>
+                  </div>
+                </div>
+                <Separator className="my-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-3">Semanal</h3>
+                  <div className="space-y-2">
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-purple-50"
+                    >
+                      Simulados parciais
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-purple-50"
+                    >
+                      Revisão de tópicos fracos
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-purple-50"
+                    >
+                      Atualização de métricas
+                    </Badge>
+                  </div>
+                </div>
+                <Separator className="my-4" />
+                <div>
+                  <h3 className="font-semibold text-gray-700 mb-3">Mensal</h3>
+                  <div className="space-y-2">
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-yellow-50"
+                    >
+                      Análise de progresso
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-yellow-50"
+                    >
+                      Ajuste de estratégias
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="w-full justify-start p-2 hover:bg-yellow-50"
+                    >
+                      Revisão geral
+                    </Badge>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <CardTitle>📁 Links Rápidos</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700"
+                  asChild
+                >
+                  <a href="/dashboard">📊 Dashboard de Hoje</a>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700"
+                  asChild
+                >
+                  <a href="/doc/metricas-progresso.md">
+                    📈 Métricas de Progresso
+                  </a>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-yellow-50 hover:bg-yellow-100 text-yellow-700"
+                  asChild
+                >
+                  <a href="/doc/anotacoes/exercicios">✍️ Exercícios</a>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700"
+                  asChild
+                >
+                  <a href="/doc/anotacoes/resumos">📝 Resumos</a>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+      </div>
+    </main>
+  )
 }

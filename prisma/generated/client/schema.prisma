@@ -1,0 +1,111 @@
+// This is your Prisma schema file
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated/client"
+  previewFeatures = ["clientExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model DailyDashboard {
+  id        String   @id @default(cuid())
+  date      DateTime @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  objetivos         Objetivo[]
+  cronograma        Atividade[]
+  metricas          MetricaDisciplina[]
+  proximosConteudos String[]
+}
+
+model Objetivo {
+  id          String         @id @default(cuid())
+  descricao   String
+  completo    Boolean        @default(false)
+  dashboardId String
+  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])
+}
+
+enum AtividadeStatus {
+  completed
+  in_progress
+  pending
+}
+
+model Atividade {
+  id          String          @id @default(cuid())
+  horario     String
+  atividade   String
+  status      AtividadeStatus @default(pending)
+  dashboardId String
+  dashboard   DailyDashboard  @relation(fields: [dashboardId], references: [id])
+
+  disciplinaId String?
+  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])
+}
+
+model MetricaDisciplina {
+  id          String         @id @default(cuid())
+  nome        String
+  progresso   Int
+  cor         String
+  dashboardId String
+  dashboard   DailyDashboard @relation(fields: [dashboardId], references: [id])
+
+  disciplinaId String?
+  disciplina   Disciplina? @relation(fields: [disciplinaId], references: [id])
+
+  // Histórico de progresso da disciplina
+  historico HistoricoProgresso[]
+}
+
+model HistoricoProgresso {
+  id           String            @id @default(cuid())
+  data         DateTime          @default(now())
+  progresso    Int
+  observacoes  String?
+  disciplinaId String
+  disciplina   MetricaDisciplina @relation(fields: [disciplinaId], references: [id])
+}
+
+model Disciplina {
+  id        String   @id @default(cuid())
+  nome      String
+  cor       String   @default("bg-blue-500")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conteudos  Conteudo[]
+  metricas   MetricaDisciplina[]
+  atividades Atividade[]
+  horarios   HorarioEstudo[]
+}
+
+model Conteudo {
+  id           String     @id @default(cuid())
+  titulo       String
+  descricao    String?
+  ordem        Int
+  completo     Boolean    @default(false)
+  disciplinaId String
+  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model HorarioEstudo {
+  id        String   @id @default(cuid())
+  diaSemana Int // 0-6 (Domingo-Sábado)
+  inicio    String // formato "HH:mm"
+  fim       String // formato "HH:mm"
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  disciplinaId String
+  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])
+}
