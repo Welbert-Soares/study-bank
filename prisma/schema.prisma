@@ -1,8 +1,7 @@
 // This is your Prisma schema file
 generator client {
-  provider        = "prisma-client-js"
-  output          = "./generated/client"
-  previewFeatures = ["clientExtensions"]
+  provider = "prisma-client-js"
+  output   = "./generated/client"
 }
 
 datasource db {
