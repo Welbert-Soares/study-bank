@@ -155,6 +155,18 @@ exports.Prisma.PlanoDeEstudosScalarFieldEnum = {
   atualizadoEm: 'atualizadoEm'
 };
 
+exports.Prisma.HistoricoEstudoScalarFieldEnum = {
+  id: 'id',
+  tituloDaMateria: 'tituloDaMateria',
+  disciplina: 'disciplina',
+  dataEstudo: 'dataEstudo',
+  tempoEstudado: 'tempoEstudado',
+  anotacoes: 'anotacoes',
+  progresso: 'progresso',
+  planoId: 'planoId',
+  criadoEm: 'criadoEm'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -201,7 +213,8 @@ exports.DiaDaSemana = exports.$Enums.DiaDaSemana = {
 exports.Prisma.ModelName = {
   Materia: 'Materia',
   DiaDisciplinaMateria: 'DiaDisciplinaMateria',
-  PlanoDeEstudos: 'PlanoDeEstudos'
+  PlanoDeEstudos: 'PlanoDeEstudos',
+  HistoricoEstudo: 'HistoricoEstudo'
 };
 
 /**

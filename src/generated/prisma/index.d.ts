@@ -28,6 +28,11 @@ export type DiaDisciplinaMateria = $Result.DefaultSelection<Prisma.$DiaDisciplin
  * 
  */
 export type PlanoDeEstudos = $Result.DefaultSelection<Prisma.$PlanoDeEstudosPayload>
+/**
+ * Model HistoricoEstudo
+ * 
+ */
+export type HistoricoEstudo = $Result.DefaultSelection<Prisma.$HistoricoEstudoPayload>
 
 /**
  * Enums
@@ -238,6 +243,16 @@ export class PrismaClient<
     * ```
     */
   get planoDeEstudos(): Prisma.PlanoDeEstudosDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.historicoEstudo`: Exposes CRUD operations for the **HistoricoEstudo** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more HistoricoEstudos
+    * const historicoEstudos = await prisma.historicoEstudo.findMany()
+    * ```
+    */
+  get historicoEstudo(): Prisma.HistoricoEstudoDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -680,7 +695,8 @@ export namespace Prisma {
   export const ModelName: {
     Materia: 'Materia',
     DiaDisciplinaMateria: 'DiaDisciplinaMateria',
-    PlanoDeEstudos: 'PlanoDeEstudos'
+    PlanoDeEstudos: 'PlanoDeEstudos',
+    HistoricoEstudo: 'HistoricoEstudo'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -699,7 +715,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "materia" | "diaDisciplinaMateria" | "planoDeEstudos"
+      modelProps: "materia" | "diaDisciplinaMateria" | "planoDeEstudos" | "historicoEstudo"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -925,6 +941,80 @@ export namespace Prisma {
           }
         }
       }
+      HistoricoEstudo: {
+        payload: Prisma.$HistoricoEstudoPayload<ExtArgs>
+        fields: Prisma.HistoricoEstudoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HistoricoEstudoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HistoricoEstudoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          findFirst: {
+            args: Prisma.HistoricoEstudoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HistoricoEstudoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          findMany: {
+            args: Prisma.HistoricoEstudoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>[]
+          }
+          create: {
+            args: Prisma.HistoricoEstudoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          createMany: {
+            args: Prisma.HistoricoEstudoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HistoricoEstudoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>[]
+          }
+          delete: {
+            args: Prisma.HistoricoEstudoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          update: {
+            args: Prisma.HistoricoEstudoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          deleteMany: {
+            args: Prisma.HistoricoEstudoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HistoricoEstudoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HistoricoEstudoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>[]
+          }
+          upsert: {
+            args: Prisma.HistoricoEstudoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoEstudoPayload>
+          }
+          aggregate: {
+            args: Prisma.HistoricoEstudoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHistoricoEstudo>
+          }
+          groupBy: {
+            args: Prisma.HistoricoEstudoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HistoricoEstudoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HistoricoEstudoCountArgs<ExtArgs>
+            result: $Utils.Optional<HistoricoEstudoCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1012,6 +1102,7 @@ export namespace Prisma {
     materia?: MateriaOmit
     diaDisciplinaMateria?: DiaDisciplinaMateriaOmit
     planoDeEstudos?: PlanoDeEstudosOmit
+    historicoEstudo?: HistoricoEstudoOmit
   }
 
   /* Types for Logging */
@@ -4642,6 +4733,1091 @@ export namespace Prisma {
 
 
   /**
+   * Model HistoricoEstudo
+   */
+
+  export type AggregateHistoricoEstudo = {
+    _count: HistoricoEstudoCountAggregateOutputType | null
+    _avg: HistoricoEstudoAvgAggregateOutputType | null
+    _sum: HistoricoEstudoSumAggregateOutputType | null
+    _min: HistoricoEstudoMinAggregateOutputType | null
+    _max: HistoricoEstudoMaxAggregateOutputType | null
+  }
+
+  export type HistoricoEstudoAvgAggregateOutputType = {
+    tempoEstudado: number | null
+    progresso: number | null
+  }
+
+  export type HistoricoEstudoSumAggregateOutputType = {
+    tempoEstudado: number | null
+    progresso: number | null
+  }
+
+  export type HistoricoEstudoMinAggregateOutputType = {
+    id: string | null
+    tituloDaMateria: string | null
+    disciplina: $Enums.DisciplinaNome | null
+    dataEstudo: Date | null
+    tempoEstudado: number | null
+    anotacoes: string | null
+    progresso: number | null
+    planoId: string | null
+    criadoEm: Date | null
+  }
+
+  export type HistoricoEstudoMaxAggregateOutputType = {
+    id: string | null
+    tituloDaMateria: string | null
+    disciplina: $Enums.DisciplinaNome | null
+    dataEstudo: Date | null
+    tempoEstudado: number | null
+    anotacoes: string | null
+    progresso: number | null
+    planoId: string | null
+    criadoEm: Date | null
+  }
+
+  export type HistoricoEstudoCountAggregateOutputType = {
+    id: number
+    tituloDaMateria: number
+    disciplina: number
+    dataEstudo: number
+    tempoEstudado: number
+    anotacoes: number
+    progresso: number
+    planoId: number
+    criadoEm: number
+    _all: number
+  }
+
+
+  export type HistoricoEstudoAvgAggregateInputType = {
+    tempoEstudado?: true
+    progresso?: true
+  }
+
+  export type HistoricoEstudoSumAggregateInputType = {
+    tempoEstudado?: true
+    progresso?: true
+  }
+
+  export type HistoricoEstudoMinAggregateInputType = {
+    id?: true
+    tituloDaMateria?: true
+    disciplina?: true
+    dataEstudo?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    progresso?: true
+    planoId?: true
+    criadoEm?: true
+  }
+
+  export type HistoricoEstudoMaxAggregateInputType = {
+    id?: true
+    tituloDaMateria?: true
+    disciplina?: true
+    dataEstudo?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    progresso?: true
+    planoId?: true
+    criadoEm?: true
+  }
+
+  export type HistoricoEstudoCountAggregateInputType = {
+    id?: true
+    tituloDaMateria?: true
+    disciplina?: true
+    dataEstudo?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    progresso?: true
+    planoId?: true
+    criadoEm?: true
+    _all?: true
+  }
+
+  export type HistoricoEstudoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HistoricoEstudo to aggregate.
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HistoricoEstudos to fetch.
+     */
+    orderBy?: HistoricoEstudoOrderByWithRelationInput | HistoricoEstudoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HistoricoEstudoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HistoricoEstudos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HistoricoEstudos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned HistoricoEstudos
+    **/
+    _count?: true | HistoricoEstudoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: HistoricoEstudoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: HistoricoEstudoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HistoricoEstudoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HistoricoEstudoMaxAggregateInputType
+  }
+
+  export type GetHistoricoEstudoAggregateType<T extends HistoricoEstudoAggregateArgs> = {
+        [P in keyof T & keyof AggregateHistoricoEstudo]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHistoricoEstudo[P]>
+      : GetScalarType<T[P], AggregateHistoricoEstudo[P]>
+  }
+
+
+
+
+  export type HistoricoEstudoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HistoricoEstudoWhereInput
+    orderBy?: HistoricoEstudoOrderByWithAggregationInput | HistoricoEstudoOrderByWithAggregationInput[]
+    by: HistoricoEstudoScalarFieldEnum[] | HistoricoEstudoScalarFieldEnum
+    having?: HistoricoEstudoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HistoricoEstudoCountAggregateInputType | true
+    _avg?: HistoricoEstudoAvgAggregateInputType
+    _sum?: HistoricoEstudoSumAggregateInputType
+    _min?: HistoricoEstudoMinAggregateInputType
+    _max?: HistoricoEstudoMaxAggregateInputType
+  }
+
+  export type HistoricoEstudoGroupByOutputType = {
+    id: string
+    tituloDaMateria: string
+    disciplina: $Enums.DisciplinaNome
+    dataEstudo: Date
+    tempoEstudado: number
+    anotacoes: string | null
+    progresso: number
+    planoId: string | null
+    criadoEm: Date
+    _count: HistoricoEstudoCountAggregateOutputType | null
+    _avg: HistoricoEstudoAvgAggregateOutputType | null
+    _sum: HistoricoEstudoSumAggregateOutputType | null
+    _min: HistoricoEstudoMinAggregateOutputType | null
+    _max: HistoricoEstudoMaxAggregateOutputType | null
+  }
+
+  type GetHistoricoEstudoGroupByPayload<T extends HistoricoEstudoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HistoricoEstudoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HistoricoEstudoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HistoricoEstudoGroupByOutputType[P]>
+            : GetScalarType<T[P], HistoricoEstudoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HistoricoEstudoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tituloDaMateria?: boolean
+    disciplina?: boolean
+    dataEstudo?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    progresso?: boolean
+    planoId?: boolean
+    criadoEm?: boolean
+  }, ExtArgs["result"]["historicoEstudo"]>
+
+  export type HistoricoEstudoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tituloDaMateria?: boolean
+    disciplina?: boolean
+    dataEstudo?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    progresso?: boolean
+    planoId?: boolean
+    criadoEm?: boolean
+  }, ExtArgs["result"]["historicoEstudo"]>
+
+  export type HistoricoEstudoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    tituloDaMateria?: boolean
+    disciplina?: boolean
+    dataEstudo?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    progresso?: boolean
+    planoId?: boolean
+    criadoEm?: boolean
+  }, ExtArgs["result"]["historicoEstudo"]>
+
+  export type HistoricoEstudoSelectScalar = {
+    id?: boolean
+    tituloDaMateria?: boolean
+    disciplina?: boolean
+    dataEstudo?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    progresso?: boolean
+    planoId?: boolean
+    criadoEm?: boolean
+  }
+
+  export type HistoricoEstudoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "tituloDaMateria" | "disciplina" | "dataEstudo" | "tempoEstudado" | "anotacoes" | "progresso" | "planoId" | "criadoEm", ExtArgs["result"]["historicoEstudo"]>
+
+  export type $HistoricoEstudoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "HistoricoEstudo"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      tituloDaMateria: string
+      disciplina: $Enums.DisciplinaNome
+      dataEstudo: Date
+      tempoEstudado: number
+      anotacoes: string | null
+      progresso: number
+      planoId: string | null
+      criadoEm: Date
+    }, ExtArgs["result"]["historicoEstudo"]>
+    composites: {}
+  }
+
+  type HistoricoEstudoGetPayload<S extends boolean | null | undefined | HistoricoEstudoDefaultArgs> = $Result.GetResult<Prisma.$HistoricoEstudoPayload, S>
+
+  type HistoricoEstudoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HistoricoEstudoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HistoricoEstudoCountAggregateInputType | true
+    }
+
+  export interface HistoricoEstudoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['HistoricoEstudo'], meta: { name: 'HistoricoEstudo' } }
+    /**
+     * Find zero or one HistoricoEstudo that matches the filter.
+     * @param {HistoricoEstudoFindUniqueArgs} args - Arguments to find a HistoricoEstudo
+     * @example
+     * // Get one HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HistoricoEstudoFindUniqueArgs>(args: SelectSubset<T, HistoricoEstudoFindUniqueArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one HistoricoEstudo that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HistoricoEstudoFindUniqueOrThrowArgs} args - Arguments to find a HistoricoEstudo
+     * @example
+     * // Get one HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HistoricoEstudoFindUniqueOrThrowArgs>(args: SelectSubset<T, HistoricoEstudoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HistoricoEstudo that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoFindFirstArgs} args - Arguments to find a HistoricoEstudo
+     * @example
+     * // Get one HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HistoricoEstudoFindFirstArgs>(args?: SelectSubset<T, HistoricoEstudoFindFirstArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first HistoricoEstudo that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoFindFirstOrThrowArgs} args - Arguments to find a HistoricoEstudo
+     * @example
+     * // Get one HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HistoricoEstudoFindFirstOrThrowArgs>(args?: SelectSubset<T, HistoricoEstudoFindFirstOrThrowArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more HistoricoEstudos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all HistoricoEstudos
+     * const historicoEstudos = await prisma.historicoEstudo.findMany()
+     * 
+     * // Get first 10 HistoricoEstudos
+     * const historicoEstudos = await prisma.historicoEstudo.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const historicoEstudoWithIdOnly = await prisma.historicoEstudo.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HistoricoEstudoFindManyArgs>(args?: SelectSubset<T, HistoricoEstudoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a HistoricoEstudo.
+     * @param {HistoricoEstudoCreateArgs} args - Arguments to create a HistoricoEstudo.
+     * @example
+     * // Create one HistoricoEstudo
+     * const HistoricoEstudo = await prisma.historicoEstudo.create({
+     *   data: {
+     *     // ... data to create a HistoricoEstudo
+     *   }
+     * })
+     * 
+     */
+    create<T extends HistoricoEstudoCreateArgs>(args: SelectSubset<T, HistoricoEstudoCreateArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many HistoricoEstudos.
+     * @param {HistoricoEstudoCreateManyArgs} args - Arguments to create many HistoricoEstudos.
+     * @example
+     * // Create many HistoricoEstudos
+     * const historicoEstudo = await prisma.historicoEstudo.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HistoricoEstudoCreateManyArgs>(args?: SelectSubset<T, HistoricoEstudoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many HistoricoEstudos and returns the data saved in the database.
+     * @param {HistoricoEstudoCreateManyAndReturnArgs} args - Arguments to create many HistoricoEstudos.
+     * @example
+     * // Create many HistoricoEstudos
+     * const historicoEstudo = await prisma.historicoEstudo.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many HistoricoEstudos and only return the `id`
+     * const historicoEstudoWithIdOnly = await prisma.historicoEstudo.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HistoricoEstudoCreateManyAndReturnArgs>(args?: SelectSubset<T, HistoricoEstudoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a HistoricoEstudo.
+     * @param {HistoricoEstudoDeleteArgs} args - Arguments to delete one HistoricoEstudo.
+     * @example
+     * // Delete one HistoricoEstudo
+     * const HistoricoEstudo = await prisma.historicoEstudo.delete({
+     *   where: {
+     *     // ... filter to delete one HistoricoEstudo
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HistoricoEstudoDeleteArgs>(args: SelectSubset<T, HistoricoEstudoDeleteArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one HistoricoEstudo.
+     * @param {HistoricoEstudoUpdateArgs} args - Arguments to update one HistoricoEstudo.
+     * @example
+     * // Update one HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HistoricoEstudoUpdateArgs>(args: SelectSubset<T, HistoricoEstudoUpdateArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more HistoricoEstudos.
+     * @param {HistoricoEstudoDeleteManyArgs} args - Arguments to filter HistoricoEstudos to delete.
+     * @example
+     * // Delete a few HistoricoEstudos
+     * const { count } = await prisma.historicoEstudo.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HistoricoEstudoDeleteManyArgs>(args?: SelectSubset<T, HistoricoEstudoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HistoricoEstudos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many HistoricoEstudos
+     * const historicoEstudo = await prisma.historicoEstudo.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HistoricoEstudoUpdateManyArgs>(args: SelectSubset<T, HistoricoEstudoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more HistoricoEstudos and returns the data updated in the database.
+     * @param {HistoricoEstudoUpdateManyAndReturnArgs} args - Arguments to update many HistoricoEstudos.
+     * @example
+     * // Update many HistoricoEstudos
+     * const historicoEstudo = await prisma.historicoEstudo.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more HistoricoEstudos and only return the `id`
+     * const historicoEstudoWithIdOnly = await prisma.historicoEstudo.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HistoricoEstudoUpdateManyAndReturnArgs>(args: SelectSubset<T, HistoricoEstudoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one HistoricoEstudo.
+     * @param {HistoricoEstudoUpsertArgs} args - Arguments to update or create a HistoricoEstudo.
+     * @example
+     * // Update or create a HistoricoEstudo
+     * const historicoEstudo = await prisma.historicoEstudo.upsert({
+     *   create: {
+     *     // ... data to create a HistoricoEstudo
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the HistoricoEstudo we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HistoricoEstudoUpsertArgs>(args: SelectSubset<T, HistoricoEstudoUpsertArgs<ExtArgs>>): Prisma__HistoricoEstudoClient<$Result.GetResult<Prisma.$HistoricoEstudoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of HistoricoEstudos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoCountArgs} args - Arguments to filter HistoricoEstudos to count.
+     * @example
+     * // Count the number of HistoricoEstudos
+     * const count = await prisma.historicoEstudo.count({
+     *   where: {
+     *     // ... the filter for the HistoricoEstudos we want to count
+     *   }
+     * })
+    **/
+    count<T extends HistoricoEstudoCountArgs>(
+      args?: Subset<T, HistoricoEstudoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HistoricoEstudoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a HistoricoEstudo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HistoricoEstudoAggregateArgs>(args: Subset<T, HistoricoEstudoAggregateArgs>): Prisma.PrismaPromise<GetHistoricoEstudoAggregateType<T>>
+
+    /**
+     * Group by HistoricoEstudo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoEstudoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HistoricoEstudoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HistoricoEstudoGroupByArgs['orderBy'] }
+        : { orderBy?: HistoricoEstudoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HistoricoEstudoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHistoricoEstudoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the HistoricoEstudo model
+   */
+  readonly fields: HistoricoEstudoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for HistoricoEstudo.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HistoricoEstudoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the HistoricoEstudo model
+   */
+  interface HistoricoEstudoFieldRefs {
+    readonly id: FieldRef<"HistoricoEstudo", 'String'>
+    readonly tituloDaMateria: FieldRef<"HistoricoEstudo", 'String'>
+    readonly disciplina: FieldRef<"HistoricoEstudo", 'DisciplinaNome'>
+    readonly dataEstudo: FieldRef<"HistoricoEstudo", 'DateTime'>
+    readonly tempoEstudado: FieldRef<"HistoricoEstudo", 'Int'>
+    readonly anotacoes: FieldRef<"HistoricoEstudo", 'String'>
+    readonly progresso: FieldRef<"HistoricoEstudo", 'Int'>
+    readonly planoId: FieldRef<"HistoricoEstudo", 'String'>
+    readonly criadoEm: FieldRef<"HistoricoEstudo", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * HistoricoEstudo findUnique
+   */
+  export type HistoricoEstudoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter, which HistoricoEstudo to fetch.
+     */
+    where: HistoricoEstudoWhereUniqueInput
+  }
+
+  /**
+   * HistoricoEstudo findUniqueOrThrow
+   */
+  export type HistoricoEstudoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter, which HistoricoEstudo to fetch.
+     */
+    where: HistoricoEstudoWhereUniqueInput
+  }
+
+  /**
+   * HistoricoEstudo findFirst
+   */
+  export type HistoricoEstudoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter, which HistoricoEstudo to fetch.
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HistoricoEstudos to fetch.
+     */
+    orderBy?: HistoricoEstudoOrderByWithRelationInput | HistoricoEstudoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HistoricoEstudos.
+     */
+    cursor?: HistoricoEstudoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HistoricoEstudos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HistoricoEstudos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HistoricoEstudos.
+     */
+    distinct?: HistoricoEstudoScalarFieldEnum | HistoricoEstudoScalarFieldEnum[]
+  }
+
+  /**
+   * HistoricoEstudo findFirstOrThrow
+   */
+  export type HistoricoEstudoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter, which HistoricoEstudo to fetch.
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HistoricoEstudos to fetch.
+     */
+    orderBy?: HistoricoEstudoOrderByWithRelationInput | HistoricoEstudoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for HistoricoEstudos.
+     */
+    cursor?: HistoricoEstudoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HistoricoEstudos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HistoricoEstudos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of HistoricoEstudos.
+     */
+    distinct?: HistoricoEstudoScalarFieldEnum | HistoricoEstudoScalarFieldEnum[]
+  }
+
+  /**
+   * HistoricoEstudo findMany
+   */
+  export type HistoricoEstudoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter, which HistoricoEstudos to fetch.
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of HistoricoEstudos to fetch.
+     */
+    orderBy?: HistoricoEstudoOrderByWithRelationInput | HistoricoEstudoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing HistoricoEstudos.
+     */
+    cursor?: HistoricoEstudoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` HistoricoEstudos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` HistoricoEstudos.
+     */
+    skip?: number
+    distinct?: HistoricoEstudoScalarFieldEnum | HistoricoEstudoScalarFieldEnum[]
+  }
+
+  /**
+   * HistoricoEstudo create
+   */
+  export type HistoricoEstudoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * The data needed to create a HistoricoEstudo.
+     */
+    data: XOR<HistoricoEstudoCreateInput, HistoricoEstudoUncheckedCreateInput>
+  }
+
+  /**
+   * HistoricoEstudo createMany
+   */
+  export type HistoricoEstudoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many HistoricoEstudos.
+     */
+    data: HistoricoEstudoCreateManyInput | HistoricoEstudoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HistoricoEstudo createManyAndReturn
+   */
+  export type HistoricoEstudoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * The data used to create many HistoricoEstudos.
+     */
+    data: HistoricoEstudoCreateManyInput | HistoricoEstudoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * HistoricoEstudo update
+   */
+  export type HistoricoEstudoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * The data needed to update a HistoricoEstudo.
+     */
+    data: XOR<HistoricoEstudoUpdateInput, HistoricoEstudoUncheckedUpdateInput>
+    /**
+     * Choose, which HistoricoEstudo to update.
+     */
+    where: HistoricoEstudoWhereUniqueInput
+  }
+
+  /**
+   * HistoricoEstudo updateMany
+   */
+  export type HistoricoEstudoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update HistoricoEstudos.
+     */
+    data: XOR<HistoricoEstudoUpdateManyMutationInput, HistoricoEstudoUncheckedUpdateManyInput>
+    /**
+     * Filter which HistoricoEstudos to update
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * Limit how many HistoricoEstudos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HistoricoEstudo updateManyAndReturn
+   */
+  export type HistoricoEstudoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * The data used to update HistoricoEstudos.
+     */
+    data: XOR<HistoricoEstudoUpdateManyMutationInput, HistoricoEstudoUncheckedUpdateManyInput>
+    /**
+     * Filter which HistoricoEstudos to update
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * Limit how many HistoricoEstudos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * HistoricoEstudo upsert
+   */
+  export type HistoricoEstudoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * The filter to search for the HistoricoEstudo to update in case it exists.
+     */
+    where: HistoricoEstudoWhereUniqueInput
+    /**
+     * In case the HistoricoEstudo found by the `where` argument doesn't exist, create a new HistoricoEstudo with this data.
+     */
+    create: XOR<HistoricoEstudoCreateInput, HistoricoEstudoUncheckedCreateInput>
+    /**
+     * In case the HistoricoEstudo was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HistoricoEstudoUpdateInput, HistoricoEstudoUncheckedUpdateInput>
+  }
+
+  /**
+   * HistoricoEstudo delete
+   */
+  export type HistoricoEstudoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+    /**
+     * Filter which HistoricoEstudo to delete.
+     */
+    where: HistoricoEstudoWhereUniqueInput
+  }
+
+  /**
+   * HistoricoEstudo deleteMany
+   */
+  export type HistoricoEstudoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which HistoricoEstudos to delete
+     */
+    where?: HistoricoEstudoWhereInput
+    /**
+     * Limit how many HistoricoEstudos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * HistoricoEstudo without action
+   */
+  export type HistoricoEstudoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the HistoricoEstudo
+     */
+    select?: HistoricoEstudoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the HistoricoEstudo
+     */
+    omit?: HistoricoEstudoOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4697,6 +5873,21 @@ export namespace Prisma {
   };
 
   export type PlanoDeEstudosScalarFieldEnum = (typeof PlanoDeEstudosScalarFieldEnum)[keyof typeof PlanoDeEstudosScalarFieldEnum]
+
+
+  export const HistoricoEstudoScalarFieldEnum: {
+    id: 'id',
+    tituloDaMateria: 'tituloDaMateria',
+    disciplina: 'disciplina',
+    dataEstudo: 'dataEstudo',
+    tempoEstudado: 'tempoEstudado',
+    anotacoes: 'anotacoes',
+    progresso: 'progresso',
+    planoId: 'planoId',
+    criadoEm: 'criadoEm'
+  };
+
+  export type HistoricoEstudoScalarFieldEnum = (typeof HistoricoEstudoScalarFieldEnum)[keyof typeof HistoricoEstudoScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -5065,6 +6256,80 @@ export namespace Prisma {
     atualizadoEm?: DateTimeWithAggregatesFilter<"PlanoDeEstudos"> | Date | string
   }
 
+  export type HistoricoEstudoWhereInput = {
+    AND?: HistoricoEstudoWhereInput | HistoricoEstudoWhereInput[]
+    OR?: HistoricoEstudoWhereInput[]
+    NOT?: HistoricoEstudoWhereInput | HistoricoEstudoWhereInput[]
+    id?: StringFilter<"HistoricoEstudo"> | string
+    tituloDaMateria?: StringFilter<"HistoricoEstudo"> | string
+    disciplina?: EnumDisciplinaNomeFilter<"HistoricoEstudo"> | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFilter<"HistoricoEstudo"> | Date | string
+    tempoEstudado?: IntFilter<"HistoricoEstudo"> | number
+    anotacoes?: StringNullableFilter<"HistoricoEstudo"> | string | null
+    progresso?: IntFilter<"HistoricoEstudo"> | number
+    planoId?: StringNullableFilter<"HistoricoEstudo"> | string | null
+    criadoEm?: DateTimeFilter<"HistoricoEstudo"> | Date | string
+  }
+
+  export type HistoricoEstudoOrderByWithRelationInput = {
+    id?: SortOrder
+    tituloDaMateria?: SortOrder
+    disciplina?: SortOrder
+    dataEstudo?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrderInput | SortOrder
+    progresso?: SortOrder
+    planoId?: SortOrderInput | SortOrder
+    criadoEm?: SortOrder
+  }
+
+  export type HistoricoEstudoWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: HistoricoEstudoWhereInput | HistoricoEstudoWhereInput[]
+    OR?: HistoricoEstudoWhereInput[]
+    NOT?: HistoricoEstudoWhereInput | HistoricoEstudoWhereInput[]
+    tituloDaMateria?: StringFilter<"HistoricoEstudo"> | string
+    disciplina?: EnumDisciplinaNomeFilter<"HistoricoEstudo"> | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFilter<"HistoricoEstudo"> | Date | string
+    tempoEstudado?: IntFilter<"HistoricoEstudo"> | number
+    anotacoes?: StringNullableFilter<"HistoricoEstudo"> | string | null
+    progresso?: IntFilter<"HistoricoEstudo"> | number
+    planoId?: StringNullableFilter<"HistoricoEstudo"> | string | null
+    criadoEm?: DateTimeFilter<"HistoricoEstudo"> | Date | string
+  }, "id">
+
+  export type HistoricoEstudoOrderByWithAggregationInput = {
+    id?: SortOrder
+    tituloDaMateria?: SortOrder
+    disciplina?: SortOrder
+    dataEstudo?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrderInput | SortOrder
+    progresso?: SortOrder
+    planoId?: SortOrderInput | SortOrder
+    criadoEm?: SortOrder
+    _count?: HistoricoEstudoCountOrderByAggregateInput
+    _avg?: HistoricoEstudoAvgOrderByAggregateInput
+    _max?: HistoricoEstudoMaxOrderByAggregateInput
+    _min?: HistoricoEstudoMinOrderByAggregateInput
+    _sum?: HistoricoEstudoSumOrderByAggregateInput
+  }
+
+  export type HistoricoEstudoScalarWhereWithAggregatesInput = {
+    AND?: HistoricoEstudoScalarWhereWithAggregatesInput | HistoricoEstudoScalarWhereWithAggregatesInput[]
+    OR?: HistoricoEstudoScalarWhereWithAggregatesInput[]
+    NOT?: HistoricoEstudoScalarWhereWithAggregatesInput | HistoricoEstudoScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"HistoricoEstudo"> | string
+    tituloDaMateria?: StringWithAggregatesFilter<"HistoricoEstudo"> | string
+    disciplina?: EnumDisciplinaNomeWithAggregatesFilter<"HistoricoEstudo"> | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeWithAggregatesFilter<"HistoricoEstudo"> | Date | string
+    tempoEstudado?: IntWithAggregatesFilter<"HistoricoEstudo"> | number
+    anotacoes?: StringNullableWithAggregatesFilter<"HistoricoEstudo"> | string | null
+    progresso?: IntWithAggregatesFilter<"HistoricoEstudo"> | number
+    planoId?: StringNullableWithAggregatesFilter<"HistoricoEstudo"> | string | null
+    criadoEm?: DateTimeWithAggregatesFilter<"HistoricoEstudo"> | Date | string
+  }
+
   export type MateriaCreateInput = {
     id?: string
     titulo: string
@@ -5314,6 +6579,90 @@ export namespace Prisma {
     progressoGeral?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoEstudoCreateInput = {
+    id?: string
+    tituloDaMateria: string
+    disciplina: $Enums.DisciplinaNome
+    dataEstudo: Date | string
+    tempoEstudado: number
+    anotacoes?: string | null
+    progresso?: number
+    planoId?: string | null
+    criadoEm?: Date | string
+  }
+
+  export type HistoricoEstudoUncheckedCreateInput = {
+    id?: string
+    tituloDaMateria: string
+    disciplina: $Enums.DisciplinaNome
+    dataEstudo: Date | string
+    tempoEstudado: number
+    anotacoes?: string | null
+    progresso?: number
+    planoId?: string | null
+    criadoEm?: Date | string
+  }
+
+  export type HistoricoEstudoUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tituloDaMateria?: StringFieldUpdateOperationsInput | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFieldUpdateOperationsInput | Date | string
+    tempoEstudado?: IntFieldUpdateOperationsInput | number
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoEstudoUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tituloDaMateria?: StringFieldUpdateOperationsInput | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFieldUpdateOperationsInput | Date | string
+    tempoEstudado?: IntFieldUpdateOperationsInput | number
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoEstudoCreateManyInput = {
+    id?: string
+    tituloDaMateria: string
+    disciplina: $Enums.DisciplinaNome
+    dataEstudo: Date | string
+    tempoEstudado: number
+    anotacoes?: string | null
+    progresso?: number
+    planoId?: string | null
+    criadoEm?: Date | string
+  }
+
+  export type HistoricoEstudoUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tituloDaMateria?: StringFieldUpdateOperationsInput | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFieldUpdateOperationsInput | Date | string
+    tempoEstudado?: IntFieldUpdateOperationsInput | number
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoEstudoUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    tituloDaMateria?: StringFieldUpdateOperationsInput | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    dataEstudo?: DateTimeFieldUpdateOperationsInput | Date | string
+    tempoEstudado?: IntFieldUpdateOperationsInput | number
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -5704,6 +7053,52 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type HistoricoEstudoCountOrderByAggregateInput = {
+    id?: SortOrder
+    tituloDaMateria?: SortOrder
+    disciplina?: SortOrder
+    dataEstudo?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    progresso?: SortOrder
+    planoId?: SortOrder
+    criadoEm?: SortOrder
+  }
+
+  export type HistoricoEstudoAvgOrderByAggregateInput = {
+    tempoEstudado?: SortOrder
+    progresso?: SortOrder
+  }
+
+  export type HistoricoEstudoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    tituloDaMateria?: SortOrder
+    disciplina?: SortOrder
+    dataEstudo?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    progresso?: SortOrder
+    planoId?: SortOrder
+    criadoEm?: SortOrder
+  }
+
+  export type HistoricoEstudoMinOrderByAggregateInput = {
+    id?: SortOrder
+    tituloDaMateria?: SortOrder
+    disciplina?: SortOrder
+    dataEstudo?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    progresso?: SortOrder
+    planoId?: SortOrder
+    criadoEm?: SortOrder
+  }
+
+  export type HistoricoEstudoSumOrderByAggregateInput = {
+    tempoEstudado?: SortOrder
+    progresso?: SortOrder
   }
 
   export type DiaDisciplinaMateriaCreateNestedManyWithoutMateriaInput = {

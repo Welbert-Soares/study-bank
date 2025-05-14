@@ -60,12 +60,39 @@ export async function updateMateria(
 
 export async function deleteMateria(id: string) {
   try {
-    // Primeiro, deletar todos os agendamentos associados à matéria
+    // Primeiro, buscar a matéria e seus agendamentos para preservar o histórico
+    const materiaComAgendamentos = await db.materia.findUnique({
+      where: { id },
+      include: {
+        agendamentos: true,
+      },
+    })
+
+    if (!materiaComAgendamentos) {
+      throw new Error('Matéria não encontrada')
+    }
+
+    // Criar registros históricos para cada agendamento
+    if (materiaComAgendamentos.agendamentos.length > 0) {
+      await db.historicoEstudo.createMany({
+        data: materiaComAgendamentos.agendamentos.map((agendamento) => ({
+          tituloDaMateria: materiaComAgendamentos.titulo,
+          disciplina: materiaComAgendamentos.disciplina,
+          dataEstudo: agendamento.criadoEm,
+          tempoEstudado: agendamento.tempoEstudado || 0,
+          anotacoes: agendamento.anotacoes,
+          progresso: agendamento.progresso,
+          planoId: agendamento.planoId,
+        })),
+      })
+    }
+
+    // Depois, deletar todos os agendamentos
     await db.diaDisciplinaMateria.deleteMany({
       where: { materiaId: id },
     })
 
-    // Depois, deletar a matéria
+    // Por fim, deletar a matéria
     await db.materia.delete({
       where: { id },
     })
