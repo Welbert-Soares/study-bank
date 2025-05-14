@@ -47,7 +47,9 @@ export default function HistoricoPage() {
       try {
         setIsLoading(true)
         const data = await getHistoricoEstudos()
-        setHistorico(data)
+        if (data) {
+          setHistorico(data)
+        }
       } catch (error) {
         console.error('Erro ao carregar histórico:', error)
       } finally {
