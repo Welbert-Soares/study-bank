@@ -1,7 +1,12 @@
-// This is your Prisma schema file
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
-  output   = "./generated/client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -39,20 +44,39 @@ enum StatusConteudo {
 }
 
 model Materia {
-  id         String         @id @default(cuid())
-  titulo     String
-  status     StatusConteudo @default(pendente)
-  ordem      Int
-  disciplina DisciplinaNome
+  id           String         @id @default(cuid())
+  titulo       String
+  descricao    String?
+  status       StatusConteudo @default(pendente)
+  ordem        Int
+  disciplina   DisciplinaNome
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
 
-  diasDisciplina DiaDisciplinaMateria[]
+  // Relações
+  agendamentos DiaDisciplinaMateria[]
 }
 
 model DiaDisciplinaMateria {
-  id         String         @id @default(cuid())
-  dia        DiaDaSemana
-  disciplina DisciplinaNome
-  materiaId  String
-  materia    Materia      @relation(fields: [materiaId], references: [id])
-  status     StatusConteudo @default(pendente)
+  id            String         @id @default(cuid())
+  dia           DiaDaSemana
+  materiaId     String
+  materia       Materia        @relation(fields: [materiaId], references: [id])
+  status        StatusConteudo @default(pendente)
+  tempoEstudado Int? // Em minutos
+  anotacoes     String?
+  criadoEm      DateTime       @default(now())
+  atualizadoEm  DateTime       @updatedAt
+
+  @@index([materiaId])
+}
+
+model PlanoDeEstudos {
+  id           String    @id @default(cuid())
+  titulo       String
+  dataInicio   DateTime
+  dataFim      DateTime?
+  ativo        Boolean   @default(true)
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
 }

@@ -19,101 +19,10 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-import { useCallback, useEffect, useState } from 'react'
-import {
-  getDisciplinas,
-  createDisciplina,
-  createConteudo,
-  updateConteudo,
-  createHorarioEstudo,
-} from '../actions/disciplinas'
+
 import Link from 'next/link'
 
-type Disciplina = {
-  id: string
-  nome: string
-  cor: string
-  conteudos: Array<{
-    id: string
-    titulo: string
-    descricao: string | null
-    ordem: number
-    completo: boolean
-  }>
-}
-
 export default function ConfigPage() {
-  const [disciplinas, setDisciplinas] = useState<Disciplina[]>([])
-  const [loading, setLoading] = useState(true)
-  const [novaDisciplina, setNovaDisciplina] = useState({ nome: '', cor: '' })
-  const [novoConteudo, setNovoConteudo] = useState({
-    disciplinaId: '',
-    titulo: '',
-    descricao: '',
-  })
-  const [novoHorario, setNovoHorario] = useState({
-    disciplinaId: '',
-    diaSemana: 1,
-    inicio: '08:00',
-    fim: '10:00',
-  })
-
-  const loadDisciplinas = useCallback(async () => {
-    setLoading(true)
-    try {
-      const data = await getDisciplinas()
-      setDisciplinas(data)
-    } catch (error) {
-      console.error('Erro ao carregar disciplinas:', error)
-    }
-    setLoading(false)
-  }, [])
-
-  useEffect(() => {
-    loadDisciplinas()
-  }, [loadDisciplinas])
-
-  const handleAddDisciplina = async () => {
-    try {
-      await createDisciplina(novaDisciplina)
-      setNovaDisciplina({ nome: '', cor: '' })
-      await loadDisciplinas()
-    } catch (error) {
-      console.error('Erro ao criar disciplina:', error)
-    }
-  }
-
-  const handleAddConteudo = async () => {
-    try {
-      const ordem =
-        disciplinas.find((d) => d.id === novoConteudo.disciplinaId)?.conteudos
-          .length || 0
-      await createConteudo({
-        ...novoConteudo,
-        ordem,
-      })
-      setNovoConteudo({ disciplinaId: '', titulo: '', descricao: '' })
-      await loadDisciplinas()
-    } catch (error) {
-      console.error('Erro ao criar conteúdo:', error)
-    }
-  }
-
-  const handleAddHorario = async () => {
-    try {
-      await createHorarioEstudo(novoHorario)
-      setNovoHorario({
-        disciplinaId: '',
-        diaSemana: 1,
-        inicio: '08:00',
-        fim: '10:00',
-      })
-      await loadDisciplinas()
-    } catch (error) {
-      console.error('Erro ao criar horário:', error)
-    }
-  }
-
   const diasSemana = [
     'Domingo',
     'Segunda',
@@ -123,14 +32,6 @@ export default function ConfigPage() {
     'Sexta',
     'Sábado',
   ]
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
 
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">

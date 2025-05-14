@@ -12,51 +12,6 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 
 export default function Home() {
-  const studyPlan = [
-    {
-      day: 'Segunda',
-      discipline1: 'Tecnologia da Informação',
-      discipline2: 'Língua Inglesa',
-      writing: 'Estudo de temas e estrutura',
-    },
-    {
-      day: 'Terça',
-      discipline1: 'Língua Portuguesa',
-      discipline2: 'Probabilidade e Estatística',
-      writing: 'Escrever uma redação',
-    },
-    {
-      day: 'Quarta',
-      discipline1: 'Tecnologia da Informação',
-      discipline2: 'Atualidades do Mercado',
-      writing: 'Correção/redação anterior',
-    },
-    {
-      day: 'Quinta',
-      discipline1: 'Conhecimentos Bancários',
-      discipline2: 'Matemática',
-      writing: 'Estudo de temas e estrutura',
-    },
-    {
-      day: 'Sexta',
-      discipline1: 'Tecnologia da Informação',
-      discipline2: 'Língua Portuguesa',
-      writing: 'Escrever uma redação',
-    },
-    {
-      day: 'Sábado',
-      discipline1: 'Revisão (todas as disciplinas)',
-      discipline2: 'Simulado parcial',
-      writing: 'Correção/redação anterior',
-    },
-    {
-      day: 'Domingo',
-      discipline1: 'Descanso ou revisão leve',
-      discipline2: '-',
-      writing: '-',
-    },
-  ]
-
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">

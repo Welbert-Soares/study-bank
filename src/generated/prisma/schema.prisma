@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum DisciplinaNome {
+  TI
+  Ingles
+  Portugues
+  Estatistica
+  Atualidades
+  Bancarios
+  Matematica
+  Simulado
+  Revisoes
+  Redacao
+}
+
+enum DiaDaSemana {
+  Domingo
+  Segunda
+  Terca
+  Quarta
+  Quinta
+  Sexta
+  Sabado
+}
+
+enum StatusConteudo {
+  pendente
+  em_progresso
+  concluido
+}
+
+model Materia {
+  id           String         @id @default(cuid())
+  titulo       String
+  descricao    String?
+  status       StatusConteudo @default(pendente)
+  ordem        Int
+  disciplina   DisciplinaNome
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+
+  // Relações
+  agendamentos DiaDisciplinaMateria[]
+}
+
+model DiaDisciplinaMateria {
+  id            String         @id @default(cuid())
+  dia           DiaDaSemana
+  materiaId     String
+  materia       Materia        @relation(fields: [materiaId], references: [id])
+  status        StatusConteudo @default(pendente)
+  tempoEstudado Int? // Em minutos
+  anotacoes     String?
+  criadoEm      DateTime       @default(now())
+  atualizadoEm  DateTime       @updatedAt
+
+  @@index([materiaId])
+}
+
+model PlanoDeEstudos {
+  id           String    @id @default(cuid())
+  titulo       String
+  dataInicio   DateTime
+  dataFim      DateTime?
+  ativo        Boolean   @default(true)
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+}

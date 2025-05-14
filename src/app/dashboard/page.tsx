@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,119 +15,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  getDashboardByDate,
-  createDashboard,
-  updateAtividadeStatus,
-  updateObjetivo,
-  updateMetricaDisciplina,
-} from '../actions/dashboard'
-import { DashboardData } from '@/types/dashboard'
-import { AtividadeStatus } from '../../../prisma/generated/client'
-import { useCallback, useEffect, useState, useMemo } from 'react'
-import Link from 'next/link'
 
 export default function DashboardPage() {
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  const hoje = useMemo(() => new Date(), [])
-
-  const dataFormatada = hoje.toLocaleDateString('pt-BR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-
-  const loadDashboard = useCallback(async () => {
-    setLoading(true)
-    try {
-      let data = await getDashboardByDate(hoje)
-
-      if (!data) {
-        data = await createDashboard({
-          date: hoje,
-          objetivos: [
-            { descricao: 'Completar exercícios de Estruturas de Dados' },
-            { descricao: 'Revisar conteúdo de Língua Inglesa' },
-            { descricao: 'Praticar questões de concursos anteriores' },
-          ],
-          cronograma: [
-            { horario: '08:00 - 10:00', atividade: 'Estruturas de Dados' },
-            { horario: '10:15 - 12:00', atividade: 'Língua Inglesa' },
-            { horario: '14:00 - 16:00', atividade: 'Exercícios Práticos' },
-            { horario: '16:15 - 18:00', atividade: 'Revisão e Resumos' },
-          ],
-          metricas: [
-            {
-              nome: 'Tecnologia da Informação',
-              progresso: 0,
-              cor: 'bg-blue-500',
-            },
-            { nome: 'Língua Inglesa', progresso: 0, cor: 'bg-green-500' },
-            { nome: 'Matemática', progresso: 0, cor: 'bg-purple-500' },
-          ],
-          proximosConteudos: [
-            'Árvores Binárias de Busca',
-            'Phrasal Verbs mais comuns',
-            'Análise Combinatória',
-          ],
-        })
-      }
-
-      setDashboard(data)
-    } catch (error) {
-      console.error('Erro ao carregar dashboard:', error)
-    }
-    setLoading(false)
-  }, [hoje])
-
-  useEffect(() => {
-    loadDashboard()
-  }, [loadDashboard])
-
-  const handleAtividadeStatusChange = async (
-    id: string,
-    newStatus: 'completed' | 'in_progress' | 'pending',
-  ) => {
-    try {
-      await updateAtividadeStatus(id, newStatus as AtividadeStatus)
-      await loadDashboard()
-    } catch (error) {
-      console.error('Erro ao atualizar status:', error)
-    }
-  }
-
-  const handleObjetivoStatusChange = async (id: string, completo: boolean) => {
-    try {
-      await updateObjetivo(id, completo)
-      await loadDashboard()
-    } catch (error) {
-      console.error('Erro ao atualizar objetivo:', error)
-    }
-  }
-
-  const handleMetricaProgressoChange = async (
-    id: string,
-    progresso: number,
-  ) => {
-    try {
-      await updateMetricaDisciplina(id, progresso)
-      await loadDashboard()
-    } catch (error) {
-      console.error('Erro ao atualizar progresso:', error)
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-      </div>
-    )
-  }
-
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
