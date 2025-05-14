@@ -1133,6 +1133,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type PlanoDeEstudosCountOutputType
+   */
+
+  export type PlanoDeEstudosCountOutputType = {
+    registros: number
+  }
+
+  export type PlanoDeEstudosCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    registros?: boolean | PlanoDeEstudosCountOutputTypeCountRegistrosArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PlanoDeEstudosCountOutputType without action
+   */
+  export type PlanoDeEstudosCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanoDeEstudosCountOutputType
+     */
+    select?: PlanoDeEstudosCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PlanoDeEstudosCountOutputType without action
+   */
+  export type PlanoDeEstudosCountOutputTypeCountRegistrosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DiaDisciplinaMateriaWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -2293,19 +2324,23 @@ export namespace Prisma {
 
   export type DiaDisciplinaMateriaAvgAggregateOutputType = {
     tempoEstudado: number | null
+    progresso: number | null
   }
 
   export type DiaDisciplinaMateriaSumAggregateOutputType = {
     tempoEstudado: number | null
+    progresso: number | null
   }
 
   export type DiaDisciplinaMateriaMinAggregateOutputType = {
     id: string | null
     dia: $Enums.DiaDaSemana | null
     materiaId: string | null
+    planoId: string | null
     status: $Enums.StatusConteudo | null
     tempoEstudado: number | null
     anotacoes: string | null
+    progresso: number | null
     criadoEm: Date | null
     atualizadoEm: Date | null
   }
@@ -2314,9 +2349,11 @@ export namespace Prisma {
     id: string | null
     dia: $Enums.DiaDaSemana | null
     materiaId: string | null
+    planoId: string | null
     status: $Enums.StatusConteudo | null
     tempoEstudado: number | null
     anotacoes: string | null
+    progresso: number | null
     criadoEm: Date | null
     atualizadoEm: Date | null
   }
@@ -2325,9 +2362,11 @@ export namespace Prisma {
     id: number
     dia: number
     materiaId: number
+    planoId: number
     status: number
     tempoEstudado: number
     anotacoes: number
+    progresso: number
     criadoEm: number
     atualizadoEm: number
     _all: number
@@ -2336,19 +2375,23 @@ export namespace Prisma {
 
   export type DiaDisciplinaMateriaAvgAggregateInputType = {
     tempoEstudado?: true
+    progresso?: true
   }
 
   export type DiaDisciplinaMateriaSumAggregateInputType = {
     tempoEstudado?: true
+    progresso?: true
   }
 
   export type DiaDisciplinaMateriaMinAggregateInputType = {
     id?: true
     dia?: true
     materiaId?: true
+    planoId?: true
     status?: true
     tempoEstudado?: true
     anotacoes?: true
+    progresso?: true
     criadoEm?: true
     atualizadoEm?: true
   }
@@ -2357,9 +2400,11 @@ export namespace Prisma {
     id?: true
     dia?: true
     materiaId?: true
+    planoId?: true
     status?: true
     tempoEstudado?: true
     anotacoes?: true
+    progresso?: true
     criadoEm?: true
     atualizadoEm?: true
   }
@@ -2368,9 +2413,11 @@ export namespace Prisma {
     id?: true
     dia?: true
     materiaId?: true
+    planoId?: true
     status?: true
     tempoEstudado?: true
     anotacoes?: true
+    progresso?: true
     criadoEm?: true
     atualizadoEm?: true
     _all?: true
@@ -2466,9 +2513,11 @@ export namespace Prisma {
     id: string
     dia: $Enums.DiaDaSemana
     materiaId: string
+    planoId: string | null
     status: $Enums.StatusConteudo
     tempoEstudado: number | null
     anotacoes: string | null
+    progresso: number
     criadoEm: Date
     atualizadoEm: Date
     _count: DiaDisciplinaMateriaCountAggregateOutputType | null
@@ -2496,72 +2545,89 @@ export namespace Prisma {
     id?: boolean
     dia?: boolean
     materiaId?: boolean
+    planoId?: boolean
     status?: boolean
     tempoEstudado?: boolean
     anotacoes?: boolean
+    progresso?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }, ExtArgs["result"]["diaDisciplinaMateria"]>
 
   export type DiaDisciplinaMateriaSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     dia?: boolean
     materiaId?: boolean
+    planoId?: boolean
     status?: boolean
     tempoEstudado?: boolean
     anotacoes?: boolean
+    progresso?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }, ExtArgs["result"]["diaDisciplinaMateria"]>
 
   export type DiaDisciplinaMateriaSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     dia?: boolean
     materiaId?: boolean
+    planoId?: boolean
     status?: boolean
     tempoEstudado?: boolean
     anotacoes?: boolean
+    progresso?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }, ExtArgs["result"]["diaDisciplinaMateria"]>
 
   export type DiaDisciplinaMateriaSelectScalar = {
     id?: boolean
     dia?: boolean
     materiaId?: boolean
+    planoId?: boolean
     status?: boolean
     tempoEstudado?: boolean
     anotacoes?: boolean
+    progresso?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
   }
 
-  export type DiaDisciplinaMateriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dia" | "materiaId" | "status" | "tempoEstudado" | "anotacoes" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["diaDisciplinaMateria"]>
+  export type DiaDisciplinaMateriaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "dia" | "materiaId" | "planoId" | "status" | "tempoEstudado" | "anotacoes" | "progresso" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["diaDisciplinaMateria"]>
   export type DiaDisciplinaMateriaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }
   export type DiaDisciplinaMateriaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }
   export type DiaDisciplinaMateriaIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     materia?: boolean | MateriaDefaultArgs<ExtArgs>
+    plano?: boolean | DiaDisciplinaMateria$planoArgs<ExtArgs>
   }
 
   export type $DiaDisciplinaMateriaPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "DiaDisciplinaMateria"
     objects: {
       materia: Prisma.$MateriaPayload<ExtArgs>
+      plano: Prisma.$PlanoDeEstudosPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       dia: $Enums.DiaDaSemana
       materiaId: string
+      planoId: string | null
       status: $Enums.StatusConteudo
       tempoEstudado: number | null
       anotacoes: string | null
+      progresso: number
       criadoEm: Date
       atualizadoEm: Date
     }, ExtArgs["result"]["diaDisciplinaMateria"]>
@@ -2959,6 +3025,7 @@ export namespace Prisma {
   export interface Prisma__DiaDisciplinaMateriaClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     materia<T extends MateriaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MateriaDefaultArgs<ExtArgs>>): Prisma__MateriaClient<$Result.GetResult<Prisma.$MateriaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    plano<T extends DiaDisciplinaMateria$planoArgs<ExtArgs> = {}>(args?: Subset<T, DiaDisciplinaMateria$planoArgs<ExtArgs>>): Prisma__PlanoDeEstudosClient<$Result.GetResult<Prisma.$PlanoDeEstudosPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2991,9 +3058,11 @@ export namespace Prisma {
     readonly id: FieldRef<"DiaDisciplinaMateria", 'String'>
     readonly dia: FieldRef<"DiaDisciplinaMateria", 'DiaDaSemana'>
     readonly materiaId: FieldRef<"DiaDisciplinaMateria", 'String'>
+    readonly planoId: FieldRef<"DiaDisciplinaMateria", 'String'>
     readonly status: FieldRef<"DiaDisciplinaMateria", 'StatusConteudo'>
     readonly tempoEstudado: FieldRef<"DiaDisciplinaMateria", 'Int'>
     readonly anotacoes: FieldRef<"DiaDisciplinaMateria", 'String'>
+    readonly progresso: FieldRef<"DiaDisciplinaMateria", 'Int'>
     readonly criadoEm: FieldRef<"DiaDisciplinaMateria", 'DateTime'>
     readonly atualizadoEm: FieldRef<"DiaDisciplinaMateria", 'DateTime'>
   }
@@ -3392,6 +3461,25 @@ export namespace Prisma {
   }
 
   /**
+   * DiaDisciplinaMateria.plano
+   */
+  export type DiaDisciplinaMateria$planoArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlanoDeEstudos
+     */
+    select?: PlanoDeEstudosSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlanoDeEstudos
+     */
+    omit?: PlanoDeEstudosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    where?: PlanoDeEstudosWhereInput
+  }
+
+  /**
    * DiaDisciplinaMateria without action
    */
   export type DiaDisciplinaMateriaDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3416,8 +3504,18 @@ export namespace Prisma {
 
   export type AggregatePlanoDeEstudos = {
     _count: PlanoDeEstudosCountAggregateOutputType | null
+    _avg: PlanoDeEstudosAvgAggregateOutputType | null
+    _sum: PlanoDeEstudosSumAggregateOutputType | null
     _min: PlanoDeEstudosMinAggregateOutputType | null
     _max: PlanoDeEstudosMaxAggregateOutputType | null
+  }
+
+  export type PlanoDeEstudosAvgAggregateOutputType = {
+    progressoGeral: number | null
+  }
+
+  export type PlanoDeEstudosSumAggregateOutputType = {
+    progressoGeral: number | null
   }
 
   export type PlanoDeEstudosMinAggregateOutputType = {
@@ -3426,6 +3524,7 @@ export namespace Prisma {
     dataInicio: Date | null
     dataFim: Date | null
     ativo: boolean | null
+    progressoGeral: number | null
     criadoEm: Date | null
     atualizadoEm: Date | null
   }
@@ -3436,6 +3535,7 @@ export namespace Prisma {
     dataInicio: Date | null
     dataFim: Date | null
     ativo: boolean | null
+    progressoGeral: number | null
     criadoEm: Date | null
     atualizadoEm: Date | null
   }
@@ -3446,11 +3546,20 @@ export namespace Prisma {
     dataInicio: number
     dataFim: number
     ativo: number
+    progressoGeral: number
     criadoEm: number
     atualizadoEm: number
     _all: number
   }
 
+
+  export type PlanoDeEstudosAvgAggregateInputType = {
+    progressoGeral?: true
+  }
+
+  export type PlanoDeEstudosSumAggregateInputType = {
+    progressoGeral?: true
+  }
 
   export type PlanoDeEstudosMinAggregateInputType = {
     id?: true
@@ -3458,6 +3567,7 @@ export namespace Prisma {
     dataInicio?: true
     dataFim?: true
     ativo?: true
+    progressoGeral?: true
     criadoEm?: true
     atualizadoEm?: true
   }
@@ -3468,6 +3578,7 @@ export namespace Prisma {
     dataInicio?: true
     dataFim?: true
     ativo?: true
+    progressoGeral?: true
     criadoEm?: true
     atualizadoEm?: true
   }
@@ -3478,6 +3589,7 @@ export namespace Prisma {
     dataInicio?: true
     dataFim?: true
     ativo?: true
+    progressoGeral?: true
     criadoEm?: true
     atualizadoEm?: true
     _all?: true
@@ -3521,6 +3633,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: PlanoDeEstudosAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlanoDeEstudosSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: PlanoDeEstudosMinAggregateInputType
@@ -3551,6 +3675,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: PlanoDeEstudosCountAggregateInputType | true
+    _avg?: PlanoDeEstudosAvgAggregateInputType
+    _sum?: PlanoDeEstudosSumAggregateInputType
     _min?: PlanoDeEstudosMinAggregateInputType
     _max?: PlanoDeEstudosMaxAggregateInputType
   }
@@ -3561,9 +3687,12 @@ export namespace Prisma {
     dataInicio: Date
     dataFim: Date | null
     ativo: boolean
+    progressoGeral: number
     criadoEm: Date
     atualizadoEm: Date
     _count: PlanoDeEstudosCountAggregateOutputType | null
+    _avg: PlanoDeEstudosAvgAggregateOutputType | null
+    _sum: PlanoDeEstudosSumAggregateOutputType | null
     _min: PlanoDeEstudosMinAggregateOutputType | null
     _max: PlanoDeEstudosMaxAggregateOutputType | null
   }
@@ -3588,8 +3717,11 @@ export namespace Prisma {
     dataInicio?: boolean
     dataFim?: boolean
     ativo?: boolean
+    progressoGeral?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
+    registros?: boolean | PlanoDeEstudos$registrosArgs<ExtArgs>
+    _count?: boolean | PlanoDeEstudosCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["planoDeEstudos"]>
 
   export type PlanoDeEstudosSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -3598,6 +3730,7 @@ export namespace Prisma {
     dataInicio?: boolean
     dataFim?: boolean
     ativo?: boolean
+    progressoGeral?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
   }, ExtArgs["result"]["planoDeEstudos"]>
@@ -3608,6 +3741,7 @@ export namespace Prisma {
     dataInicio?: boolean
     dataFim?: boolean
     ativo?: boolean
+    progressoGeral?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
   }, ExtArgs["result"]["planoDeEstudos"]>
@@ -3618,21 +3752,31 @@ export namespace Prisma {
     dataInicio?: boolean
     dataFim?: boolean
     ativo?: boolean
+    progressoGeral?: boolean
     criadoEm?: boolean
     atualizadoEm?: boolean
   }
 
-  export type PlanoDeEstudosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "titulo" | "dataInicio" | "dataFim" | "ativo" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["planoDeEstudos"]>
+  export type PlanoDeEstudosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "titulo" | "dataInicio" | "dataFim" | "ativo" | "progressoGeral" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["planoDeEstudos"]>
+  export type PlanoDeEstudosInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    registros?: boolean | PlanoDeEstudos$registrosArgs<ExtArgs>
+    _count?: boolean | PlanoDeEstudosCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PlanoDeEstudosIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type PlanoDeEstudosIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $PlanoDeEstudosPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PlanoDeEstudos"
-    objects: {}
+    objects: {
+      registros: Prisma.$DiaDisciplinaMateriaPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       titulo: string
       dataInicio: Date
       dataFim: Date | null
       ativo: boolean
+      progressoGeral: number
       criadoEm: Date
       atualizadoEm: Date
     }, ExtArgs["result"]["planoDeEstudos"]>
@@ -4029,6 +4173,7 @@ export namespace Prisma {
    */
   export interface Prisma__PlanoDeEstudosClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    registros<T extends PlanoDeEstudos$registrosArgs<ExtArgs> = {}>(args?: Subset<T, PlanoDeEstudos$registrosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DiaDisciplinaMateriaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4063,6 +4208,7 @@ export namespace Prisma {
     readonly dataInicio: FieldRef<"PlanoDeEstudos", 'DateTime'>
     readonly dataFim: FieldRef<"PlanoDeEstudos", 'DateTime'>
     readonly ativo: FieldRef<"PlanoDeEstudos", 'Boolean'>
+    readonly progressoGeral: FieldRef<"PlanoDeEstudos", 'Int'>
     readonly criadoEm: FieldRef<"PlanoDeEstudos", 'DateTime'>
     readonly atualizadoEm: FieldRef<"PlanoDeEstudos", 'DateTime'>
   }
@@ -4082,6 +4228,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * Filter, which PlanoDeEstudos to fetch.
      */
     where: PlanoDeEstudosWhereUniqueInput
@@ -4100,6 +4250,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * Filter, which PlanoDeEstudos to fetch.
      */
     where: PlanoDeEstudosWhereUniqueInput
@@ -4117,6 +4271,10 @@ export namespace Prisma {
      * Omit specific fields from the PlanoDeEstudos
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
     /**
      * Filter, which PlanoDeEstudos to fetch.
      */
@@ -4166,6 +4324,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * Filter, which PlanoDeEstudos to fetch.
      */
     where?: PlanoDeEstudosWhereInput
@@ -4214,6 +4376,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * Filter, which PlanoDeEstudos to fetch.
      */
     where?: PlanoDeEstudosWhereInput
@@ -4256,6 +4422,10 @@ export namespace Prisma {
      * Omit specific fields from the PlanoDeEstudos
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
     /**
      * The data needed to create a PlanoDeEstudos.
      */
@@ -4304,6 +4474,10 @@ export namespace Prisma {
      * Omit specific fields from the PlanoDeEstudos
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
     /**
      * The data needed to update a PlanoDeEstudos.
      */
@@ -4371,6 +4545,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * The filter to search for the PlanoDeEstudos to update in case it exists.
      */
     where: PlanoDeEstudosWhereUniqueInput
@@ -4397,6 +4575,10 @@ export namespace Prisma {
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
+    /**
      * Filter which PlanoDeEstudos to delete.
      */
     where: PlanoDeEstudosWhereUniqueInput
@@ -4417,6 +4599,30 @@ export namespace Prisma {
   }
 
   /**
+   * PlanoDeEstudos.registros
+   */
+  export type PlanoDeEstudos$registrosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DiaDisciplinaMateria
+     */
+    select?: DiaDisciplinaMateriaSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DiaDisciplinaMateria
+     */
+    omit?: DiaDisciplinaMateriaOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DiaDisciplinaMateriaInclude<ExtArgs> | null
+    where?: DiaDisciplinaMateriaWhereInput
+    orderBy?: DiaDisciplinaMateriaOrderByWithRelationInput | DiaDisciplinaMateriaOrderByWithRelationInput[]
+    cursor?: DiaDisciplinaMateriaWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DiaDisciplinaMateriaScalarFieldEnum | DiaDisciplinaMateriaScalarFieldEnum[]
+  }
+
+  /**
    * PlanoDeEstudos without action
    */
   export type PlanoDeEstudosDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4428,6 +4634,10 @@ export namespace Prisma {
      * Omit specific fields from the PlanoDeEstudos
      */
     omit?: PlanoDeEstudosOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlanoDeEstudosInclude<ExtArgs> | null
   }
 
 
@@ -4463,9 +4673,11 @@ export namespace Prisma {
     id: 'id',
     dia: 'dia',
     materiaId: 'materiaId',
+    planoId: 'planoId',
     status: 'status',
     tempoEstudado: 'tempoEstudado',
     anotacoes: 'anotacoes',
+    progresso: 'progresso',
     criadoEm: 'criadoEm',
     atualizadoEm: 'atualizadoEm'
   };
@@ -4479,6 +4691,7 @@ export namespace Prisma {
     dataInicio: 'dataInicio',
     dataFim: 'dataFim',
     ativo: 'ativo',
+    progressoGeral: 'progressoGeral',
     criadoEm: 'criadoEm',
     atualizadoEm: 'atualizadoEm'
   };
@@ -4702,24 +4915,30 @@ export namespace Prisma {
     id?: StringFilter<"DiaDisciplinaMateria"> | string
     dia?: EnumDiaDaSemanaFilter<"DiaDisciplinaMateria"> | $Enums.DiaDaSemana
     materiaId?: StringFilter<"DiaDisciplinaMateria"> | string
+    planoId?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
     status?: EnumStatusConteudoFilter<"DiaDisciplinaMateria"> | $Enums.StatusConteudo
     tempoEstudado?: IntNullableFilter<"DiaDisciplinaMateria"> | number | null
     anotacoes?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
+    progresso?: IntFilter<"DiaDisciplinaMateria"> | number
     criadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
     atualizadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
     materia?: XOR<MateriaScalarRelationFilter, MateriaWhereInput>
+    plano?: XOR<PlanoDeEstudosNullableScalarRelationFilter, PlanoDeEstudosWhereInput> | null
   }
 
   export type DiaDisciplinaMateriaOrderByWithRelationInput = {
     id?: SortOrder
     dia?: SortOrder
     materiaId?: SortOrder
+    planoId?: SortOrderInput | SortOrder
     status?: SortOrder
     tempoEstudado?: SortOrderInput | SortOrder
     anotacoes?: SortOrderInput | SortOrder
+    progresso?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
     materia?: MateriaOrderByWithRelationInput
+    plano?: PlanoDeEstudosOrderByWithRelationInput
   }
 
   export type DiaDisciplinaMateriaWhereUniqueInput = Prisma.AtLeast<{
@@ -4729,21 +4948,26 @@ export namespace Prisma {
     NOT?: DiaDisciplinaMateriaWhereInput | DiaDisciplinaMateriaWhereInput[]
     dia?: EnumDiaDaSemanaFilter<"DiaDisciplinaMateria"> | $Enums.DiaDaSemana
     materiaId?: StringFilter<"DiaDisciplinaMateria"> | string
+    planoId?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
     status?: EnumStatusConteudoFilter<"DiaDisciplinaMateria"> | $Enums.StatusConteudo
     tempoEstudado?: IntNullableFilter<"DiaDisciplinaMateria"> | number | null
     anotacoes?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
+    progresso?: IntFilter<"DiaDisciplinaMateria"> | number
     criadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
     atualizadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
     materia?: XOR<MateriaScalarRelationFilter, MateriaWhereInput>
+    plano?: XOR<PlanoDeEstudosNullableScalarRelationFilter, PlanoDeEstudosWhereInput> | null
   }, "id">
 
   export type DiaDisciplinaMateriaOrderByWithAggregationInput = {
     id?: SortOrder
     dia?: SortOrder
     materiaId?: SortOrder
+    planoId?: SortOrderInput | SortOrder
     status?: SortOrder
     tempoEstudado?: SortOrderInput | SortOrder
     anotacoes?: SortOrderInput | SortOrder
+    progresso?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
     _count?: DiaDisciplinaMateriaCountOrderByAggregateInput
@@ -4760,9 +4984,11 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"DiaDisciplinaMateria"> | string
     dia?: EnumDiaDaSemanaWithAggregatesFilter<"DiaDisciplinaMateria"> | $Enums.DiaDaSemana
     materiaId?: StringWithAggregatesFilter<"DiaDisciplinaMateria"> | string
+    planoId?: StringNullableWithAggregatesFilter<"DiaDisciplinaMateria"> | string | null
     status?: EnumStatusConteudoWithAggregatesFilter<"DiaDisciplinaMateria"> | $Enums.StatusConteudo
     tempoEstudado?: IntNullableWithAggregatesFilter<"DiaDisciplinaMateria"> | number | null
     anotacoes?: StringNullableWithAggregatesFilter<"DiaDisciplinaMateria"> | string | null
+    progresso?: IntWithAggregatesFilter<"DiaDisciplinaMateria"> | number
     criadoEm?: DateTimeWithAggregatesFilter<"DiaDisciplinaMateria"> | Date | string
     atualizadoEm?: DateTimeWithAggregatesFilter<"DiaDisciplinaMateria"> | Date | string
   }
@@ -4776,8 +5002,10 @@ export namespace Prisma {
     dataInicio?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
     dataFim?: DateTimeNullableFilter<"PlanoDeEstudos"> | Date | string | null
     ativo?: BoolFilter<"PlanoDeEstudos"> | boolean
+    progressoGeral?: IntFilter<"PlanoDeEstudos"> | number
     criadoEm?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
     atualizadoEm?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
+    registros?: DiaDisciplinaMateriaListRelationFilter
   }
 
   export type PlanoDeEstudosOrderByWithRelationInput = {
@@ -4786,8 +5014,10 @@ export namespace Prisma {
     dataInicio?: SortOrder
     dataFim?: SortOrderInput | SortOrder
     ativo?: SortOrder
+    progressoGeral?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
+    registros?: DiaDisciplinaMateriaOrderByRelationAggregateInput
   }
 
   export type PlanoDeEstudosWhereUniqueInput = Prisma.AtLeast<{
@@ -4799,8 +5029,10 @@ export namespace Prisma {
     dataInicio?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
     dataFim?: DateTimeNullableFilter<"PlanoDeEstudos"> | Date | string | null
     ativo?: BoolFilter<"PlanoDeEstudos"> | boolean
+    progressoGeral?: IntFilter<"PlanoDeEstudos"> | number
     criadoEm?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
     atualizadoEm?: DateTimeFilter<"PlanoDeEstudos"> | Date | string
+    registros?: DiaDisciplinaMateriaListRelationFilter
   }, "id">
 
   export type PlanoDeEstudosOrderByWithAggregationInput = {
@@ -4809,11 +5041,14 @@ export namespace Prisma {
     dataInicio?: SortOrder
     dataFim?: SortOrderInput | SortOrder
     ativo?: SortOrder
+    progressoGeral?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
     _count?: PlanoDeEstudosCountOrderByAggregateInput
+    _avg?: PlanoDeEstudosAvgOrderByAggregateInput
     _max?: PlanoDeEstudosMaxOrderByAggregateInput
     _min?: PlanoDeEstudosMinOrderByAggregateInput
+    _sum?: PlanoDeEstudosSumOrderByAggregateInput
   }
 
   export type PlanoDeEstudosScalarWhereWithAggregatesInput = {
@@ -4825,6 +5060,7 @@ export namespace Prisma {
     dataInicio?: DateTimeWithAggregatesFilter<"PlanoDeEstudos"> | Date | string
     dataFim?: DateTimeNullableWithAggregatesFilter<"PlanoDeEstudos"> | Date | string | null
     ativo?: BoolWithAggregatesFilter<"PlanoDeEstudos"> | boolean
+    progressoGeral?: IntWithAggregatesFilter<"PlanoDeEstudos"> | number
     criadoEm?: DateTimeWithAggregatesFilter<"PlanoDeEstudos"> | Date | string
     atualizadoEm?: DateTimeWithAggregatesFilter<"PlanoDeEstudos"> | Date | string
   }
@@ -4916,18 +5152,22 @@ export namespace Prisma {
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
     materia: MateriaCreateNestedOneWithoutAgendamentosInput
+    plano?: PlanoDeEstudosCreateNestedOneWithoutRegistrosInput
   }
 
   export type DiaDisciplinaMateriaUncheckedCreateInput = {
     id?: string
     dia: $Enums.DiaDaSemana
     materiaId: string
+    planoId?: string | null
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
   }
@@ -4938,18 +5178,22 @@ export namespace Prisma {
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     materia?: MateriaUpdateOneRequiredWithoutAgendamentosNestedInput
+    plano?: PlanoDeEstudosUpdateOneWithoutRegistrosNestedInput
   }
 
   export type DiaDisciplinaMateriaUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
     materiaId?: StringFieldUpdateOperationsInput | string
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4958,9 +5202,11 @@ export namespace Prisma {
     id?: string
     dia: $Enums.DiaDaSemana
     materiaId: string
+    planoId?: string | null
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
   }
@@ -4971,6 +5217,7 @@ export namespace Prisma {
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4979,9 +5226,11 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
     materiaId?: StringFieldUpdateOperationsInput | string
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -4992,8 +5241,10 @@ export namespace Prisma {
     dataInicio: Date | string
     dataFim?: Date | string | null
     ativo?: boolean
+    progressoGeral?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
+    registros?: DiaDisciplinaMateriaCreateNestedManyWithoutPlanoInput
   }
 
   export type PlanoDeEstudosUncheckedCreateInput = {
@@ -5002,8 +5253,10 @@ export namespace Prisma {
     dataInicio: Date | string
     dataFim?: Date | string | null
     ativo?: boolean
+    progressoGeral?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
+    registros?: DiaDisciplinaMateriaUncheckedCreateNestedManyWithoutPlanoInput
   }
 
   export type PlanoDeEstudosUpdateInput = {
@@ -5012,8 +5265,10 @@ export namespace Prisma {
     dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
     dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    registros?: DiaDisciplinaMateriaUpdateManyWithoutPlanoNestedInput
   }
 
   export type PlanoDeEstudosUncheckedUpdateInput = {
@@ -5022,8 +5277,10 @@ export namespace Prisma {
     dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
     dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    registros?: DiaDisciplinaMateriaUncheckedUpdateManyWithoutPlanoNestedInput
   }
 
   export type PlanoDeEstudosCreateManyInput = {
@@ -5032,6 +5289,7 @@ export namespace Prisma {
     dataInicio: Date | string
     dataFim?: Date | string | null
     ativo?: boolean
+    progressoGeral?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
   }
@@ -5042,6 +5300,7 @@ export namespace Prisma {
     dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
     dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5052,6 +5311,7 @@ export namespace Prisma {
     dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
     dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5287,28 +5547,38 @@ export namespace Prisma {
     isNot?: MateriaWhereInput
   }
 
+  export type PlanoDeEstudosNullableScalarRelationFilter = {
+    is?: PlanoDeEstudosWhereInput | null
+    isNot?: PlanoDeEstudosWhereInput | null
+  }
+
   export type DiaDisciplinaMateriaCountOrderByAggregateInput = {
     id?: SortOrder
     dia?: SortOrder
     materiaId?: SortOrder
+    planoId?: SortOrder
     status?: SortOrder
     tempoEstudado?: SortOrder
     anotacoes?: SortOrder
+    progresso?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
   }
 
   export type DiaDisciplinaMateriaAvgOrderByAggregateInput = {
     tempoEstudado?: SortOrder
+    progresso?: SortOrder
   }
 
   export type DiaDisciplinaMateriaMaxOrderByAggregateInput = {
     id?: SortOrder
     dia?: SortOrder
     materiaId?: SortOrder
+    planoId?: SortOrder
     status?: SortOrder
     tempoEstudado?: SortOrder
     anotacoes?: SortOrder
+    progresso?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
   }
@@ -5317,15 +5587,18 @@ export namespace Prisma {
     id?: SortOrder
     dia?: SortOrder
     materiaId?: SortOrder
+    planoId?: SortOrder
     status?: SortOrder
     tempoEstudado?: SortOrder
     anotacoes?: SortOrder
+    progresso?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
   }
 
   export type DiaDisciplinaMateriaSumOrderByAggregateInput = {
     tempoEstudado?: SortOrder
+    progresso?: SortOrder
   }
 
   export type EnumDiaDaSemanaWithAggregatesFilter<$PrismaModel = never> = {
@@ -5376,8 +5649,13 @@ export namespace Prisma {
     dataInicio?: SortOrder
     dataFim?: SortOrder
     ativo?: SortOrder
+    progressoGeral?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
+  }
+
+  export type PlanoDeEstudosAvgOrderByAggregateInput = {
+    progressoGeral?: SortOrder
   }
 
   export type PlanoDeEstudosMaxOrderByAggregateInput = {
@@ -5386,6 +5664,7 @@ export namespace Prisma {
     dataInicio?: SortOrder
     dataFim?: SortOrder
     ativo?: SortOrder
+    progressoGeral?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
   }
@@ -5396,8 +5675,13 @@ export namespace Prisma {
     dataInicio?: SortOrder
     dataFim?: SortOrder
     ativo?: SortOrder
+    progressoGeral?: SortOrder
     criadoEm?: SortOrder
     atualizadoEm?: SortOrder
+  }
+
+  export type PlanoDeEstudosSumOrderByAggregateInput = {
+    progressoGeral?: SortOrder
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -5498,6 +5782,12 @@ export namespace Prisma {
     connect?: MateriaWhereUniqueInput
   }
 
+  export type PlanoDeEstudosCreateNestedOneWithoutRegistrosInput = {
+    create?: XOR<PlanoDeEstudosCreateWithoutRegistrosInput, PlanoDeEstudosUncheckedCreateWithoutRegistrosInput>
+    connectOrCreate?: PlanoDeEstudosCreateOrConnectWithoutRegistrosInput
+    connect?: PlanoDeEstudosWhereUniqueInput
+  }
+
   export type EnumDiaDaSemanaFieldUpdateOperationsInput = {
     set?: $Enums.DiaDaSemana
   }
@@ -5518,12 +5808,64 @@ export namespace Prisma {
     update?: XOR<XOR<MateriaUpdateToOneWithWhereWithoutAgendamentosInput, MateriaUpdateWithoutAgendamentosInput>, MateriaUncheckedUpdateWithoutAgendamentosInput>
   }
 
+  export type PlanoDeEstudosUpdateOneWithoutRegistrosNestedInput = {
+    create?: XOR<PlanoDeEstudosCreateWithoutRegistrosInput, PlanoDeEstudosUncheckedCreateWithoutRegistrosInput>
+    connectOrCreate?: PlanoDeEstudosCreateOrConnectWithoutRegistrosInput
+    upsert?: PlanoDeEstudosUpsertWithoutRegistrosInput
+    disconnect?: PlanoDeEstudosWhereInput | boolean
+    delete?: PlanoDeEstudosWhereInput | boolean
+    connect?: PlanoDeEstudosWhereUniqueInput
+    update?: XOR<XOR<PlanoDeEstudosUpdateToOneWithWhereWithoutRegistrosInput, PlanoDeEstudosUpdateWithoutRegistrosInput>, PlanoDeEstudosUncheckedUpdateWithoutRegistrosInput>
+  }
+
+  export type DiaDisciplinaMateriaCreateNestedManyWithoutPlanoInput = {
+    create?: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput> | DiaDisciplinaMateriaCreateWithoutPlanoInput[] | DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput[]
+    connectOrCreate?: DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput | DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput[]
+    createMany?: DiaDisciplinaMateriaCreateManyPlanoInputEnvelope
+    connect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+  }
+
+  export type DiaDisciplinaMateriaUncheckedCreateNestedManyWithoutPlanoInput = {
+    create?: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput> | DiaDisciplinaMateriaCreateWithoutPlanoInput[] | DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput[]
+    connectOrCreate?: DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput | DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput[]
+    createMany?: DiaDisciplinaMateriaCreateManyPlanoInputEnvelope
+    connect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type DiaDisciplinaMateriaUpdateManyWithoutPlanoNestedInput = {
+    create?: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput> | DiaDisciplinaMateriaCreateWithoutPlanoInput[] | DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput[]
+    connectOrCreate?: DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput | DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput[]
+    upsert?: DiaDisciplinaMateriaUpsertWithWhereUniqueWithoutPlanoInput | DiaDisciplinaMateriaUpsertWithWhereUniqueWithoutPlanoInput[]
+    createMany?: DiaDisciplinaMateriaCreateManyPlanoInputEnvelope
+    set?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    disconnect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    delete?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    connect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    update?: DiaDisciplinaMateriaUpdateWithWhereUniqueWithoutPlanoInput | DiaDisciplinaMateriaUpdateWithWhereUniqueWithoutPlanoInput[]
+    updateMany?: DiaDisciplinaMateriaUpdateManyWithWhereWithoutPlanoInput | DiaDisciplinaMateriaUpdateManyWithWhereWithoutPlanoInput[]
+    deleteMany?: DiaDisciplinaMateriaScalarWhereInput | DiaDisciplinaMateriaScalarWhereInput[]
+  }
+
+  export type DiaDisciplinaMateriaUncheckedUpdateManyWithoutPlanoNestedInput = {
+    create?: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput> | DiaDisciplinaMateriaCreateWithoutPlanoInput[] | DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput[]
+    connectOrCreate?: DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput | DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput[]
+    upsert?: DiaDisciplinaMateriaUpsertWithWhereUniqueWithoutPlanoInput | DiaDisciplinaMateriaUpsertWithWhereUniqueWithoutPlanoInput[]
+    createMany?: DiaDisciplinaMateriaCreateManyPlanoInputEnvelope
+    set?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    disconnect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    delete?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    connect?: DiaDisciplinaMateriaWhereUniqueInput | DiaDisciplinaMateriaWhereUniqueInput[]
+    update?: DiaDisciplinaMateriaUpdateWithWhereUniqueWithoutPlanoInput | DiaDisciplinaMateriaUpdateWithWhereUniqueWithoutPlanoInput[]
+    updateMany?: DiaDisciplinaMateriaUpdateManyWithWhereWithoutPlanoInput | DiaDisciplinaMateriaUpdateManyWithWhereWithoutPlanoInput[]
+    deleteMany?: DiaDisciplinaMateriaScalarWhereInput | DiaDisciplinaMateriaScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -5784,16 +6126,20 @@ export namespace Prisma {
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
+    plano?: PlanoDeEstudosCreateNestedOneWithoutRegistrosInput
   }
 
   export type DiaDisciplinaMateriaUncheckedCreateWithoutMateriaInput = {
     id?: string
     dia: $Enums.DiaDaSemana
+    planoId?: string | null
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
   }
@@ -5831,9 +6177,11 @@ export namespace Prisma {
     id?: StringFilter<"DiaDisciplinaMateria"> | string
     dia?: EnumDiaDaSemanaFilter<"DiaDisciplinaMateria"> | $Enums.DiaDaSemana
     materiaId?: StringFilter<"DiaDisciplinaMateria"> | string
+    planoId?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
     status?: EnumStatusConteudoFilter<"DiaDisciplinaMateria"> | $Enums.StatusConteudo
     tempoEstudado?: IntNullableFilter<"DiaDisciplinaMateria"> | number | null
     anotacoes?: StringNullableFilter<"DiaDisciplinaMateria"> | string | null
+    progresso?: IntFilter<"DiaDisciplinaMateria"> | number
     criadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
     atualizadoEm?: DateTimeFilter<"DiaDisciplinaMateria"> | Date | string
   }
@@ -5863,6 +6211,33 @@ export namespace Prisma {
   export type MateriaCreateOrConnectWithoutAgendamentosInput = {
     where: MateriaWhereUniqueInput
     create: XOR<MateriaCreateWithoutAgendamentosInput, MateriaUncheckedCreateWithoutAgendamentosInput>
+  }
+
+  export type PlanoDeEstudosCreateWithoutRegistrosInput = {
+    id?: string
+    titulo: string
+    dataInicio: Date | string
+    dataFim?: Date | string | null
+    ativo?: boolean
+    progressoGeral?: number
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type PlanoDeEstudosUncheckedCreateWithoutRegistrosInput = {
+    id?: string
+    titulo: string
+    dataInicio: Date | string
+    dataFim?: Date | string | null
+    ativo?: boolean
+    progressoGeral?: number
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type PlanoDeEstudosCreateOrConnectWithoutRegistrosInput = {
+    where: PlanoDeEstudosWhereUniqueInput
+    create: XOR<PlanoDeEstudosCreateWithoutRegistrosInput, PlanoDeEstudosUncheckedCreateWithoutRegistrosInput>
   }
 
   export type MateriaUpsertWithoutAgendamentosInput = {
@@ -5898,12 +6273,97 @@ export namespace Prisma {
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type DiaDisciplinaMateriaCreateManyMateriaInput = {
+  export type PlanoDeEstudosUpsertWithoutRegistrosInput = {
+    update: XOR<PlanoDeEstudosUpdateWithoutRegistrosInput, PlanoDeEstudosUncheckedUpdateWithoutRegistrosInput>
+    create: XOR<PlanoDeEstudosCreateWithoutRegistrosInput, PlanoDeEstudosUncheckedCreateWithoutRegistrosInput>
+    where?: PlanoDeEstudosWhereInput
+  }
+
+  export type PlanoDeEstudosUpdateToOneWithWhereWithoutRegistrosInput = {
+    where?: PlanoDeEstudosWhereInput
+    data: XOR<PlanoDeEstudosUpdateWithoutRegistrosInput, PlanoDeEstudosUncheckedUpdateWithoutRegistrosInput>
+  }
+
+  export type PlanoDeEstudosUpdateWithoutRegistrosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    titulo?: StringFieldUpdateOperationsInput | string
+    dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlanoDeEstudosUncheckedUpdateWithoutRegistrosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    titulo?: StringFieldUpdateOperationsInput | string
+    dataInicio?: DateTimeFieldUpdateOperationsInput | Date | string
+    dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ativo?: BoolFieldUpdateOperationsInput | boolean
+    progressoGeral?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiaDisciplinaMateriaCreateWithoutPlanoInput = {
     id?: string
     dia: $Enums.DiaDaSemana
     status?: $Enums.StatusConteudo
     tempoEstudado?: number | null
     anotacoes?: string | null
+    progresso?: number
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+    materia: MateriaCreateNestedOneWithoutAgendamentosInput
+  }
+
+  export type DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput = {
+    id?: string
+    dia: $Enums.DiaDaSemana
+    materiaId: string
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    progresso?: number
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type DiaDisciplinaMateriaCreateOrConnectWithoutPlanoInput = {
+    where: DiaDisciplinaMateriaWhereUniqueInput
+    create: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput>
+  }
+
+  export type DiaDisciplinaMateriaCreateManyPlanoInputEnvelope = {
+    data: DiaDisciplinaMateriaCreateManyPlanoInput | DiaDisciplinaMateriaCreateManyPlanoInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type DiaDisciplinaMateriaUpsertWithWhereUniqueWithoutPlanoInput = {
+    where: DiaDisciplinaMateriaWhereUniqueInput
+    update: XOR<DiaDisciplinaMateriaUpdateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedUpdateWithoutPlanoInput>
+    create: XOR<DiaDisciplinaMateriaCreateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedCreateWithoutPlanoInput>
+  }
+
+  export type DiaDisciplinaMateriaUpdateWithWhereUniqueWithoutPlanoInput = {
+    where: DiaDisciplinaMateriaWhereUniqueInput
+    data: XOR<DiaDisciplinaMateriaUpdateWithoutPlanoInput, DiaDisciplinaMateriaUncheckedUpdateWithoutPlanoInput>
+  }
+
+  export type DiaDisciplinaMateriaUpdateManyWithWhereWithoutPlanoInput = {
+    where: DiaDisciplinaMateriaScalarWhereInput
+    data: XOR<DiaDisciplinaMateriaUpdateManyMutationInput, DiaDisciplinaMateriaUncheckedUpdateManyWithoutPlanoInput>
+  }
+
+  export type DiaDisciplinaMateriaCreateManyMateriaInput = {
+    id?: string
+    dia: $Enums.DiaDaSemana
+    planoId?: string | null
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    progresso?: number
     criadoEm?: Date | string
     atualizadoEm?: Date | string
   }
@@ -5914,16 +6374,20 @@ export namespace Prisma {
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    plano?: PlanoDeEstudosUpdateOneWithoutRegistrosNestedInput
   }
 
   export type DiaDisciplinaMateriaUncheckedUpdateWithoutMateriaInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5931,9 +6395,59 @@ export namespace Prisma {
   export type DiaDisciplinaMateriaUncheckedUpdateManyWithoutMateriaInput = {
     id?: StringFieldUpdateOperationsInput | string
     dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
+    planoId?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
     tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
     anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiaDisciplinaMateriaCreateManyPlanoInput = {
+    id?: string
+    dia: $Enums.DiaDaSemana
+    materiaId: string
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    progresso?: number
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type DiaDisciplinaMateriaUpdateWithoutPlanoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    materia?: MateriaUpdateOneRequiredWithoutAgendamentosNestedInput
+  }
+
+  export type DiaDisciplinaMateriaUncheckedUpdateWithoutPlanoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
+    materiaId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DiaDisciplinaMateriaUncheckedUpdateManyWithoutPlanoInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dia?: EnumDiaDaSemanaFieldUpdateOperationsInput | $Enums.DiaDaSemana
+    materiaId?: StringFieldUpdateOperationsInput | string
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }

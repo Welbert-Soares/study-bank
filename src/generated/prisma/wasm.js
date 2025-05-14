@@ -135,9 +135,11 @@ exports.Prisma.DiaDisciplinaMateriaScalarFieldEnum = {
   id: 'id',
   dia: 'dia',
   materiaId: 'materiaId',
+  planoId: 'planoId',
   status: 'status',
   tempoEstudado: 'tempoEstudado',
   anotacoes: 'anotacoes',
+  progresso: 'progresso',
   criadoEm: 'criadoEm',
   atualizadoEm: 'atualizadoEm'
 };
@@ -148,6 +150,7 @@ exports.Prisma.PlanoDeEstudosScalarFieldEnum = {
   dataInicio: 'dataInicio',
   dataFim: 'dataFim',
   ativo: 'ativo',
+  progressoGeral: 'progressoGeral',
   criadoEm: 'criadoEm',
   atualizadoEm: 'atualizadoEm'
 };

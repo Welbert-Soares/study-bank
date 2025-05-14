@@ -58,25 +58,31 @@ model Materia {
 }
 
 model DiaDisciplinaMateria {
-  id            String         @id @default(cuid())
+  id            String          @id @default(cuid())
   dia           DiaDaSemana
   materiaId     String
-  materia       Materia        @relation(fields: [materiaId], references: [id])
-  status        StatusConteudo @default(pendente)
+  materia       Materia         @relation(fields: [materiaId], references: [id])
+  planoId       String? // Opcional para manter compatibilidade com registros existentes
+  plano         PlanoDeEstudos? @relation(fields: [planoId], references: [id])
+  status        StatusConteudo  @default(pendente)
   tempoEstudado Int? // Em minutos
   anotacoes     String?
-  criadoEm      DateTime       @default(now())
-  atualizadoEm  DateTime       @updatedAt
+  progresso     Int             @default(0) // Progresso em porcentagem
+  criadoEm      DateTime        @default(now())
+  atualizadoEm  DateTime        @updatedAt
 
   @@index([materiaId])
+  @@index([planoId])
 }
 
 model PlanoDeEstudos {
-  id           String    @id @default(cuid())
-  titulo       String
-  dataInicio   DateTime
-  dataFim      DateTime?
-  ativo        Boolean   @default(true)
-  criadoEm     DateTime  @default(now())
-  atualizadoEm DateTime  @updatedAt
+  id             String                 @id @default(cuid())
+  titulo         String
+  dataInicio     DateTime
+  dataFim        DateTime?
+  ativo          Boolean                @default(true)
+  progressoGeral Int                    @default(0) // Progresso geral do plano em porcentagem
+  registros      DiaDisciplinaMateria[] // Relação com os registros de estudo
+  criadoEm       DateTime               @default(now())
+  atualizadoEm   DateTime               @updatedAt
 }

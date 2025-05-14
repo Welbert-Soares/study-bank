@@ -26,9 +26,11 @@ CREATE TABLE "DiaDisciplinaMateria" (
     "id" TEXT NOT NULL,
     "dia" "DiaDaSemana" NOT NULL,
     "materiaId" TEXT NOT NULL,
+    "planoId" TEXT,
     "status" "StatusConteudo" NOT NULL DEFAULT 'pendente',
     "tempoEstudado" INTEGER,
     "anotacoes" TEXT,
+    "progresso" INTEGER NOT NULL DEFAULT 0,
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizadoEm" TIMESTAMP(3) NOT NULL,
 
@@ -42,6 +44,7 @@ CREATE TABLE "PlanoDeEstudos" (
     "dataInicio" TIMESTAMP(3) NOT NULL,
     "dataFim" TIMESTAMP(3),
     "ativo" BOOLEAN NOT NULL DEFAULT true,
+    "progressoGeral" INTEGER NOT NULL DEFAULT 0,
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizadoEm" TIMESTAMP(3) NOT NULL,
 
@@ -51,5 +54,11 @@ CREATE TABLE "PlanoDeEstudos" (
 -- CreateIndex
 CREATE INDEX "DiaDisciplinaMateria_materiaId_idx" ON "DiaDisciplinaMateria"("materiaId");
 
+-- CreateIndex
+CREATE INDEX "DiaDisciplinaMateria_planoId_idx" ON "DiaDisciplinaMateria"("planoId");
+
 -- AddForeignKey
 ALTER TABLE "DiaDisciplinaMateria" ADD CONSTRAINT "DiaDisciplinaMateria_materiaId_fkey" FOREIGN KEY ("materiaId") REFERENCES "Materia"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "DiaDisciplinaMateria" ADD CONSTRAINT "DiaDisciplinaMateria_planoId_fkey" FOREIGN KEY ("planoId") REFERENCES "PlanoDeEstudos"("id") ON DELETE SET NULL ON UPDATE CASCADE;
