@@ -187,10 +187,14 @@ export async function updateAgendamento(
     status?: StatusConteudo
     tempoEstudado?: number
     anotacoes?: string
-    criarRevisao?: boolean
   },
 ) {
   try {
+    // Validate input parameters
+    if (!id) {
+      throw new Error('ID do agendamento não fornecido')
+    }
+
     // Buscar o agendamento atual para comparar mudanças
     const agendamentoAtual = await db.diaDisciplinaMateria.findUnique({
       where: { id },
@@ -201,38 +205,45 @@ export async function updateAgendamento(
       throw new Error('Agendamento não encontrado')
     }
 
-    // Se a opção de criar revisão mudou para true, criar a revisão
-    if (data.criarRevisao && data.materiaId && data.dia) {
-      await criarRevisao(data.materiaId, data.dia)
+    // Prepare update data, using current values if not provided
+    const updateData = {
+      materiaId: data.materiaId ?? agendamentoAtual.materiaId,
+      dia: data.dia ?? agendamentoAtual.dia,
+      status: data.status ?? agendamentoAtual.status,
+      tempoEstudado: data.tempoEstudado ?? agendamentoAtual.tempoEstudado,
+      anotacoes: data.anotacoes ?? agendamentoAtual.anotacoes,
+    }
+
+    // Validate required fields
+    if (!updateData.materiaId) {
+      throw new Error('materiaId é obrigatório')
+    }
+    if (!updateData.dia) {
+      throw new Error('dia é obrigatório')
     }
 
     // Atualizar o agendamento
     const agendamento = await db.diaDisciplinaMateria.update({
       where: { id },
-      data: {
-        materiaId: data.materiaId,
-        dia: data.dia,
-        status: data.status,
-        tempoEstudado: data.tempoEstudado,
-        anotacoes: data.anotacoes,
-      },
+      data: updateData,
       include: {
         materia: true,
       },
     })
 
-    // Se solicitado criar revisão e houve mudança no dia ou na matéria
-    if (data.criarRevisao && (data.dia || data.materiaId)) {
-      await criarRevisao(
-        data.materiaId || agendamentoAtual.materiaId,
-        data.dia || agendamentoAtual.dia,
-      )
-    }
     revalidatePath('/config')
     return agendamento
   } catch (error) {
     console.error('Erro ao atualizar agendamento:', error)
-    throw new Error('Não foi possível atualizar o agendamento')
+    if (error instanceof Error) {
+      throw new Error(
+        `Não foi possível atualizar o agendamento: ${error.message}`,
+      )
+    } else {
+      throw new Error(
+        'Não foi possível atualizar o agendamento: erro desconhecido',
+      )
+    }
   }
 }
 

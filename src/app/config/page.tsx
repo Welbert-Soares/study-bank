@@ -149,16 +149,22 @@ export default function ConfigPage() {
           status,
           tempoEstudado,
           anotacoes,
-          criarRevisao,
         } = editingItem
-        await updateAgendamento(id, {
+
+        // Ensure required fields are present
+        if (!materiaId || !dia) {
+          throw new Error('Matéria e dia são campos obrigatórios')
+        }
+
+        const updateData = {
           materiaId,
           dia,
           status,
-          criarRevisao,
           tempoEstudado: tempoEstudado ?? undefined,
           anotacoes: anotacoes ?? undefined,
-        })
+        }
+
+        await updateAgendamento(id, updateData)
       } else {
         const { id, titulo, disciplina, status, ordem } = editingItem
         await updateMateria(id, { titulo, disciplina, status, ordem })
@@ -168,6 +174,7 @@ export default function ConfigPage() {
       await loadData()
     } catch (error) {
       console.error('Erro ao atualizar item:', error)
+      // You might want to show this error to the user in a more friendly way
     }
   }
 
@@ -191,17 +198,33 @@ export default function ConfigPage() {
   const handleAgendamentoSubmit = async (e: React.MouseEvent) => {
     e.preventDefault()
     try {
-      // Get data from the form
-      const agendamentoData = {
-        ...novoAgendamento,
-        criarRevisao: novoAgendamento.criarRevisao || false,
+      if (!editingItem || !isAgendamento(editingItem)) {
+        throw new Error('Agendamento inválido')
       }
 
-      if (editingItem && isAgendamento(editingItem)) {
-        await updateAgendamento(editingItem.id, agendamentoData)
-      } else {
-        await createAgendamento(agendamentoData)
+      const {
+        id,
+        materiaId,
+        dia,
+        status,
+        tempoEstudado,
+        anotacoes,
+      } = editingItem
+
+      // Ensure required fields are present
+      if (!materiaId || !dia) {
+        throw new Error('Matéria e dia são campos obrigatórios')
       }
+
+      const agendamentoData = {
+        materiaId,
+        dia,
+        status,
+        tempoEstudado: tempoEstudado ?? undefined,
+        anotacoes: anotacoes ?? undefined,
+      }
+
+      await updateAgendamento(id, agendamentoData)
 
       // Update list
       await loadData()
@@ -528,34 +551,6 @@ export default function ConfigPage() {
                   ))}
                 </SelectContent>
               </Select>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Criar Revisão</label>
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="criarRevisao"
-                      checked={editingItem.criarRevisao === true}
-                      onChange={() => updateEditingItem({ criarRevisao: true })}
-                      className="h-4 w-4"
-                    />
-                    <span>Sim</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="criarRevisao"
-                      checked={editingItem.criarRevisao === false}
-                      onChange={() =>
-                        updateEditingItem({ criarRevisao: false })
-                      }
-                      className="h-4 w-4"
-                    />
-                    <span>Não</span>
-                  </label>
-                </div>
-              </div>
 
               <Textarea
                 placeholder="Anotações (opcional)"
