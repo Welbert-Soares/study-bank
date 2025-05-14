@@ -1,13 +1,17 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { DisciplinaNome } from '@/generated/prisma'
+import type {
+  DiaDaSemana,
+  DisciplinaNome,
+  StatusConteudo,
+} from '@/generated/prisma'
 
 export interface MateriaDoDia {
   id: string
   titulo: string
   descricao: string | null
-  status: string
+  status: StatusConteudo
   progresso: number
   tempoEstudado: number | null
   anotacoes: string | null
@@ -87,4 +91,56 @@ export async function buscarHistoricoPorDia(): Promise<RegistroDiario[]> {
     data,
     disciplinas,
   }))
+}
+
+export async function buscarHistoricoDoDia(
+  dia: string,
+): Promise<DisciplinaDoDia[]> {
+  try {
+    const materiasPorDia = await db.diaDisciplinaMateria.findMany({
+      where: {
+        dia: dia as DiaDaSemana,
+      },
+      include: {
+        materia: true,
+      },
+      orderBy: {
+        materia: {
+          ordem: 'asc',
+        },
+      },
+    })
+
+    type AgrupamentoDisciplinas = {
+      [K in DisciplinaNome]?: MateriaDoDia[]
+    }
+
+    const disciplinas = materiasPorDia.reduce(
+      (acc: AgrupamentoDisciplinas, registro) => {
+        const disciplina = registro.materia.disciplina
+        if (!acc[disciplina]) {
+          acc[disciplina] = []
+        }
+        acc[disciplina]?.push({
+          id: registro.id,
+          titulo: registro.materia.titulo,
+          descricao: registro.materia.descricao || '',
+          status: registro.status,
+          progresso: registro.progresso,
+          tempoEstudado: registro.tempoEstudado || 0,
+          anotacoes: registro.anotacoes || '',
+        })
+        return acc
+      },
+      {},
+    )
+
+    return Object.entries(disciplinas).map(([disciplina, materias]) => ({
+      disciplina: disciplina as DisciplinaNome,
+      materias: materias as MateriaDoDia[],
+    }))
+  } catch (error) {
+    console.error('Erro ao buscar histórico do dia:', error)
+    return []
+  }
 }

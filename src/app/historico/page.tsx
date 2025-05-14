@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   Accordion,
   AccordionContent,
@@ -209,6 +215,14 @@ export default function HistoricoPage() {
                   )}
                 </Accordion>
               </CardContent>
+              <CardFooter className="flex justify-end">
+                <Link
+                  href={`/historico/${dia.data}`}
+                  className="text-sm text-cyan-600 hover:underline"
+                >
+                  Ver detalhes
+                </Link>
+              </CardFooter>
             </Card>
           ))}
 
