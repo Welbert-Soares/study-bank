@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,22 +18,158 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogFooter,
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
-
-import Link from 'next/link'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@/generated/prisma'
+import {
+  getDisciplinas,
+  createMateria,
+  updateMateria,
+  deleteMateria,
+  getAgendamentos,
+  createAgendamento,
+  updateAgendamento,
+  deleteAgendamento,
+} from '../actions/config.actions'
+import {
+  MateriaFromDB,
+  AgendamentoFromDB,
+  MateriaFormData,
+  AgendamentoFormData,
+} from '@/types/config'
 
 export default function ConfigPage() {
-  const diasSemana = [
-    'Domingo',
-    'Segunda',
-    'Terça',
-    'Quarta',
-    'Quinta',
-    'Sexta',
-    'Sábado',
-  ]
+  const [materias, setMaterias] = useState<MateriaFromDB[]>([])
+  const [agendamentos, setAgendamentos] = useState<AgendamentoFromDB[]>([])
+  const [novaMateria, setNovaMateria] = useState<MateriaFormData>({
+    titulo: '',
+    descricao: undefined,
+    disciplina: DisciplinaNome.Matematica,
+    ordem: 0,
+  })
+  const [novoAgendamento, setNovoAgendamento] = useState<AgendamentoFormData>({
+    dia: DiaDaSemana.Segunda,
+    materiaId: '',
+    status: StatusConteudo.pendente,
+    tempoEstudado: undefined,
+    anotacoes: undefined,
+  })
+  const [editingItem, setEditingItem] = useState<
+    MateriaFromDB | AgendamentoFromDB | null
+  >(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+
+  // Helpers
+  const isAgendamento = (
+    item: MateriaFromDB | AgendamentoFromDB,
+  ): item is AgendamentoFromDB => {
+    return 'materiaId' in item
+  }
+
+  const updateEditingItem = (
+    updates: Partial<MateriaFromDB | AgendamentoFromDB>,
+  ) => {
+    setEditingItem((prev) => (prev ? { ...prev, ...updates } : null))
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    try {
+      const [materiasData, agendamentosData] = await Promise.all([
+        getDisciplinas(),
+        getAgendamentos(),
+      ])
+      setMaterias(materiasData)
+      setAgendamentos(agendamentosData)
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    }
+  }
+
+  async function handleAddMateria() {
+    try {
+      await createMateria(novaMateria)
+      setNovaMateria({
+        titulo: '',
+        descricao: undefined,
+        disciplina: DisciplinaNome.Matematica,
+        ordem: 0,
+      })
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao adicionar matéria:', error)
+    }
+  }
+
+  async function handleAddAgendamento() {
+    try {
+      await createAgendamento(novoAgendamento)
+      setNovoAgendamento({
+        dia: DiaDaSemana.Segunda,
+        materiaId: '',
+        status: StatusConteudo.pendente,
+        tempoEstudado: undefined,
+        anotacoes: undefined,
+      })
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao adicionar agendamento:', error)
+    }
+  }
+
+  async function handleUpdateItem() {
+    if (!editingItem) return
+
+    try {
+      if (isAgendamento(editingItem)) {
+        const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
+          editingItem
+        await updateAgendamento(id, {
+          materiaId,
+          dia,
+          status,
+          tempoEstudado: tempoEstudado ?? undefined,
+          anotacoes: anotacoes ?? undefined,
+        })
+      } else {
+        const { id, titulo, disciplina, status, ordem } = editingItem
+        await updateMateria(id, { titulo, disciplina, status, ordem })
+      }
+      setIsEditDialogOpen(false)
+      setEditingItem(null)
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao atualizar item:', error)
+    }
+  }
+
+  async function handleDeleteItem() {
+    if (!editingItem?.id) return
+
+    try {
+      if (isAgendamento(editingItem)) {
+        await deleteAgendamento(editingItem.id)
+      } else {
+        await deleteMateria(editingItem.id)
+      }
+      setIsEditDialogOpen(false)
+      setEditingItem(null)
+      await loadData()
+    } catch (error) {
+      console.error('Erro ao deletar item:', error)
+    }
+  }
 
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
@@ -50,118 +188,72 @@ export default function ConfigPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>📚 Disciplinas</CardTitle>
+              <CardTitle>📚 Matérias</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <Input
-                    placeholder="Nome da disciplina"
-                    value={novaDisciplina.nome}
+                    placeholder="Título da matéria"
+                    value={novaMateria.titulo}
                     onChange={(e) =>
-                      setNovaDisciplina({
-                        ...novaDisciplina,
-                        nome: e.target.value,
+                      setNovaMateria({
+                        ...novaMateria,
+                        titulo: e.target.value,
                       })
                     }
                   />
-                  <Input
-                    placeholder="Cor (bg-blue-500)"
-                    value={novaDisciplina.cor}
-                    onChange={(e) =>
-                      setNovaDisciplina({
-                        ...novaDisciplina,
-                        cor: e.target.value,
+                  <Select
+                    value={novaMateria.disciplina}
+                    onValueChange={(value) =>
+                      setNovaMateria({
+                        ...novaMateria,
+                        disciplina: value as DisciplinaNome,
                       })
                     }
-                  />
-                  <Button onClick={handleAddDisciplina}>Adicionar</Button>
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a disciplina" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(DisciplinaNome).map((disciplina) => (
+                        <SelectItem key={disciplina} value={disciplina}>
+                          {disciplina}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button onClick={handleAddMateria}>Adicionar</Button>
                 </div>
 
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Título</TableHead>
                       <TableHead>Disciplina</TableHead>
-                      <TableHead>Conteúdos</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-[100px]">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {disciplinas.map((disciplina) => (
-                      <TableRow key={disciplina.id}>
+                    {materias.map((materia) => (
+                      <TableRow key={materia.id}>
                         <TableCell className="font-medium">
-                          {disciplina.nome}
+                          {materia.titulo}
                         </TableCell>
+                        <TableCell>{materia.disciplina}</TableCell>
+                        <TableCell>{materia.status}</TableCell>
                         <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm">
-                                Ver Conteúdos ({disciplina.conteudos.length})
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-3xl">
-                              <DialogHeader>
-                                <DialogTitle>
-                                  Conteúdos - {disciplina.nome}
-                                </DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="flex gap-4">
-                                  <Input
-                                    placeholder="Título do conteúdo"
-                                    value={novoConteudo.titulo}
-                                    onChange={(e) =>
-                                      setNovoConteudo({
-                                        ...novoConteudo,
-                                        titulo: e.target.value,
-                                        disciplinaId: disciplina.id,
-                                      })
-                                    }
-                                  />
-                                  <Button onClick={handleAddConteudo}>
-                                    Adicionar
-                                  </Button>
-                                </div>
-                                <Textarea
-                                  placeholder="Descrição (opcional)"
-                                  value={novoConteudo.descricao}
-                                  onChange={(e) =>
-                                    setNovoConteudo({
-                                      ...novoConteudo,
-                                      descricao: e.target.value,
-                                    })
-                                  }
-                                />
-                                <div className="space-y-2">
-                                  {disciplina.conteudos.map((conteudo) => (
-                                    <div
-                                      key={conteudo.id}
-                                      className="flex items-center gap-2 p-2 rounded-lg border bg-card"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        checked={conteudo.completo}
-                                        onChange={(e) =>
-                                          updateConteudo(conteudo.id, {
-                                            completo: e.target.checked,
-                                          })
-                                        }
-                                        className="w-4 h-4"
-                                      />
-                                      <span
-                                        className={
-                                          conteudo.completo
-                                            ? 'line-through text-gray-500'
-                                            : ''
-                                        }
-                                      >
-                                        {conteudo.titulo}
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingItem(materia)
+                              setIsEditDialogOpen(true)
+                            }}
+                          >
+                            Editar
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -173,85 +265,241 @@ export default function ConfigPage() {
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle>⏰ Horários de Estudo</CardTitle>
+              <CardTitle>⏰ Agendamentos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Disciplina</label>
-                    <select
-                      className="w-full p-2 border rounded"
-                      value={novoHorario.disciplinaId}
-                      onChange={(e) =>
-                        setNovoHorario({
-                          ...novoHorario,
-                          disciplinaId: e.target.value,
-                        })
-                      }
-                    >
-                      <option value="">Selecione...</option>
-                      {disciplinas.map((d) => (
-                        <option key={d.id} value={d.id}>
-                          {d.nome}
-                        </option>
+                  <Select
+                    value={novoAgendamento.materiaId}
+                    onValueChange={(value) =>
+                      setNovoAgendamento({
+                        ...novoAgendamento,
+                        materiaId: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a matéria" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {materias.map((materia) => (
+                        <SelectItem key={materia.id} value={materia.id}>
+                          {materia.titulo}
+                        </SelectItem>
                       ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Dia da Semana</label>
-                    <select
-                      className="w-full p-2 border rounded"
-                      value={novoHorario.diaSemana}
-                      onChange={(e) =>
-                        setNovoHorario({
-                          ...novoHorario,
-                          diaSemana: parseInt(e.target.value),
-                        })
-                      }
-                    >
-                      {diasSemana.map((dia, index) => (
-                        <option key={index} value={index}>
+                    </SelectContent>
+                  </Select>
+
+                  <Select
+                    value={novoAgendamento.dia}
+                    onValueChange={(value) =>
+                      setNovoAgendamento({
+                        ...novoAgendamento,
+                        dia: value as DiaDaSemana,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Dia da semana" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(DiaDaSemana).map((dia) => (
+                        <SelectItem key={dia} value={dia}>
                           {dia}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Início</label>
-                    <Input
-                      type="time"
-                      value={novoHorario.inicio}
+                    </SelectContent>
+                  </Select>
+
+                  <div className="col-span-2">
+                    <Textarea
+                      placeholder="Anotações (opcional)"
+                      value={novoAgendamento.anotacoes ?? ''}
                       onChange={(e) =>
-                        setNovoHorario({
-                          ...novoHorario,
-                          inicio: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Fim</label>
-                    <Input
-                      type="time"
-                      value={novoHorario.fim}
-                      onChange={(e) =>
-                        setNovoHorario({
-                          ...novoHorario,
-                          fim: e.target.value,
+                        setNovoAgendamento({
+                          ...novoAgendamento,
+                          anotacoes: e.target.value,
                         })
                       }
                     />
                   </div>
                 </div>
-                <Button onClick={handleAddHorario} className="w-full">
-                  Adicionar Horário
+                <Button onClick={handleAddAgendamento} className="w-full">
+                  Adicionar Agendamento
                 </Button>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Dia</TableHead>
+                      <TableHead>Matéria</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="w-[100px]">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {agendamentos.map((agendamento) => (
+                      <TableRow key={agendamento.id}>
+                        <TableCell>{agendamento.dia}</TableCell>
+                        <TableCell>{agendamento.materia.titulo}</TableCell>
+                        <TableCell>{agendamento.status}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setEditingItem(agendamento)
+                              setIsEditDialogOpen(true)
+                            }}
+                          >
+                            Editar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {editingItem
+                ? isAgendamento(editingItem)
+                  ? 'Editar Agendamento'
+                  : 'Editar Matéria'
+                : ''}
+            </DialogTitle>
+          </DialogHeader>
+
+          {editingItem && isAgendamento(editingItem) ? (
+            <div className="space-y-4">
+              <Select
+                value={editingItem.materiaId}
+                onValueChange={(value) =>
+                  updateEditingItem({ materiaId: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a matéria" />
+                </SelectTrigger>
+                <SelectContent>
+                  {materias.map((materia) => (
+                    <SelectItem key={materia.id} value={materia.id}>
+                      {materia.titulo}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={editingItem.dia}
+                onValueChange={(value) =>
+                  updateEditingItem({ dia: value as DiaDaSemana })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Dia da semana" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(DiaDaSemana).map((dia) => (
+                    <SelectItem key={dia} value={dia}>
+                      {dia}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={editingItem.status}
+                onValueChange={(value) =>
+                  updateEditingItem({ status: value as StatusConteudo })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(StatusConteudo).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Textarea
+                placeholder="Anotações (opcional)"
+                value={editingItem.anotacoes ?? ''}
+                onChange={(e) =>
+                  updateEditingItem({ anotacoes: e.target.value })
+                }
+              />
+            </div>
+          ) : editingItem ? (
+            <div className="space-y-4">
+              <Input
+                placeholder="Título da matéria"
+                value={editingItem.titulo}
+                onChange={(e) => updateEditingItem({ titulo: e.target.value })}
+              />
+
+              <Select
+                value={editingItem.disciplina}
+                onValueChange={(value) =>
+                  updateEditingItem({
+                    disciplina: value as DisciplinaNome,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a disciplina" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(DisciplinaNome).map((disciplina) => (
+                    <SelectItem key={disciplina} value={disciplina}>
+                      {disciplina}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={editingItem.status}
+                onValueChange={(value) =>
+                  updateEditingItem({
+                    status: value as StatusConteudo,
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(StatusConteudo).map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {status}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : null}
+
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={handleDeleteItem}>
+              Excluir
+            </Button>
+            <Button onClick={handleUpdateItem}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   )
 }
