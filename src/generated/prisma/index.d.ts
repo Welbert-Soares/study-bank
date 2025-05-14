@@ -28,6 +28,11 @@ export type DiaDisciplinaMateria = $Result.DefaultSelection<Prisma.$DiaDisciplin
  * 
  */
 export type PlanoDeEstudos = $Result.DefaultSelection<Prisma.$PlanoDeEstudosPayload>
+/**
+ * Model Historico
+ * 
+ */
+export type Historico = $Result.DefaultSelection<Prisma.$HistoricoPayload>
 
 /**
  * Enums
@@ -238,6 +243,16 @@ export class PrismaClient<
     * ```
     */
   get planoDeEstudos(): Prisma.PlanoDeEstudosDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.historico`: Exposes CRUD operations for the **Historico** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Historicos
+    * const historicos = await prisma.historico.findMany()
+    * ```
+    */
+  get historico(): Prisma.HistoricoDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -680,7 +695,8 @@ export namespace Prisma {
   export const ModelName: {
     Materia: 'Materia',
     DiaDisciplinaMateria: 'DiaDisciplinaMateria',
-    PlanoDeEstudos: 'PlanoDeEstudos'
+    PlanoDeEstudos: 'PlanoDeEstudos',
+    Historico: 'Historico'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -699,7 +715,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "materia" | "diaDisciplinaMateria" | "planoDeEstudos"
+      modelProps: "materia" | "diaDisciplinaMateria" | "planoDeEstudos" | "historico"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -925,6 +941,80 @@ export namespace Prisma {
           }
         }
       }
+      Historico: {
+        payload: Prisma.$HistoricoPayload<ExtArgs>
+        fields: Prisma.HistoricoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.HistoricoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.HistoricoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          findFirst: {
+            args: Prisma.HistoricoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.HistoricoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          findMany: {
+            args: Prisma.HistoricoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>[]
+          }
+          create: {
+            args: Prisma.HistoricoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          createMany: {
+            args: Prisma.HistoricoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.HistoricoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>[]
+          }
+          delete: {
+            args: Prisma.HistoricoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          update: {
+            args: Prisma.HistoricoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          deleteMany: {
+            args: Prisma.HistoricoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.HistoricoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.HistoricoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>[]
+          }
+          upsert: {
+            args: Prisma.HistoricoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$HistoricoPayload>
+          }
+          aggregate: {
+            args: Prisma.HistoricoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateHistorico>
+          }
+          groupBy: {
+            args: Prisma.HistoricoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<HistoricoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.HistoricoCountArgs<ExtArgs>
+            result: $Utils.Optional<HistoricoCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1012,6 +1102,7 @@ export namespace Prisma {
     materia?: MateriaOmit
     diaDisciplinaMateria?: DiaDisciplinaMateriaOmit
     planoDeEstudos?: PlanoDeEstudosOmit
+    historico?: HistoricoOmit
   }
 
   /* Types for Logging */
@@ -4642,6 +4733,1117 @@ export namespace Prisma {
 
 
   /**
+   * Model Historico
+   */
+
+  export type AggregateHistorico = {
+    _count: HistoricoCountAggregateOutputType | null
+    _avg: HistoricoAvgAggregateOutputType | null
+    _sum: HistoricoSumAggregateOutputType | null
+    _min: HistoricoMinAggregateOutputType | null
+    _max: HistoricoMaxAggregateOutputType | null
+  }
+
+  export type HistoricoAvgAggregateOutputType = {
+    progresso: number | null
+    tempoEstudado: number | null
+  }
+
+  export type HistoricoSumAggregateOutputType = {
+    progresso: number | null
+    tempoEstudado: number | null
+  }
+
+  export type HistoricoMinAggregateOutputType = {
+    id: string | null
+    data: Date | null
+    disciplina: $Enums.DisciplinaNome | null
+    materia: string | null
+    descricao: string | null
+    progresso: number | null
+    status: $Enums.StatusConteudo | null
+    tempoEstudado: number | null
+    anotacoes: string | null
+    criadoEm: Date | null
+    atualizadoEm: Date | null
+  }
+
+  export type HistoricoMaxAggregateOutputType = {
+    id: string | null
+    data: Date | null
+    disciplina: $Enums.DisciplinaNome | null
+    materia: string | null
+    descricao: string | null
+    progresso: number | null
+    status: $Enums.StatusConteudo | null
+    tempoEstudado: number | null
+    anotacoes: string | null
+    criadoEm: Date | null
+    atualizadoEm: Date | null
+  }
+
+  export type HistoricoCountAggregateOutputType = {
+    id: number
+    data: number
+    disciplina: number
+    materia: number
+    descricao: number
+    progresso: number
+    status: number
+    tempoEstudado: number
+    anotacoes: number
+    criadoEm: number
+    atualizadoEm: number
+    _all: number
+  }
+
+
+  export type HistoricoAvgAggregateInputType = {
+    progresso?: true
+    tempoEstudado?: true
+  }
+
+  export type HistoricoSumAggregateInputType = {
+    progresso?: true
+    tempoEstudado?: true
+  }
+
+  export type HistoricoMinAggregateInputType = {
+    id?: true
+    data?: true
+    disciplina?: true
+    materia?: true
+    descricao?: true
+    progresso?: true
+    status?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    criadoEm?: true
+    atualizadoEm?: true
+  }
+
+  export type HistoricoMaxAggregateInputType = {
+    id?: true
+    data?: true
+    disciplina?: true
+    materia?: true
+    descricao?: true
+    progresso?: true
+    status?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    criadoEm?: true
+    atualizadoEm?: true
+  }
+
+  export type HistoricoCountAggregateInputType = {
+    id?: true
+    data?: true
+    disciplina?: true
+    materia?: true
+    descricao?: true
+    progresso?: true
+    status?: true
+    tempoEstudado?: true
+    anotacoes?: true
+    criadoEm?: true
+    atualizadoEm?: true
+    _all?: true
+  }
+
+  export type HistoricoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Historico to aggregate.
+     */
+    where?: HistoricoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Historicos to fetch.
+     */
+    orderBy?: HistoricoOrderByWithRelationInput | HistoricoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: HistoricoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Historicos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Historicos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Historicos
+    **/
+    _count?: true | HistoricoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: HistoricoAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: HistoricoSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: HistoricoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: HistoricoMaxAggregateInputType
+  }
+
+  export type GetHistoricoAggregateType<T extends HistoricoAggregateArgs> = {
+        [P in keyof T & keyof AggregateHistorico]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateHistorico[P]>
+      : GetScalarType<T[P], AggregateHistorico[P]>
+  }
+
+
+
+
+  export type HistoricoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: HistoricoWhereInput
+    orderBy?: HistoricoOrderByWithAggregationInput | HistoricoOrderByWithAggregationInput[]
+    by: HistoricoScalarFieldEnum[] | HistoricoScalarFieldEnum
+    having?: HistoricoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: HistoricoCountAggregateInputType | true
+    _avg?: HistoricoAvgAggregateInputType
+    _sum?: HistoricoSumAggregateInputType
+    _min?: HistoricoMinAggregateInputType
+    _max?: HistoricoMaxAggregateInputType
+  }
+
+  export type HistoricoGroupByOutputType = {
+    id: string
+    data: Date
+    disciplina: $Enums.DisciplinaNome
+    materia: string
+    descricao: string | null
+    progresso: number
+    status: $Enums.StatusConteudo
+    tempoEstudado: number | null
+    anotacoes: string | null
+    criadoEm: Date
+    atualizadoEm: Date
+    _count: HistoricoCountAggregateOutputType | null
+    _avg: HistoricoAvgAggregateOutputType | null
+    _sum: HistoricoSumAggregateOutputType | null
+    _min: HistoricoMinAggregateOutputType | null
+    _max: HistoricoMaxAggregateOutputType | null
+  }
+
+  type GetHistoricoGroupByPayload<T extends HistoricoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<HistoricoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof HistoricoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], HistoricoGroupByOutputType[P]>
+            : GetScalarType<T[P], HistoricoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type HistoricoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    data?: boolean
+    disciplina?: boolean
+    materia?: boolean
+    descricao?: boolean
+    progresso?: boolean
+    status?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    criadoEm?: boolean
+    atualizadoEm?: boolean
+  }, ExtArgs["result"]["historico"]>
+
+  export type HistoricoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    data?: boolean
+    disciplina?: boolean
+    materia?: boolean
+    descricao?: boolean
+    progresso?: boolean
+    status?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    criadoEm?: boolean
+    atualizadoEm?: boolean
+  }, ExtArgs["result"]["historico"]>
+
+  export type HistoricoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    data?: boolean
+    disciplina?: boolean
+    materia?: boolean
+    descricao?: boolean
+    progresso?: boolean
+    status?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    criadoEm?: boolean
+    atualizadoEm?: boolean
+  }, ExtArgs["result"]["historico"]>
+
+  export type HistoricoSelectScalar = {
+    id?: boolean
+    data?: boolean
+    disciplina?: boolean
+    materia?: boolean
+    descricao?: boolean
+    progresso?: boolean
+    status?: boolean
+    tempoEstudado?: boolean
+    anotacoes?: boolean
+    criadoEm?: boolean
+    atualizadoEm?: boolean
+  }
+
+  export type HistoricoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "data" | "disciplina" | "materia" | "descricao" | "progresso" | "status" | "tempoEstudado" | "anotacoes" | "criadoEm" | "atualizadoEm", ExtArgs["result"]["historico"]>
+
+  export type $HistoricoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Historico"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      data: Date
+      disciplina: $Enums.DisciplinaNome
+      materia: string
+      descricao: string | null
+      progresso: number
+      status: $Enums.StatusConteudo
+      tempoEstudado: number | null
+      anotacoes: string | null
+      criadoEm: Date
+      atualizadoEm: Date
+    }, ExtArgs["result"]["historico"]>
+    composites: {}
+  }
+
+  type HistoricoGetPayload<S extends boolean | null | undefined | HistoricoDefaultArgs> = $Result.GetResult<Prisma.$HistoricoPayload, S>
+
+  type HistoricoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<HistoricoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: HistoricoCountAggregateInputType | true
+    }
+
+  export interface HistoricoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Historico'], meta: { name: 'Historico' } }
+    /**
+     * Find zero or one Historico that matches the filter.
+     * @param {HistoricoFindUniqueArgs} args - Arguments to find a Historico
+     * @example
+     * // Get one Historico
+     * const historico = await prisma.historico.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends HistoricoFindUniqueArgs>(args: SelectSubset<T, HistoricoFindUniqueArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Historico that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {HistoricoFindUniqueOrThrowArgs} args - Arguments to find a Historico
+     * @example
+     * // Get one Historico
+     * const historico = await prisma.historico.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends HistoricoFindUniqueOrThrowArgs>(args: SelectSubset<T, HistoricoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Historico that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoFindFirstArgs} args - Arguments to find a Historico
+     * @example
+     * // Get one Historico
+     * const historico = await prisma.historico.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends HistoricoFindFirstArgs>(args?: SelectSubset<T, HistoricoFindFirstArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Historico that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoFindFirstOrThrowArgs} args - Arguments to find a Historico
+     * @example
+     * // Get one Historico
+     * const historico = await prisma.historico.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends HistoricoFindFirstOrThrowArgs>(args?: SelectSubset<T, HistoricoFindFirstOrThrowArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Historicos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Historicos
+     * const historicos = await prisma.historico.findMany()
+     * 
+     * // Get first 10 Historicos
+     * const historicos = await prisma.historico.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const historicoWithIdOnly = await prisma.historico.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends HistoricoFindManyArgs>(args?: SelectSubset<T, HistoricoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Historico.
+     * @param {HistoricoCreateArgs} args - Arguments to create a Historico.
+     * @example
+     * // Create one Historico
+     * const Historico = await prisma.historico.create({
+     *   data: {
+     *     // ... data to create a Historico
+     *   }
+     * })
+     * 
+     */
+    create<T extends HistoricoCreateArgs>(args: SelectSubset<T, HistoricoCreateArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Historicos.
+     * @param {HistoricoCreateManyArgs} args - Arguments to create many Historicos.
+     * @example
+     * // Create many Historicos
+     * const historico = await prisma.historico.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends HistoricoCreateManyArgs>(args?: SelectSubset<T, HistoricoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Historicos and returns the data saved in the database.
+     * @param {HistoricoCreateManyAndReturnArgs} args - Arguments to create many Historicos.
+     * @example
+     * // Create many Historicos
+     * const historico = await prisma.historico.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Historicos and only return the `id`
+     * const historicoWithIdOnly = await prisma.historico.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends HistoricoCreateManyAndReturnArgs>(args?: SelectSubset<T, HistoricoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Historico.
+     * @param {HistoricoDeleteArgs} args - Arguments to delete one Historico.
+     * @example
+     * // Delete one Historico
+     * const Historico = await prisma.historico.delete({
+     *   where: {
+     *     // ... filter to delete one Historico
+     *   }
+     * })
+     * 
+     */
+    delete<T extends HistoricoDeleteArgs>(args: SelectSubset<T, HistoricoDeleteArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Historico.
+     * @param {HistoricoUpdateArgs} args - Arguments to update one Historico.
+     * @example
+     * // Update one Historico
+     * const historico = await prisma.historico.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends HistoricoUpdateArgs>(args: SelectSubset<T, HistoricoUpdateArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Historicos.
+     * @param {HistoricoDeleteManyArgs} args - Arguments to filter Historicos to delete.
+     * @example
+     * // Delete a few Historicos
+     * const { count } = await prisma.historico.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends HistoricoDeleteManyArgs>(args?: SelectSubset<T, HistoricoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Historicos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Historicos
+     * const historico = await prisma.historico.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends HistoricoUpdateManyArgs>(args: SelectSubset<T, HistoricoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Historicos and returns the data updated in the database.
+     * @param {HistoricoUpdateManyAndReturnArgs} args - Arguments to update many Historicos.
+     * @example
+     * // Update many Historicos
+     * const historico = await prisma.historico.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Historicos and only return the `id`
+     * const historicoWithIdOnly = await prisma.historico.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends HistoricoUpdateManyAndReturnArgs>(args: SelectSubset<T, HistoricoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Historico.
+     * @param {HistoricoUpsertArgs} args - Arguments to update or create a Historico.
+     * @example
+     * // Update or create a Historico
+     * const historico = await prisma.historico.upsert({
+     *   create: {
+     *     // ... data to create a Historico
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Historico we want to update
+     *   }
+     * })
+     */
+    upsert<T extends HistoricoUpsertArgs>(args: SelectSubset<T, HistoricoUpsertArgs<ExtArgs>>): Prisma__HistoricoClient<$Result.GetResult<Prisma.$HistoricoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Historicos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoCountArgs} args - Arguments to filter Historicos to count.
+     * @example
+     * // Count the number of Historicos
+     * const count = await prisma.historico.count({
+     *   where: {
+     *     // ... the filter for the Historicos we want to count
+     *   }
+     * })
+    **/
+    count<T extends HistoricoCountArgs>(
+      args?: Subset<T, HistoricoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], HistoricoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Historico.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends HistoricoAggregateArgs>(args: Subset<T, HistoricoAggregateArgs>): Prisma.PrismaPromise<GetHistoricoAggregateType<T>>
+
+    /**
+     * Group by Historico.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {HistoricoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends HistoricoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: HistoricoGroupByArgs['orderBy'] }
+        : { orderBy?: HistoricoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, HistoricoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetHistoricoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Historico model
+   */
+  readonly fields: HistoricoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Historico.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__HistoricoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Historico model
+   */
+  interface HistoricoFieldRefs {
+    readonly id: FieldRef<"Historico", 'String'>
+    readonly data: FieldRef<"Historico", 'DateTime'>
+    readonly disciplina: FieldRef<"Historico", 'DisciplinaNome'>
+    readonly materia: FieldRef<"Historico", 'String'>
+    readonly descricao: FieldRef<"Historico", 'String'>
+    readonly progresso: FieldRef<"Historico", 'Int'>
+    readonly status: FieldRef<"Historico", 'StatusConteudo'>
+    readonly tempoEstudado: FieldRef<"Historico", 'Int'>
+    readonly anotacoes: FieldRef<"Historico", 'String'>
+    readonly criadoEm: FieldRef<"Historico", 'DateTime'>
+    readonly atualizadoEm: FieldRef<"Historico", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Historico findUnique
+   */
+  export type HistoricoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter, which Historico to fetch.
+     */
+    where: HistoricoWhereUniqueInput
+  }
+
+  /**
+   * Historico findUniqueOrThrow
+   */
+  export type HistoricoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter, which Historico to fetch.
+     */
+    where: HistoricoWhereUniqueInput
+  }
+
+  /**
+   * Historico findFirst
+   */
+  export type HistoricoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter, which Historico to fetch.
+     */
+    where?: HistoricoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Historicos to fetch.
+     */
+    orderBy?: HistoricoOrderByWithRelationInput | HistoricoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Historicos.
+     */
+    cursor?: HistoricoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Historicos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Historicos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Historicos.
+     */
+    distinct?: HistoricoScalarFieldEnum | HistoricoScalarFieldEnum[]
+  }
+
+  /**
+   * Historico findFirstOrThrow
+   */
+  export type HistoricoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter, which Historico to fetch.
+     */
+    where?: HistoricoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Historicos to fetch.
+     */
+    orderBy?: HistoricoOrderByWithRelationInput | HistoricoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Historicos.
+     */
+    cursor?: HistoricoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Historicos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Historicos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Historicos.
+     */
+    distinct?: HistoricoScalarFieldEnum | HistoricoScalarFieldEnum[]
+  }
+
+  /**
+   * Historico findMany
+   */
+  export type HistoricoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter, which Historicos to fetch.
+     */
+    where?: HistoricoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Historicos to fetch.
+     */
+    orderBy?: HistoricoOrderByWithRelationInput | HistoricoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Historicos.
+     */
+    cursor?: HistoricoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Historicos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Historicos.
+     */
+    skip?: number
+    distinct?: HistoricoScalarFieldEnum | HistoricoScalarFieldEnum[]
+  }
+
+  /**
+   * Historico create
+   */
+  export type HistoricoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Historico.
+     */
+    data: XOR<HistoricoCreateInput, HistoricoUncheckedCreateInput>
+  }
+
+  /**
+   * Historico createMany
+   */
+  export type HistoricoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Historicos.
+     */
+    data: HistoricoCreateManyInput | HistoricoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Historico createManyAndReturn
+   */
+  export type HistoricoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * The data used to create many Historicos.
+     */
+    data: HistoricoCreateManyInput | HistoricoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Historico update
+   */
+  export type HistoricoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Historico.
+     */
+    data: XOR<HistoricoUpdateInput, HistoricoUncheckedUpdateInput>
+    /**
+     * Choose, which Historico to update.
+     */
+    where: HistoricoWhereUniqueInput
+  }
+
+  /**
+   * Historico updateMany
+   */
+  export type HistoricoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Historicos.
+     */
+    data: XOR<HistoricoUpdateManyMutationInput, HistoricoUncheckedUpdateManyInput>
+    /**
+     * Filter which Historicos to update
+     */
+    where?: HistoricoWhereInput
+    /**
+     * Limit how many Historicos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Historico updateManyAndReturn
+   */
+  export type HistoricoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * The data used to update Historicos.
+     */
+    data: XOR<HistoricoUpdateManyMutationInput, HistoricoUncheckedUpdateManyInput>
+    /**
+     * Filter which Historicos to update
+     */
+    where?: HistoricoWhereInput
+    /**
+     * Limit how many Historicos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Historico upsert
+   */
+  export type HistoricoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Historico to update in case it exists.
+     */
+    where: HistoricoWhereUniqueInput
+    /**
+     * In case the Historico found by the `where` argument doesn't exist, create a new Historico with this data.
+     */
+    create: XOR<HistoricoCreateInput, HistoricoUncheckedCreateInput>
+    /**
+     * In case the Historico was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<HistoricoUpdateInput, HistoricoUncheckedUpdateInput>
+  }
+
+  /**
+   * Historico delete
+   */
+  export type HistoricoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+    /**
+     * Filter which Historico to delete.
+     */
+    where: HistoricoWhereUniqueInput
+  }
+
+  /**
+   * Historico deleteMany
+   */
+  export type HistoricoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Historicos to delete
+     */
+    where?: HistoricoWhereInput
+    /**
+     * Limit how many Historicos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Historico without action
+   */
+  export type HistoricoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Historico
+     */
+    select?: HistoricoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Historico
+     */
+    omit?: HistoricoOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -4697,6 +5899,23 @@ export namespace Prisma {
   };
 
   export type PlanoDeEstudosScalarFieldEnum = (typeof PlanoDeEstudosScalarFieldEnum)[keyof typeof PlanoDeEstudosScalarFieldEnum]
+
+
+  export const HistoricoScalarFieldEnum: {
+    id: 'id',
+    data: 'data',
+    disciplina: 'disciplina',
+    materia: 'materia',
+    descricao: 'descricao',
+    progresso: 'progresso',
+    status: 'status',
+    tempoEstudado: 'tempoEstudado',
+    anotacoes: 'anotacoes',
+    criadoEm: 'criadoEm',
+    atualizadoEm: 'atualizadoEm'
+  };
+
+  export type HistoricoScalarFieldEnum = (typeof HistoricoScalarFieldEnum)[keyof typeof HistoricoScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -5065,6 +6284,90 @@ export namespace Prisma {
     atualizadoEm?: DateTimeWithAggregatesFilter<"PlanoDeEstudos"> | Date | string
   }
 
+  export type HistoricoWhereInput = {
+    AND?: HistoricoWhereInput | HistoricoWhereInput[]
+    OR?: HistoricoWhereInput[]
+    NOT?: HistoricoWhereInput | HistoricoWhereInput[]
+    id?: StringFilter<"Historico"> | string
+    data?: DateTimeFilter<"Historico"> | Date | string
+    disciplina?: EnumDisciplinaNomeFilter<"Historico"> | $Enums.DisciplinaNome
+    materia?: StringFilter<"Historico"> | string
+    descricao?: StringNullableFilter<"Historico"> | string | null
+    progresso?: IntFilter<"Historico"> | number
+    status?: EnumStatusConteudoFilter<"Historico"> | $Enums.StatusConteudo
+    tempoEstudado?: IntNullableFilter<"Historico"> | number | null
+    anotacoes?: StringNullableFilter<"Historico"> | string | null
+    criadoEm?: DateTimeFilter<"Historico"> | Date | string
+    atualizadoEm?: DateTimeFilter<"Historico"> | Date | string
+  }
+
+  export type HistoricoOrderByWithRelationInput = {
+    id?: SortOrder
+    data?: SortOrder
+    disciplina?: SortOrder
+    materia?: SortOrder
+    descricao?: SortOrderInput | SortOrder
+    progresso?: SortOrder
+    status?: SortOrder
+    tempoEstudado?: SortOrderInput | SortOrder
+    anotacoes?: SortOrderInput | SortOrder
+    criadoEm?: SortOrder
+    atualizadoEm?: SortOrder
+  }
+
+  export type HistoricoWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: HistoricoWhereInput | HistoricoWhereInput[]
+    OR?: HistoricoWhereInput[]
+    NOT?: HistoricoWhereInput | HistoricoWhereInput[]
+    data?: DateTimeFilter<"Historico"> | Date | string
+    disciplina?: EnumDisciplinaNomeFilter<"Historico"> | $Enums.DisciplinaNome
+    materia?: StringFilter<"Historico"> | string
+    descricao?: StringNullableFilter<"Historico"> | string | null
+    progresso?: IntFilter<"Historico"> | number
+    status?: EnumStatusConteudoFilter<"Historico"> | $Enums.StatusConteudo
+    tempoEstudado?: IntNullableFilter<"Historico"> | number | null
+    anotacoes?: StringNullableFilter<"Historico"> | string | null
+    criadoEm?: DateTimeFilter<"Historico"> | Date | string
+    atualizadoEm?: DateTimeFilter<"Historico"> | Date | string
+  }, "id">
+
+  export type HistoricoOrderByWithAggregationInput = {
+    id?: SortOrder
+    data?: SortOrder
+    disciplina?: SortOrder
+    materia?: SortOrder
+    descricao?: SortOrderInput | SortOrder
+    progresso?: SortOrder
+    status?: SortOrder
+    tempoEstudado?: SortOrderInput | SortOrder
+    anotacoes?: SortOrderInput | SortOrder
+    criadoEm?: SortOrder
+    atualizadoEm?: SortOrder
+    _count?: HistoricoCountOrderByAggregateInput
+    _avg?: HistoricoAvgOrderByAggregateInput
+    _max?: HistoricoMaxOrderByAggregateInput
+    _min?: HistoricoMinOrderByAggregateInput
+    _sum?: HistoricoSumOrderByAggregateInput
+  }
+
+  export type HistoricoScalarWhereWithAggregatesInput = {
+    AND?: HistoricoScalarWhereWithAggregatesInput | HistoricoScalarWhereWithAggregatesInput[]
+    OR?: HistoricoScalarWhereWithAggregatesInput[]
+    NOT?: HistoricoScalarWhereWithAggregatesInput | HistoricoScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Historico"> | string
+    data?: DateTimeWithAggregatesFilter<"Historico"> | Date | string
+    disciplina?: EnumDisciplinaNomeWithAggregatesFilter<"Historico"> | $Enums.DisciplinaNome
+    materia?: StringWithAggregatesFilter<"Historico"> | string
+    descricao?: StringNullableWithAggregatesFilter<"Historico"> | string | null
+    progresso?: IntWithAggregatesFilter<"Historico"> | number
+    status?: EnumStatusConteudoWithAggregatesFilter<"Historico"> | $Enums.StatusConteudo
+    tempoEstudado?: IntNullableWithAggregatesFilter<"Historico"> | number | null
+    anotacoes?: StringNullableWithAggregatesFilter<"Historico"> | string | null
+    criadoEm?: DateTimeWithAggregatesFilter<"Historico"> | Date | string
+    atualizadoEm?: DateTimeWithAggregatesFilter<"Historico"> | Date | string
+  }
+
   export type MateriaCreateInput = {
     id?: string
     titulo: string
@@ -5312,6 +6615,104 @@ export namespace Prisma {
     dataFim?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     ativo?: BoolFieldUpdateOperationsInput | boolean
     progressoGeral?: IntFieldUpdateOperationsInput | number
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoCreateInput = {
+    id?: string
+    data: Date | string
+    disciplina: $Enums.DisciplinaNome
+    materia: string
+    descricao?: string | null
+    progresso?: number
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type HistoricoUncheckedCreateInput = {
+    id?: string
+    data: Date | string
+    disciplina: $Enums.DisciplinaNome
+    materia: string
+    descricao?: string | null
+    progresso?: number
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type HistoricoUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    materia?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    materia?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoCreateManyInput = {
+    id?: string
+    data: Date | string
+    disciplina: $Enums.DisciplinaNome
+    materia: string
+    descricao?: string | null
+    progresso?: number
+    status?: $Enums.StatusConteudo
+    tempoEstudado?: number | null
+    anotacoes?: string | null
+    criadoEm?: Date | string
+    atualizadoEm?: Date | string
+  }
+
+  export type HistoricoUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    materia?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
+    criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+    atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type HistoricoUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    data?: DateTimeFieldUpdateOperationsInput | Date | string
+    disciplina?: EnumDisciplinaNomeFieldUpdateOperationsInput | $Enums.DisciplinaNome
+    materia?: StringFieldUpdateOperationsInput | string
+    descricao?: NullableStringFieldUpdateOperationsInput | string | null
+    progresso?: IntFieldUpdateOperationsInput | number
+    status?: EnumStatusConteudoFieldUpdateOperationsInput | $Enums.StatusConteudo
+    tempoEstudado?: NullableIntFieldUpdateOperationsInput | number | null
+    anotacoes?: NullableStringFieldUpdateOperationsInput | string | null
     criadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
     atualizadoEm?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -5704,6 +7105,58 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type HistoricoCountOrderByAggregateInput = {
+    id?: SortOrder
+    data?: SortOrder
+    disciplina?: SortOrder
+    materia?: SortOrder
+    descricao?: SortOrder
+    progresso?: SortOrder
+    status?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    criadoEm?: SortOrder
+    atualizadoEm?: SortOrder
+  }
+
+  export type HistoricoAvgOrderByAggregateInput = {
+    progresso?: SortOrder
+    tempoEstudado?: SortOrder
+  }
+
+  export type HistoricoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    data?: SortOrder
+    disciplina?: SortOrder
+    materia?: SortOrder
+    descricao?: SortOrder
+    progresso?: SortOrder
+    status?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    criadoEm?: SortOrder
+    atualizadoEm?: SortOrder
+  }
+
+  export type HistoricoMinOrderByAggregateInput = {
+    id?: SortOrder
+    data?: SortOrder
+    disciplina?: SortOrder
+    materia?: SortOrder
+    descricao?: SortOrder
+    progresso?: SortOrder
+    status?: SortOrder
+    tempoEstudado?: SortOrder
+    anotacoes?: SortOrder
+    criadoEm?: SortOrder
+    atualizadoEm?: SortOrder
+  }
+
+  export type HistoricoSumOrderByAggregateInput = {
+    progresso?: SortOrder
+    tempoEstudado?: SortOrder
   }
 
   export type DiaDisciplinaMateriaCreateNestedManyWithoutMateriaInput = {

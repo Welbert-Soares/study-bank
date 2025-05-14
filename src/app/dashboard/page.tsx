@@ -100,7 +100,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen p-4 md:p-8 bg-gray-50">
+      <main className="w-full min-h-screen p-4 md:p-8 bg-gray-50">
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-between items-center">
             <div>
