@@ -23,9 +23,11 @@ import {
   atualizarStatusRevisao,
 } from '@/app/actions/dashboard.actions'
 import { StatusConteudo, DisciplinaNome } from '@/generated/prisma'
+import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton'
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const dataAtual = new Date()
   const dataFormatada = dataAtual.toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -36,8 +38,15 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const loadDashboard = async () => {
-      const data = await getDashboardData(new Date())
-      setDashboard(data)
+      try {
+        setIsLoading(true)
+        const data = await getDashboardData(new Date())
+        setDashboard(data)
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
 
     loadDashboard()
@@ -89,8 +98,34 @@ export default function DashboardPage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <main className="min-h-screen p-4 md:p-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">
+                Dashboard Diário
+              </h1>
+              <p className="text-gray-600 mt-1 capitalize">{dataFormatada}</p>
+            </div>
+            <div className="flex gap-4">
+              <Button variant="outline" size="lg" className="gap-2" asChild>
+                <Link href="/config">⚙️ Configurar</Link>
+              </Button>
+              <Button variant="outline" size="lg" className="gap-2" asChild>
+                <Link href="/">← Voltar ao Início</Link>
+              </Button>
+            </div>
+          </div>
+          <DashboardSkeleton />
+        </div>
+      </main>
+    )
+  }
+
   if (!dashboard) {
-    return <div>Carregando...</div>
+    return null
   }
 
   return (
