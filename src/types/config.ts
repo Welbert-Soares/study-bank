@@ -10,6 +10,7 @@ export interface MateriaFormData {
 export interface AgendamentoFormData {
   dia: DiaDaSemana
   materiaId: string
+  criarRevisao?: boolean
   status?: StatusConteudo
   tempoEstudado?: number
   anotacoes?: string
@@ -32,6 +33,7 @@ export interface AgendamentoFromDB {
   materiaId: string
   materia: MateriaFromDB
   status: StatusConteudo
+  criarRevisao?: boolean
   tempoEstudado: number | null
   anotacoes: string | null
   criadoEm: Date

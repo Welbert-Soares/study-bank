@@ -1,7 +1,12 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { DiaDaSemana, DisciplinaNome, StatusConteudo } from '@/generated/prisma'
+import {
+  DiaDaSemana,
+  DisciplinaNome,
+  StatusConteudo,
+  Materia,
+} from '@/generated/prisma'
 
 export interface DashboardCronograma {
   id: string
@@ -24,11 +29,19 @@ export interface DashboardObjetivo {
   prioridade: number
 }
 
+interface DashboardRevisao {
+  id: string
+  titulo: string
+  disciplina: DisciplinaNome
+  status: StatusConteudo
+}
+
 export interface DashboardData {
   cronograma: DashboardCronograma[]
   metricas: DashboardMetrica[]
   objetivos: DashboardObjetivo[]
   proximosConteudos: string[]
+  revisoes: DashboardRevisao[]
 }
 
 function getDiaSemana(date: Date): DiaDaSemana {
@@ -42,6 +55,22 @@ function getDiaSemana(date: Date): DiaDaSemana {
     'Sabado',
   ]
   return dias[date.getDay()]
+}
+
+// Função auxiliar para obter o dia seguinte
+function getDiaSeguinte(dia: DiaDaSemana): DiaDaSemana {
+  const dias: DiaDaSemana[] = [
+    'Domingo',
+    'Segunda',
+    'Terca',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sabado',
+  ]
+  const index = dias.indexOf(dia)
+  const proximoIndex = (index + 1) % 7
+  return dias[proximoIndex]
 }
 
 function getProximosDias(
@@ -69,7 +98,7 @@ function getProximosDias(
 }
 
 function getCorDisciplina(disciplina: DisciplinaNome): string {
-  const cores = {
+  const cores: Record<DisciplinaNome, string> = {
     TI: 'bg-blue-500',
     Ingles: 'bg-green-500',
     Portugues: 'bg-yellow-500',
@@ -84,6 +113,66 @@ function getCorDisciplina(disciplina: DisciplinaNome): string {
   return cores[disciplina] || 'bg-gray-500'
 }
 
+// Função para criar matéria de revisão
+async function criarMateriaRevisao(materiaOriginal: Materia): Promise<Materia> {
+  return await db.materia.create({
+    data: {
+      titulo: `Revisão: ${materiaOriginal.titulo}`,
+      disciplina: 'Revisoes',
+      ordem: materiaOriginal.ordem,
+      status: 'pendente',
+    },
+  })
+}
+
+// Função para agendar revisão
+async function agendarRevisao(
+  materiaOriginal: Materia,
+  diaOriginal: DiaDaSemana,
+) {
+  // Cria uma matéria específica para revisão
+  const materiaRevisao = await criarMateriaRevisao(materiaOriginal)
+
+  // Agenda para o dia seguinte
+  const diaRevisao = getDiaSeguinte(diaOriginal)
+
+  await db.diaDisciplinaMateria.create({
+    data: {
+      dia: diaRevisao,
+      materiaId: materiaRevisao.id,
+      status: 'pendente',
+    },
+  })
+}
+
+async function buscarMateriasRevisao(date: Date): Promise<DashboardRevisao[]> {
+  const diaAtual = getDiaSemana(date)
+
+  const materiasRevisao = await db.diaDisciplinaMateria.findMany({
+    where: {
+      dia: diaAtual,
+      materia: {
+        disciplina: 'Revisoes',
+      },
+    },
+    include: {
+      materia: true,
+    },
+    orderBy: {
+      materia: {
+        ordem: 'asc',
+      },
+    },
+  })
+
+  return materiasRevisao.map((item) => ({
+    id: item.id,
+    titulo: item.materia.titulo,
+    disciplina: item.materia.disciplina,
+    status: item.status,
+  }))
+}
+
 export async function getDashboardData(date: Date): Promise<DashboardData> {
   const diaSemana = getDiaSemana(date)
 
@@ -91,6 +180,11 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   const materiasHoje = await db.diaDisciplinaMateria.findMany({
     where: {
       dia: diaSemana,
+      materia: {
+        disciplina: {
+          not: 'Revisoes', // Não incluir revisões no cronograma principal
+        },
+      },
     },
     include: {
       materia: true,
@@ -105,7 +199,6 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   // Montar cronograma
   const cronograma: DashboardCronograma[] = materiasHoje.map((item) => ({
     id: item.id,
-    horario: '08:00',
     titulo: item.materia.titulo,
     disciplina: item.materia.disciplina,
     status: item.status,
@@ -125,11 +218,15 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   // Buscar próximos conteúdos
   const proximosConteudos = await buscarProximosConteudos(diaSemana)
 
+  // Buscar revisões do dia atual
+  const revisoes = await buscarMateriasRevisao(date)
+
   return {
     cronograma,
     metricas,
     objetivos,
     proximosConteudos,
+    revisoes,
   }
 }
 
@@ -147,10 +244,9 @@ async function calcularMetricas(): Promise<DashboardMetrica[]> {
     let materiasCompletas = 0
 
     materias.forEach((materia) => {
-      const concluidos = materia.agendamentos.filter(
-        (a) => a.status === 'concluido',
-      ).length
-      materiasCompletas += concluidos / materia.agendamentos.length
+      const concluidos =
+        materia.agendamentos.filter((a) => a.status === 'concluido').length || 0
+      materiasCompletas += concluidos / (materia.agendamentos.length || 1)
     })
 
     const progresso =
@@ -159,7 +255,7 @@ async function calcularMetricas(): Promise<DashboardMetrica[]> {
         : 0
 
     metricas.push({
-      id: disciplina,
+      id: String(disciplina),
       disciplina,
       progresso,
       cor: getCorDisciplina(disciplina),
@@ -180,6 +276,11 @@ async function buscarProximosConteudos(
         in: proximosDias,
       },
       status: 'pendente',
+      materia: {
+        disciplina: {
+          not: 'Revisoes', // Não incluir revisões nos próximos conteúdos
+        },
+      },
     },
     include: {
       materia: true,
@@ -188,6 +289,32 @@ async function buscarProximosConteudos(
   })
 
   return materias.map((m) => `${m.materia.titulo} (${m.dia})`)
+}
+
+export async function agendarMateria(
+  materiaId: string,
+  dia: DiaDaSemana,
+  criarRevisao: boolean = false,
+): Promise<void> {
+  // Agenda a matéria original
+  await db.diaDisciplinaMateria.create({
+    data: {
+      dia,
+      materiaId,
+      status: 'pendente',
+    },
+  })
+
+  // Se solicitado, cria e agenda a revisão
+  if (criarRevisao) {
+    const materiaOriginal = await db.materia.findUnique({
+      where: { id: materiaId },
+    })
+
+    if (materiaOriginal) {
+      await agendarRevisao(materiaOriginal, dia)
+    }
+  }
 }
 
 export async function atualizarStatusAtividade(
@@ -230,4 +357,14 @@ export async function atualizarProgressoDisciplina(
       data: { status: novoStatus },
     })
   }
+}
+
+export async function atualizarStatusRevisao(
+  id: string,
+  status: StatusConteudo,
+): Promise<void> {
+  await db.diaDisciplinaMateria.update({
+    where: { id },
+    data: { status },
+  })
 }

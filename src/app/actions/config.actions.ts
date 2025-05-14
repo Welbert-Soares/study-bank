@@ -60,9 +60,16 @@ export async function updateMateria(
 
 export async function deleteMateria(id: string) {
   try {
+    // Primeiro, deletar todos os agendamentos associados à matéria
+    await db.diaDisciplinaMateria.deleteMany({
+      where: { materiaId: id },
+    })
+
+    // Depois, deletar a matéria
     await db.materia.delete({
       where: { id },
     })
+
     revalidatePath('/config')
   } catch (error) {
     console.error('Erro ao deletar matéria:', error)
@@ -94,17 +101,76 @@ export async function getAgendamentos() {
   }
 }
 
+function getDiaSeguinte(dia: DiaDaSemana): DiaDaSemana {
+  const dias: DiaDaSemana[] = [
+    'Domingo',
+    'Segunda',
+    'Terca',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sabado',
+  ]
+  const index = dias.indexOf(dia)
+  const proximoIndex = (index + 1) % 7
+  return dias[proximoIndex]
+}
+
+async function criarRevisao(materiaId: string, diaOriginal: DiaDaSemana) {
+  try {
+    // Busca a matéria original
+    const materiaOriginal = await db.materia.findUnique({
+      where: { id: materiaId },
+    })
+
+    if (!materiaOriginal) return
+
+    // Cria uma nova matéria de revisão
+    const materiaRevisao = await db.materia.create({
+      data: {
+        titulo: `Revisar: ${materiaOriginal.titulo}`,
+        disciplina: 'Revisoes',
+        ordem: materiaOriginal.ordem,
+        status: 'pendente',
+      },
+    })
+
+    // Agenda para o dia seguinte
+    const diaRevisao = getDiaSeguinte(diaOriginal)
+
+    await db.diaDisciplinaMateria.create({
+      data: {
+        dia: diaRevisao,
+        materiaId: materiaRevisao.id,
+        status: 'pendente',
+      },
+    })
+  } catch (error) {
+    console.error('Erro ao criar revisão:', error)
+    throw new Error('Não foi possível criar a revisão')
+  }
+}
+
 export async function createAgendamento(data: AgendamentoFormData) {
   try {
     const agendamento = await db.diaDisciplinaMateria.create({
       data: {
-        ...data,
+        dia: data.dia,
+        materiaId: data.materiaId,
         status: data.status ?? StatusConteudo.pendente,
+        tempoEstudado: data.tempoEstudado,
+        anotacoes: data.anotacoes,
       },
       include: {
         materia: true,
       },
     })
+
+    // Se solicitado, criar revisão automaticamente
+    if (data.criarRevisao) {
+      await criarRevisao(data.materiaId, data.dia)
+    }
+
     revalidatePath('/config')
     return agendamento
   } catch (error) {
@@ -121,16 +187,47 @@ export async function updateAgendamento(
     status?: StatusConteudo
     tempoEstudado?: number
     anotacoes?: string
+    criarRevisao?: boolean
   },
 ) {
   try {
+    // Buscar o agendamento atual para comparar mudanças
+    const agendamentoAtual = await db.diaDisciplinaMateria.findUnique({
+      where: { id },
+      include: { materia: true },
+    })
+
+    if (!agendamentoAtual) {
+      throw new Error('Agendamento não encontrado')
+    }
+
+    // Se a opção de criar revisão mudou para true, criar a revisão
+    if (data.criarRevisao && data.materiaId && data.dia) {
+      await criarRevisao(data.materiaId, data.dia)
+    }
+
+    // Atualizar o agendamento
     const agendamento = await db.diaDisciplinaMateria.update({
       where: { id },
-      data,
+      data: {
+        materiaId: data.materiaId,
+        dia: data.dia,
+        status: data.status,
+        tempoEstudado: data.tempoEstudado,
+        anotacoes: data.anotacoes,
+      },
       include: {
         materia: true,
       },
     })
+
+    // Se solicitado criar revisão e houve mudança no dia ou na matéria
+    if (data.criarRevisao && (data.dia || data.materiaId)) {
+      await criarRevisao(
+        data.materiaId || agendamentoAtual.materiaId,
+        data.dia || agendamentoAtual.dia,
+      )
+    }
     revalidatePath('/config')
     return agendamento
   } catch (error) {

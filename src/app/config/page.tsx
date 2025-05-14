@@ -61,6 +61,7 @@ export default function ConfigPage() {
     status: StatusConteudo.pendente,
     tempoEstudado: undefined,
     anotacoes: undefined,
+    criarRevisao: false,
   })
   const [editingItem, setEditingItem] = useState<
     MateriaFromDB | AgendamentoFromDB | null
@@ -111,34 +112,45 @@ export default function ConfigPage() {
       console.error('Erro ao adicionar matéria:', error)
     }
   }
-
   async function handleAddAgendamento() {
     try {
-      await createAgendamento(novoAgendamento)
+      const agendamentoData = {
+        ...novoAgendamento,
+        criarRevisao: novoAgendamento.criarRevisao || false,
+      }
+      await createAgendamento(agendamentoData)
       setNovoAgendamento({
         dia: DiaDaSemana.Segunda,
         materiaId: '',
         status: StatusConteudo.pendente,
         tempoEstudado: undefined,
         anotacoes: undefined,
+        criarRevisao: false,
       })
       await loadData()
     } catch (error) {
       console.error('Erro ao adicionar agendamento:', error)
     }
   }
-
   async function handleUpdateItem() {
     if (!editingItem) return
 
     try {
       if (isAgendamento(editingItem)) {
-        const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
-          editingItem
+        const {
+          id,
+          materiaId,
+          dia,
+          status,
+          tempoEstudado,
+          anotacoes,
+          criarRevisao,
+        } = editingItem
         await updateAgendamento(id, {
           materiaId,
           dia,
           status,
+          criarRevisao,
           tempoEstudado: tempoEstudado ?? undefined,
           anotacoes: anotacoes ?? undefined,
         })
@@ -168,6 +180,32 @@ export default function ConfigPage() {
       await loadData()
     } catch (error) {
       console.error('Erro ao deletar item:', error)
+    }
+  }
+
+  const handleAgendamentoSubmit = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    try {
+      // Get data from the form
+      const agendamentoData = {
+        ...novoAgendamento,
+        criarRevisao: novoAgendamento.criarRevisao || false,
+      }
+
+      if (editingItem && isAgendamento(editingItem)) {
+        await updateAgendamento(editingItem.id, agendamentoData)
+      } else {
+        await createAgendamento(agendamentoData)
+      }
+
+      // Update list
+      await loadData()
+
+      // Clear form
+      setIsEditDialogOpen(false)
+      setEditingItem(null)
+    } catch (error) {
+      console.error('Erro ao salvar agendamento:', error)
     }
   }
 
@@ -313,6 +351,46 @@ export default function ConfigPage() {
                   </Select>
 
                   <div className="col-span-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Criar Revisão
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="criarRevisao"
+                            checked={novoAgendamento.criarRevisao === true}
+                            onChange={() =>
+                              setNovoAgendamento({
+                                ...novoAgendamento,
+                                criarRevisao: true,
+                              })
+                            }
+                            className="h-4 w-4"
+                          />
+                          <span>Sim</span>
+                        </label>
+                        <label className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            name="criarRevisao"
+                            checked={novoAgendamento.criarRevisao === false}
+                            onChange={() =>
+                              setNovoAgendamento({
+                                ...novoAgendamento,
+                                criarRevisao: false,
+                              })
+                            }
+                            className="h-4 w-4"
+                          />
+                          <span>Não</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
                     <Textarea
                       placeholder="Anotações (opcional)"
                       value={novoAgendamento.anotacoes ?? ''}
@@ -341,15 +419,19 @@ export default function ConfigPage() {
                   <TableBody>
                     {agendamentos.map((agendamento) => (
                       <TableRow key={agendamento.id}>
+                        {' '}
                         <TableCell>{agendamento.dia}</TableCell>
                         <TableCell>{agendamento.materia.titulo}</TableCell>
                         <TableCell>{agendamento.status}</TableCell>
-                        <TableCell>
+                        <TableCell className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              setEditingItem(agendamento)
+                              setEditingItem({
+                                ...agendamento,
+                                criarRevisao: agendamento.criarRevisao || false,
+                              })
                               setIsEditDialogOpen(true)
                             }}
                           >
@@ -365,7 +447,6 @@ export default function ConfigPage() {
           </Card>
         </div>
       </div>
-
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -376,8 +457,7 @@ export default function ConfigPage() {
                   : 'Editar Matéria'
                 : ''}
             </DialogTitle>
-          </DialogHeader>
-
+          </DialogHeader>{' '}
           {editingItem && isAgendamento(editingItem) ? (
             <div className="space-y-4">
               <Select
@@ -433,6 +513,34 @@ export default function ConfigPage() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Criar Revisão</label>
+                <div className="flex items-center space-x-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="criarRevisao"
+                      checked={editingItem.criarRevisao === true}
+                      onChange={() => updateEditingItem({ criarRevisao: true })}
+                      className="h-4 w-4"
+                    />
+                    <span>Sim</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="criarRevisao"
+                      checked={editingItem.criarRevisao === false}
+                      onChange={() =>
+                        updateEditingItem({ criarRevisao: false })
+                      }
+                      className="h-4 w-4"
+                    />
+                    <span>Não</span>
+                  </label>
+                </div>
+              </div>
 
               <Textarea
                 placeholder="Anotações (opcional)"
@@ -491,15 +599,25 @@ export default function ConfigPage() {
               </Select>
             </div>
           ) : null}
-
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={handleDeleteItem}>
               Excluir
             </Button>
-            <Button onClick={handleUpdateItem}>Salvar</Button>
+            <Button
+              onClick={(e) => {
+                e.preventDefault()
+                if (editingItem && isAgendamento(editingItem)) {
+                  handleAgendamentoSubmit(e)
+                } else {
+                  handleUpdateItem()
+                }
+              }}
+            >
+              Salvar
+            </Button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog>{' '}
     </main>
   )
 }
