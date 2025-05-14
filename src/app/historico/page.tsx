@@ -8,6 +8,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import HistoricoSkeleton from '@/components/skeletons/historico-skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
@@ -71,25 +72,15 @@ export default function HistoricoPage() {
   if (isLoading) {
     return (
       <main className="min-h-screen p-4 md:p-8 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="animate-pulse space-y-8">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-lg p-6 shadow-md">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                <div className="space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-7xl mx-auto">
+          <HistoricoSkeleton />
         </div>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
+    <main className="w-full min-h-screen p-4 md:p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
           <div>
@@ -143,14 +134,22 @@ export default function HistoricoPage() {
                                 >
                                   <div className="flex justify-between items-start gap-4">
                                     <div className="space-y-1 flex-1">
-                                      <h3 className="font-medium">
-                                        {materia.titulo}
-                                      </h3>
-                                      {materia.descricao && (
-                                        <p className="text-sm text-gray-600">
-                                          {materia.descricao}
-                                        </p>
-                                      )}
+                                      {' '}
+                                      <div className="space-y-1">
+                                        <h3 className="font-medium text-base">
+                                          {materia.titulo}
+                                        </h3>
+                                        {materia.descricao && (
+                                          <div className="text-sm text-gray-600 bg-gray-100 p-2 rounded-md">
+                                            <span className="font-medium text-gray-700">
+                                              Conteúdo estudado:
+                                            </span>
+                                            <p className="mt-1">
+                                              {materia.descricao}
+                                            </p>
+                                          </div>
+                                        )}
+                                      </div>
                                     </div>
                                     <Badge
                                       variant="secondary"

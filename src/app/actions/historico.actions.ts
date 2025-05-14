@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { DisciplinaNome, DiaDaSemana } from '@/generated/prisma'
+import { DisciplinaNome } from '@/generated/prisma'
 
 export interface MateriaDoDia {
   id: string
