@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   NavigationMenu,
@@ -25,17 +24,16 @@ export function Navbar() {
       <NavigationMenuList>
         {routes.map((routes, i) => (
           <NavigationMenuItem key={i}>
-            <Link href={routes.path} className="text-sm">
-              <NavigationMenuLink
-                className={`${
-                  isActive(routes.path)
-                    ? 'bg-cyan-700 text-white hover:bg-cyan-600 hover:text-white transition-colors'
-                    : navigationMenuTriggerStyle()
-                } `}
-              >
-                {routes.name}
-              </NavigationMenuLink>
-            </Link>
+            <NavigationMenuLink
+              className={`${
+                isActive(routes.path)
+                  ? 'bg-cyan-700 text-white hover:bg-cyan-600 hover:text-white transition-colors'
+                  : navigationMenuTriggerStyle()
+              } `}
+              href={routes.path}
+            >
+              {routes.name}
+            </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
       </NavigationMenuList>
