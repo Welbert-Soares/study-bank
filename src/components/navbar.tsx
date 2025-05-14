@@ -12,6 +12,7 @@ import {
 const routes = [
   { name: 'Home', path: '/' },
   { name: 'Dashboard', path: '/dashboard' },
+  { name: 'Métricas', path: '/metricas' },
   { name: 'Configurações', path: '/config' },
 ]
 

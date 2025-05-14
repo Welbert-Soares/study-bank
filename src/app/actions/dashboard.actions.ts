@@ -7,6 +7,7 @@ import {
   StatusConteudo,
   Materia,
 } from '@/generated/prisma'
+import { getCorDisciplina } from '@/lib/cores'
 
 export interface DashboardCronograma {
   id: string
@@ -97,21 +98,7 @@ function getProximosDias(
   return proximos
 }
 
-function getCorDisciplina(disciplina: DisciplinaNome): string {
-  const cores: Record<DisciplinaNome, string> = {
-    TI: 'bg-blue-500',
-    Ingles: 'bg-green-500',
-    Portugues: 'bg-yellow-500',
-    Estatistica: 'bg-purple-500',
-    Atualidades: 'bg-pink-500',
-    Bancarios: 'bg-orange-500',
-    Matematica: 'bg-red-500',
-    Simulado: 'bg-indigo-500',
-    Revisoes: 'bg-gray-500',
-    Redacao: 'bg-teal-500',
-  }
-  return cores[disciplina] || 'bg-gray-500'
-}
+// Moved to src/lib/cores.ts
 
 // Função para criar matéria de revisão
 async function criarMateriaRevisao(materiaOriginal: Materia): Promise<Materia> {
@@ -204,8 +191,8 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
     status: item.status,
   }))
 
-  // Calcular métricas
-  const metricas = await calcularMetricas()
+  // Calcular métricas apenas das matérias do dia
+  const metricas = await calcularMetricasDoDia(materiasHoje)
 
   // Montar objetivos
   const objetivos: DashboardObjetivo[] = materiasHoje.map((item) => ({
@@ -230,29 +217,31 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   }
 }
 
-async function calcularMetricas(): Promise<DashboardMetrica[]> {
-  const disciplinas = Object.values(DisciplinaNome)
+// Função movida para metricas/actions.ts
+
+type MateriaComAgendamento = {
+  materia: { disciplina: DisciplinaNome; titulo: string }
+  status: StatusConteudo
+}
+
+async function calcularMetricasDoDia(
+  materiasHoje: MateriaComAgendamento[],
+): Promise<DashboardMetrica[]> {
+  const disciplinas = new Set(
+    materiasHoje.map((item) => item.materia.disciplina),
+  )
   const metricas: DashboardMetrica[] = []
 
   for (const disciplina of disciplinas) {
-    const materias = await db.materia.findMany({
-      where: { disciplina },
-      include: { agendamentos: true },
-    })
+    const materiasDaDisciplina = materiasHoje.filter(
+      (item) => item.materia.disciplina === disciplina,
+    )
+    const total = materiasDaDisciplina.length
+    const concluidos = materiasDaDisciplina.filter(
+      (item) => item.status === 'concluido',
+    ).length
 
-    const totalMaterias = materias.length
-    let materiasCompletas = 0
-
-    materias.forEach((materia) => {
-      const concluidos =
-        materia.agendamentos.filter((a) => a.status === 'concluido').length || 0
-      materiasCompletas += concluidos / (materia.agendamentos.length || 1)
-    })
-
-    const progresso =
-      totalMaterias > 0
-        ? Math.round((materiasCompletas / totalMaterias) * 100)
-        : 0
+    const progresso = total > 0 ? Math.round((concluidos / total) * 100) : 0
 
     metricas.push({
       id: String(disciplina),

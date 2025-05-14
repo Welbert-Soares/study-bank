@@ -53,6 +53,14 @@ export default async function Home() {
                   🗂️ Flashcards (Quizlet)
                 </a>
               </Button>
+              <Button
+                variant="default"
+                size="lg"
+                className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
+                asChild
+              >
+                <a href="/metricas">📈 Métricas Gerais</a>
+              </Button>
             </div>
           </CardHeader>
         </Card>
