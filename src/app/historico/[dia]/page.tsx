@@ -16,18 +16,26 @@ import Link from 'next/link'
 import type { DisciplinaDoDia } from '../../actions/historico.actions'
 import { buscarHistoricoDeEstudosPorDia } from '../../actions/historico.actions'
 
-function formatarDiaSemana(dia: string): string {
-  const diasDaSemana: Record<string, string> = {
-    Segunda: 'Segunda-feira',
-    Terca: 'Terça-feira',
-    Quarta: 'Quarta-feira',
-    Quinta: 'Quinta-feira',
-    Sexta: 'Sexta-feira',
-    Sabado: 'Sábado',
-    Domingo: 'Domingo',
-  }
+function formatarDiaSemana(dataString: string): string {
+  const [ano, mes, dia] = dataString.split('-').map(Number)
+  const data = new Date(ano, mes - 1, dia)
+  const diasDaSemana = [
+    'Domingo',
+    'Segunda-feira',
+    'Terça-feira',
+    'Quarta-feira',
+    'Quinta-feira',
+    'Sexta-feira',
+    'Sábado',
+  ]
+  return diasDaSemana[data.getDay()]
+}
 
-  return diasDaSemana[dia] || dia
+function formatarData(dataString: string): string {
+  const [ano, mes, dia] = dataString.split('-').map(Number)
+  return `${dia.toString().padStart(2, '0')}/${mes
+    .toString()
+    .padStart(2, '0')}/${ano}`
 }
 
 function getStatusColor(status: string): string {
@@ -180,7 +188,7 @@ export default function DetalhesHistoricoPage({
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">
-              {formatarDiaSemana(dia)}
+              {formatarDiaSemana(dia)} - {formatarData(dia)}
             </h1>
             <p className="text-gray-600">Detalhes das atividades do dia</p>
           </div>
