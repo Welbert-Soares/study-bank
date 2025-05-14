@@ -51,11 +51,32 @@ CREATE TABLE "PlanoDeEstudos" (
     CONSTRAINT "PlanoDeEstudos_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "HistoricoEstudo" (
+    "id" TEXT NOT NULL,
+    "tituloDaMateria" TEXT NOT NULL,
+    "disciplina" "DisciplinaNome" NOT NULL,
+    "dataEstudo" TIMESTAMP(3) NOT NULL,
+    "tempoEstudado" INTEGER NOT NULL,
+    "anotacoes" TEXT,
+    "progresso" INTEGER NOT NULL DEFAULT 0,
+    "planoId" TEXT,
+    "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "HistoricoEstudo_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE INDEX "DiaDisciplinaMateria_materiaId_idx" ON "DiaDisciplinaMateria"("materiaId");
 
 -- CreateIndex
 CREATE INDEX "DiaDisciplinaMateria_planoId_idx" ON "DiaDisciplinaMateria"("planoId");
+
+-- CreateIndex
+CREATE INDEX "HistoricoEstudo_disciplina_idx" ON "HistoricoEstudo"("disciplina");
+
+-- CreateIndex
+CREATE INDEX "HistoricoEstudo_dataEstudo_idx" ON "HistoricoEstudo"("dataEstudo");
 
 -- AddForeignKey
 ALTER TABLE "DiaDisciplinaMateria" ADD CONSTRAINT "DiaDisciplinaMateria_materiaId_fkey" FOREIGN KEY ("materiaId") REFERENCES "Materia"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

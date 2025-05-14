@@ -86,3 +86,19 @@ model PlanoDeEstudos {
   criadoEm       DateTime               @default(now())
   atualizadoEm   DateTime               @updatedAt
 }
+
+// Tabela para armazenar o histórico de estudos de matérias deletadas
+model HistoricoEstudo {
+  id              String         @id @default(cuid())
+  tituloDaMateria String // Nome da matéria quando foi deletada
+  disciplina      DisciplinaNome
+  dataEstudo      DateTime
+  tempoEstudado   Int // Em minutos
+  anotacoes       String?
+  progresso       Int            @default(0) // Progresso que tinha sido alcançado
+  planoId         String? // Referência opcional ao plano de estudos, caso existisse 
+  criadoEm        DateTime       @default(now())
+
+  @@index([disciplina])
+  @@index([dataEstudo])
+}

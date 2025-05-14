@@ -199,7 +199,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "c:\\Users\\welbert\\Documents\\github\\study-bank\\src\\generated\\prisma",
+      "value": "C:\\Users\\welbert\\Documents\\github\\study-bank\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -213,7 +213,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "c:\\Users\\welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -231,7 +231,7 @@ const config = {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://neondb_owner:npg_v9KxY4yLkPWJ@ep-nameless-mud-acrtyqeo-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require"
+        "value": "postgresql://neondb_owner:npg_skG94oHuvBwJ@ep-gentle-rain-acbwh4ei-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require"
       }
     }
   },

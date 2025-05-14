@@ -25,7 +25,7 @@ import type {
   DisciplinaDoDia,
 } from '../actions/historico.actions'
 import {
-  buscarHistoricoPorDia,
+  buscarHistoricoDeEstudos,
   RegistroDiario,
 } from '../actions/historico.actions'
 
@@ -62,7 +62,7 @@ export default function HistoricoPage() {
     async function carregarDados() {
       try {
         setIsLoading(true)
-        const dados = await buscarHistoricoPorDia()
+        const dados = await buscarHistoricoDeEstudos() // Usando nova função
         if (dados) {
           setHistorico(dados)
         }

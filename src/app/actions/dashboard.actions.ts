@@ -341,10 +341,36 @@ export async function atualizarStatusAtividade(
   id: string,
   status: StatusConteudo,
 ) {
+  // Buscar o registro para ter acesso aos dados da matéria
+  const registro = await db.diaDisciplinaMateria.findUnique({
+    where: { id },
+    include: { materia: true },
+  })
+
+  if (!registro) {
+    throw new Error('Registro não encontrado')
+  }
+
+  // Atualizar o status
   await db.diaDisciplinaMateria.update({
     where: { id },
     data: { status },
   })
+
+  // Se o status for concluído, salvar no histórico
+  if (status === 'concluido') {
+    await db.historicoEstudo.create({
+      data: {
+        tituloDaMateria: registro.materia.titulo,
+        disciplina: registro.materia.disciplina,
+        dataEstudo: new Date(),
+        tempoEstudado: registro.tempoEstudado ?? 0,
+        anotacoes: registro.anotacoes,
+        progresso: registro.progresso,
+        planoId: registro.planoId,
+      },
+    })
+  }
 }
 
 export async function atualizarStatusObjetivo(id: string, completo: boolean) {
@@ -372,10 +398,34 @@ export async function atualizarProgressoDisciplina(
         ? 'em_progresso'
         : 'pendente'
 
+    // Atualizar todos os agendamentos desta matéria
     await db.diaDisciplinaMateria.updateMany({
       where: { materiaId: materia.id },
       data: { status: novoStatus },
     })
+
+    // Se a matéria foi concluída (progresso = 100%), salvar no histórico
+    if (novoStatus === 'concluido') {
+      // Buscar o último agendamento para pegar as informações mais recentes
+      const ultimoAgendamento = await db.diaDisciplinaMateria.findFirst({
+        where: { materiaId: materia.id },
+        orderBy: { atualizadoEm: 'desc' },
+      })
+
+      if (ultimoAgendamento) {
+        await db.historicoEstudo.create({
+          data: {
+            tituloDaMateria: materia.titulo,
+            disciplina: materia.disciplina,
+            dataEstudo: new Date(),
+            tempoEstudado: ultimoAgendamento.tempoEstudado ?? 0,
+            anotacoes: ultimoAgendamento.anotacoes,
+            progresso: ultimoAgendamento.progresso,
+            planoId: ultimoAgendamento.planoId,
+          },
+        })
+      }
+    }
   }
 }
 

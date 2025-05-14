@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/table'
 import Link from 'next/link'
 import type { DisciplinaDoDia } from '../../actions/historico.actions'
-import { buscarHistoricoDoDia } from '../../actions/historico.actions'
+import { buscarHistoricoDeEstudosPorDia } from '../../actions/historico.actions'
 
 function formatarDiaSemana(dia: string): string {
   const diasDaSemana: Record<string, string> = {
@@ -59,7 +59,7 @@ export default function DetalhesHistoricoPage({
     async function carregarDados() {
       try {
         setIsLoading(true)
-        const dados = await buscarHistoricoDoDia(dia)
+        const dados = await buscarHistoricoDeEstudosPorDia(dia) // Usando nova função
         setDisciplinas(dados)
       } catch (error) {
         setError('Erro ao carregar o histórico')
