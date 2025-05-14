@@ -142,14 +142,8 @@ export default function ConfigPage() {
 
     try {
       if (isAgendamento(editingItem)) {
-        const {
-          id,
-          materiaId,
-          dia,
-          status,
-          tempoEstudado,
-          anotacoes,
-        } = editingItem
+        const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
+          editingItem
 
         // Ensure required fields are present
         if (!materiaId || !dia) {
@@ -202,14 +196,8 @@ export default function ConfigPage() {
         throw new Error('Agendamento inválido')
       }
 
-      const {
-        id,
-        materiaId,
-        dia,
-        status,
-        tempoEstudado,
-        anotacoes,
-      } = editingItem
+      const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
+        editingItem
 
       // Ensure required fields are present
       if (!materiaId || !dia) {
