@@ -1,12 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-
 import {
   Table,
   TableBody,
@@ -15,8 +10,75 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
+import Link from 'next/link'
+import {
+  DashboardData,
+  getDashboardData,
+  atualizarStatusAtividade,
+  atualizarStatusObjetivo,
+  atualizarProgressoDisciplina,
+} from '@/app/actions/dashboard.actions'
+import { StatusConteudo, DisciplinaNome } from '@/generated/prisma'
 
 export default function DashboardPage() {
+  const [dashboard, setDashboard] = useState<DashboardData | null>(null)
+  const dataAtual = new Date()
+  const dataFormatada = dataAtual.toLocaleDateString('pt-BR', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+
+  useEffect(() => {
+    const loadDashboard = async () => {
+      const data = await getDashboardData(new Date())
+      setDashboard(data)
+    }
+
+    loadDashboard()
+  }, [])
+
+  const handleMetricaProgressoChange = async (id: string, valor: number) => {
+    try {
+      await atualizarProgressoDisciplina(id as DisciplinaNome, valor)
+      const data = await getDashboardData(new Date())
+      setDashboard(data)
+    } catch (error) {
+      console.error('Erro ao atualizar progresso:', error)
+    }
+  }
+
+  const handleAtividadeStatusChange = async (
+    id: string,
+    status: StatusConteudo,
+  ) => {
+    try {
+      await atualizarStatusAtividade(id, status)
+      const data = await getDashboardData(new Date())
+      setDashboard(data)
+    } catch (error) {
+      console.error('Erro ao atualizar status da atividade:', error)
+    }
+  }
+
+  const handleObjetivoStatusChange = async (id: string, completo: boolean) => {
+    try {
+      await atualizarStatusObjetivo(id, completo)
+      const data = await getDashboardData(new Date())
+      setDashboard(data)
+    } catch (error) {
+      console.error('Erro ao atualizar status do objetivo:', error)
+    }
+  }
+
+  if (!dashboard) {
+    return <div>Carregando...</div>
+  }
+
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -47,78 +109,60 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Horário</TableHead>
                       <TableHead>Atividade</TableHead>
+                      <TableHead>Disciplina</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead className="w-[100px]">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dashboard?.cronograma.map((item) => (
-                      <TableRow key={item.id}>
+                    {dashboard.cronograma.map((item) => (
+                      <TableRow
+                        key={item.id}
+                        className={
+                          item.status === 'concluido'
+                            ? 'bg-green-50'
+                            : item.status === 'em_progresso'
+                            ? 'bg-yellow-50'
+                            : ''
+                        }
+                      >
                         <TableCell className="font-medium">
-                          {item.horario}
+                          {item.titulo}
                         </TableCell>
+                        <TableCell>{item.disciplina}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={item.disciplina?.cor || 'bg-blue-50'}
-                          >
-                            {item.atividade}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              item.status === 'completed'
-                                ? 'default'
-                                : item.status === 'in_progress'
-                                ? 'secondary'
-                                : 'outline'
-                            }
-                          >
-                            {item.status === 'completed'
-                              ? '✓ Concluído'
-                              : item.status === 'in_progress'
-                              ? '⌛ Em Andamento'
-                              : '• Pendente'}
+                          <Badge variant="outline" className="capitalize">
+                            {item.status}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
-                              variant="outline"
                               size="sm"
+                              variant="outline"
                               onClick={() =>
-                                item.id &&
                                 handleAtividadeStatusChange(
                                   item.id,
-                                  'completed',
+                                  'em_progresso',
                                 )
                               }
-                              className={
-                                item.status === 'completed' ? 'bg-green-50' : ''
-                              }
+                              disabled={item.status === 'concluido'}
                             >
-                              ✓
+                              ▶️
                             </Button>
                             <Button
-                              variant="outline"
                               size="sm"
+                              variant="outline"
                               onClick={() =>
-                                item.id &&
                                 handleAtividadeStatusChange(
                                   item.id,
-                                  'in_progress',
+                                  'concluido',
                                 )
                               }
-                              className={
-                                item.status === 'in_progress'
-                                  ? 'bg-yellow-50'
-                                  : ''
-                              }
+                              disabled={item.status === 'concluido'}
                             >
-                              ⌛
+                              ✓
                             </Button>
                           </div>
                         </TableCell>
@@ -135,10 +179,12 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {dashboard?.metricas.map((metrica) => (
+                  {dashboard.metricas.map((metrica) => (
                     <div key={metrica.id} className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="font-medium">{metrica.nome}</span>
+                        <span className="font-medium">
+                          {metrica.disciplina}
+                        </span>
                         <span className="text-gray-500">
                           {metrica.progresso}%
                         </span>
@@ -177,7 +223,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboard?.objetivos.map((objetivo, index) => (
+                  {dashboard.objetivos.map((objetivo) => (
                     <div
                       key={objetivo.id}
                       className="flex items-center gap-2 p-2 rounded-lg border bg-card"
@@ -186,7 +232,6 @@ export default function DashboardPage() {
                         type="checkbox"
                         checked={objetivo.completo}
                         onChange={(e) =>
-                          objetivo.id &&
                           handleObjetivoStatusChange(
                             objetivo.id,
                             e.target.checked,
@@ -198,7 +243,7 @@ export default function DashboardPage() {
                         variant="outline"
                         className="w-6 h-6 flex items-center justify-center p-1"
                       >
-                        {index + 1}
+                        {objetivo.prioridade}
                       </Badge>
                       <span
                         className={
@@ -219,7 +264,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {dashboard?.proximosConteudos.map((conteudo, index) => (
+                  {dashboard.proximosConteudos.map((conteudo, index) => (
                     <Badge
                       key={index}
                       variant="outline"

@@ -10,8 +10,12 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { Progress } from '@/components/ui/progress'
+import { getWeeklyPlan } from '@/app/actions/home.actions'
 
-export default function Home() {
+export default async function Home() {
+  const studyPlan = await getWeeklyPlan()
+
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -68,6 +72,7 @@ export default function Home() {
                         <TableHead className="py-3">Disciplina 1</TableHead>
                         <TableHead className="py-3">Disciplina 2</TableHead>
                         <TableHead className="py-3">Redação</TableHead>
+                        <TableHead className="py-3">Progresso</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -77,12 +82,20 @@ export default function Home() {
                             {day.day}
                           </TableCell>
                           <TableCell className="py-3">
-                            {day.discipline1}
+                            {day.discipline1 || '-'}
                           </TableCell>
                           <TableCell className="py-3">
-                            {day.discipline2}
+                            {day.discipline2 || '-'}
                           </TableCell>
-                          <TableCell className="py-3">{day.writing}</TableCell>
+                          <TableCell className="py-3">
+                            {day.writing ? '✓' : '-'}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            <Progress
+                              value={day.progress}
+                              className="w-[60px]"
+                            />
+                          </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
