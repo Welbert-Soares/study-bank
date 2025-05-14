@@ -163,15 +163,10 @@ async function buscarMateriasRevisao(date: Date): Promise<DashboardRevisao[]> {
 export async function getDashboardData(date: Date): Promise<DashboardData> {
   const diaSemana = getDiaSemana(date)
 
-  // Buscar materias do dia
+  // Buscar todas as atividades do dia, incluindo revisões
   const materiasHoje = await db.diaDisciplinaMateria.findMany({
     where: {
       dia: diaSemana,
-      materia: {
-        disciplina: {
-          not: 'Revisoes', // Não incluir revisões no cronograma principal
-        },
-      },
     },
     include: {
       materia: true,
@@ -183,30 +178,38 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
     },
   })
 
-  // Montar cronograma
-  const cronograma: DashboardCronograma[] = materiasHoje.map((item) => ({
+  // Separar matérias regulares e revisões
+  const materiasRegulares = materiasHoje.filter(
+    (item) => item.materia.disciplina !== 'Revisoes',
+  )
+
+  // Buscar revisões usando a função especializada
+  const revisoes = await buscarMateriasRevisao(date)
+
+  // Montar cronograma apenas com matérias regulares
+  const cronograma: DashboardCronograma[] = materiasRegulares.map((item) => ({
     id: item.id,
     titulo: item.materia.titulo,
     disciplina: item.materia.disciplina,
     status: item.status,
   }))
 
-  // Calcular métricas apenas das matérias do dia
+  // Calcular métricas incluindo todas as atividades
   const metricas = await calcularMetricasDoDia(materiasHoje)
 
   // Montar objetivos
   const objetivos: DashboardObjetivo[] = materiasHoje.map((item) => ({
     id: item.id,
-    descricao: `Estudar ${item.materia.titulo}`,
+    descricao:
+      item.materia.disciplina === 'Revisoes'
+        ? `Revisar: ${item.materia.titulo.replace('Revisão: ', '')}`
+        : `Estudar ${item.materia.titulo}`,
     completo: item.status === 'concluido',
     prioridade: item.materia.ordem,
   }))
 
   // Buscar próximos conteúdos
   const proximosConteudos = await buscarProximosConteudos(diaSemana)
-
-  // Buscar revisões do dia atual
-  const revisoes = await buscarMateriasRevisao(date)
 
   return {
     cronograma,
@@ -227,21 +230,49 @@ type MateriaComAgendamento = {
 async function calcularMetricasDoDia(
   materiasHoje: MateriaComAgendamento[],
 ): Promise<DashboardMetrica[]> {
-  const disciplinas = new Set(
-    materiasHoje.map((item) => item.materia.disciplina),
-  )
+  const disciplinasMap = new Map<DisciplinaNome, MateriaComAgendamento[]>()
+
+  // Agrupar matérias por disciplina, mapeando revisões para suas disciplinas originais
+  for (const item of materiasHoje) {
+    let disciplina = item.materia.disciplina
+
+    // Se for uma revisão, extrair a disciplina original do título
+    if (disciplina === 'Revisoes') {
+      const tituloOriginal = item.materia.titulo.replace('Revisão: ', '')
+      // Encontrar a matéria regular correspondente para pegar a disciplina correta
+      const materiaOriginal = materiasHoje.find(
+        (m) =>
+          m.materia.disciplina !== 'Revisoes' &&
+          tituloOriginal.includes(m.materia.titulo),
+      )
+      if (materiaOriginal) {
+        disciplina = materiaOriginal.materia.disciplina
+      }
+    }
+
+    if (!disciplinasMap.has(disciplina)) {
+      disciplinasMap.set(disciplina, [])
+    }
+    disciplinasMap.get(disciplina)!.push(item)
+  }
+
   const metricas: DashboardMetrica[] = []
 
-  for (const disciplina of disciplinas) {
-    const materiasDaDisciplina = materiasHoje.filter(
-      (item) => item.materia.disciplina === disciplina,
-    )
-    const total = materiasDaDisciplina.length
-    const concluidos = materiasDaDisciplina.filter(
+  // Calcular progresso para cada disciplina
+  for (const [disciplina, materias] of disciplinasMap.entries()) {
+    const total = materias.length
+    const concluidos = materias.filter(
       (item) => item.status === 'concluido',
     ).length
+    const emProgresso = materias.filter(
+      (item) => item.status === 'em_progresso',
+    ).length
 
-    const progresso = total > 0 ? Math.round((concluidos / total) * 100) : 0
+    // Calcular progresso considerando itens em progresso como 50% concluídos
+    const progresso =
+      total > 0
+        ? Math.round(((concluidos + emProgresso * 0.5) / total) * 100)
+        : 0
 
     metricas.push({
       id: String(disciplina),

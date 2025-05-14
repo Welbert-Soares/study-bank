@@ -9,6 +9,8 @@ export interface StudyPlanDay {
   discipline2: DisciplinaNome | null
   writing: boolean
   progress: number
+  revisoes: number
+  revisoesTitulos: string[]
 }
 
 export async function getWeeklyPlan(): Promise<StudyPlanDay[]> {
@@ -33,6 +35,8 @@ export async function getWeeklyPlan(): Promise<StudyPlanDay[]> {
       discipline2: null,
       writing: false,
       progress: 0,
+      revisoes: 0,
+      revisoesTitulos: [],
     })
   })
 
@@ -41,7 +45,10 @@ export async function getWeeklyPlan(): Promise<StudyPlanDay[]> {
     const day = assignment.dia
     const plan = weeklyPlan.get(day)!
 
-    if (!plan.discipline1) {
+    if (assignment.materia.disciplina === 'Revisoes') {
+      plan.revisoes++
+      plan.revisoesTitulos.push(assignment.materia.titulo)
+    } else if (!plan.discipline1) {
       plan.discipline1 = assignment.materia.disciplina
     } else if (!plan.discipline2) {
       plan.discipline2 = assignment.materia.disciplina

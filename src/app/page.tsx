@@ -80,6 +80,7 @@ export default async function Home() {
                         <TableHead className="py-3">Disciplina 1</TableHead>
                         <TableHead className="py-3">Disciplina 2</TableHead>
                         <TableHead className="py-3">Redação</TableHead>
+                        <TableHead className="py-3">Revisões</TableHead>
                         <TableHead className="py-3">Progresso</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -97,6 +98,22 @@ export default async function Home() {
                           </TableCell>
                           <TableCell className="py-3">
                             {day.writing ? '✓' : '-'}
+                          </TableCell>
+                          <TableCell className="py-3">
+                            {day.revisoes > 0 ? (
+                              <div className="flex flex-col gap-1">
+                                {day.revisoesTitulos?.map((titulo, index) => (
+                                  <span
+                                    key={index}
+                                    className="text-sm text-gray-600"
+                                  >
+                                    • {titulo.replace('Revisão: ', '')}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              '-'
+                            )}
                           </TableCell>
                           <TableCell className="py-3">
                             <Progress

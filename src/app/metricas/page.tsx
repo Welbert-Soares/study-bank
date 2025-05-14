@@ -36,8 +36,8 @@ export default function MetricasPage() {
   }, [])
 
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <main className="w-full flex flex-col min-h-screen p-4 md:p-8 bg-gray-50">
+      <div className="space-y-8 mx-auto lg:w-3/4">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">
