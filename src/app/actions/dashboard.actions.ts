@@ -204,7 +204,7 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
     id: item.id,
     descricao:
       item.materia.disciplina === 'Revisoes'
-        ? `Revisar: ${item.materia.titulo.replace('Revisão: ', '')}`
+        ? `Revisar: ${item.materia.titulo.replace('Revisar: ', '')}`
         : `Estudar ${item.materia.titulo}`,
     completo: item.status === 'concluido',
     prioridade: item.materia.ordem,
