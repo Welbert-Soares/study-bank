@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getMetricasGerais, MetricaGeral } from '../actions/metricas.actions'
+import {
+  getMetricasGeraisAction,
+  type MetricaGeral,
+} from '../actions/metricas.actions'
 import { MetricasPageSkeleton } from '@/components/skeletons/metricas-skeleton'
 
 // Import components
@@ -17,7 +20,7 @@ export default function MetricasPage() {
     async function loadData() {
       try {
         setIsLoading(true)
-        const data = await getMetricasGerais()
+        const data = await getMetricasGeraisAction()
         setMetricas(data)
       } catch (error) {
         console.error('Erro ao carregar métricas:', error)
