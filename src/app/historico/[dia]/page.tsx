@@ -3,8 +3,8 @@
 import { useState, useEffect, use } from 'react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import type { DisciplinaDoDia } from '../../actions/historico.actions'
-import { buscarHistoricoDeEstudosPorDia } from '../../actions/historico.actions'
+import type { DisciplinaDoDia } from '@/services/historico/types'
+import { buscarHistoricoDoDiaAction } from '../../actions/historico.actions'
 import { PageHeader } from '../_components/PageHeader'
 import { TableSkeleton } from './_components/TableSkeleton'
 import { DetailedTable } from './_components/DetailedTable'
@@ -29,7 +29,7 @@ export default function DetalhesHistoricoPage({
     async function carregarDados() {
       try {
         setIsLoading(true)
-        const dados = await buscarHistoricoDeEstudosPorDia(dia)
+        const dados = await buscarHistoricoDoDiaAction(dia)
         setDisciplinas(dados)
       } catch (error) {
         setError('Erro ao carregar o histórico')

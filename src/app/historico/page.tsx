@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import HistoricoSkeleton from '@/components/skeletons/historico-skeleton'
-import {
-  buscarHistoricoDeEstudos,
-  RegistroDiario,
-} from '../actions/historico.actions'
+import { buscarHistoricoPorDiaAction } from '../actions/historico.actions'
+import type { RegistroDiario } from '@/services/historico/types'
 import { PageHeader } from './_components/PageHeader'
 import { StudyDayCard } from './_components/StudyDayCard'
 
@@ -18,10 +16,8 @@ export default function HistoricoPage() {
     async function carregarDados() {
       try {
         setIsLoading(true)
-        const dados = await buscarHistoricoDeEstudos()
-        if (dados) {
-          setHistorico(dados)
-        }
+        const dados = await buscarHistoricoPorDiaAction()
+        setHistorico(dados)
       } catch (error) {
         console.error('Erro ao carregar histórico:', error)
       } finally {
