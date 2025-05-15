@@ -99,6 +99,9 @@ model HistoricoEstudo {
   planoId         String? // Referência opcional ao plano de estudos, caso existisse 
   criadoEm        DateTime       @default(now())
 
+  // Add unique constraint
+  @@unique([tituloDaMateria, disciplina, dataEstudo])
+
   @@index([disciplina])
   @@index([dataEstudo])
 }

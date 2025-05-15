@@ -8,6 +8,8 @@ import {
   Materia,
 } from '@/generated/prisma'
 import { getCorDisciplina } from '@/lib/cores'
+import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
+import { revalidatePath } from 'next/cache'
 
 export interface DashboardCronograma {
   id: string
@@ -341,91 +343,221 @@ export async function atualizarStatusAtividade(
   id: string,
   status: StatusConteudo,
 ) {
-  // Buscar o registro para ter acesso aos dados da matéria
-  const registro = await db.diaDisciplinaMateria.findUnique({
-    where: { id },
-    include: { materia: true },
-  })
-
-  if (!registro) {
-    throw new Error('Registro não encontrado')
-  }
-
-  // Atualizar o status
-  await db.diaDisciplinaMateria.update({
-    where: { id },
-    data: { status },
-  })
-
-  // Se o status for concluído, salvar no histórico
-  if (status === 'concluido') {
-    await db.historicoEstudo.create({
-      data: {
-        tituloDaMateria: registro.materia.titulo,
-        disciplina: registro.materia.disciplina,
-        dataEstudo: new Date(),
-        tempoEstudado: registro.tempoEstudado ?? 0,
-        anotacoes: registro.anotacoes,
-        progresso: registro.progresso,
-        planoId: registro.planoId,
-      },
+  try {
+    // Buscar o registro para ter acesso aos dados da matéria
+    const registro = await db.diaDisciplinaMateria.findUnique({
+      where: { id },
+      include: { materia: true },
     })
+
+    if (!registro) {
+      throw new Error('Registro não encontrado')
+    }
+
+    // Atualizar o status primeiro
+    await db.diaDisciplinaMateria.update({
+      where: { id },
+      data: { status },
+    })
+
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    const amanha = new Date(hoje)
+    amanha.setDate(amanha.getDate() + 1)
+
+    // Se marcando como concluído
+    if (status === 'concluido') {
+      console.log('Criando histórico para:', registro.materia.titulo)
+      
+      // Criar entrada no histórico
+      await db.historicoEstudo.create({
+        data: {
+          tituloDaMateria: registro.materia.titulo,
+          disciplina: registro.materia.disciplina,
+          dataEstudo: new Date(),
+          tempoEstudado: registro.tempoEstudado ?? 0,
+          anotacoes: registro.anotacoes,
+          progresso: registro.progresso,
+          planoId: registro.planoId,
+        },
+      })
+    } 
+    // Se desmarcando de concluído
+    else if (registro.status === 'concluido') {
+      console.log('Removendo histórico para:', registro.materia.titulo)
+      
+      // Remover do histórico
+      await db.historicoEstudo.deleteMany({
+        where: {
+          tituloDaMateria: registro.materia.titulo,
+          disciplina: registro.materia.disciplina,
+          dataEstudo: {
+            gte: hoje,
+            lt: amanha
+          }
+        }
+      })
+    }
+
+    // Forçar revalidação das páginas
+    revalidatePath('/dashboard')
+    revalidatePath('/historico')
+
+    return registro
+
+  } catch (error) {
+    console.error('Erro ao atualizar status da atividade:', error)
+    throw new Error('Falha ao atualizar status: ' + (error as Error).message)
   }
 }
 
 export async function atualizarStatusObjetivo(id: string, completo: boolean) {
-  await db.diaDisciplinaMateria.update({
-    where: { id },
-    data: { status: completo ? 'concluido' : 'pendente' },
-  })
+  try {
+    // Buscar o registro para ter acesso aos dados da matéria
+    const registro = await db.diaDisciplinaMateria.findUnique({
+      where: { id },
+      include: { materia: true },
+    })
+
+    if (!registro) {
+      throw new Error('Registro não encontrado')
+    }
+
+    // Atualizar o status
+    await db.diaDisciplinaMateria.update({
+      where: { id },
+      data: { status: completo ? 'concluido' : 'pendente' },
+    })
+
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    const amanha = new Date(hoje)
+    amanha.setDate(amanha.getDate() + 1)
+
+    // Se está marcando como completo
+    if (completo) {
+      console.log('Criando histórico para objetivo:', registro.materia.titulo)
+      
+      // Criar entrada no histórico
+      await db.historicoEstudo.create({
+        data: {
+          tituloDaMateria: registro.materia.titulo,
+          disciplina: registro.materia.disciplina,
+          dataEstudo: new Date(),
+          tempoEstudado: registro.tempoEstudado ?? 0,
+          anotacoes: registro.anotacoes,
+          progresso: registro.progresso,
+          planoId: registro.planoId,
+        },
+      })
+    } 
+    // Se está desmarcando como completo
+    else {
+      console.log('Removendo histórico para objetivo:', registro.materia.titulo)
+      
+      // Remover do histórico
+      await db.historicoEstudo.deleteMany({
+        where: {
+          tituloDaMateria: registro.materia.titulo,
+          disciplina: registro.materia.disciplina,
+          dataEstudo: {
+            gte: hoje,
+            lt: amanha
+          }
+        }
+      })
+    }
+
+    // Forçar revalidação das páginas
+    revalidatePath('/dashboard')
+    revalidatePath('/historico')
+
+  } catch (error) {
+    console.error('Erro ao atualizar status do objetivo:', error)
+    throw new Error('Falha ao atualizar objetivo: ' + (error as Error).message)
+  }
 }
 
 export async function atualizarProgressoDisciplina(
   disciplina: DisciplinaNome,
   progresso: number,
 ) {
-  const materias = await db.materia.findMany({
-    where: { disciplina },
-    include: { agendamentos: true },
-  })
-
-  // Atualiza o status das matérias baseado no progresso geral
-  for (const materia of materias) {
-    const novoStatus: StatusConteudo =
-      progresso >= 100
-        ? 'concluido'
-        : progresso > 0
-        ? 'em_progresso'
-        : 'pendente'
-
-    // Atualizar todos os agendamentos desta matéria
-    await db.diaDisciplinaMateria.updateMany({
-      where: { materiaId: materia.id },
-      data: { status: novoStatus },
+  try {
+    const materias = await db.materia.findMany({
+      where: { disciplina },
+      include: { agendamentos: true },
     })
 
-    // Se a matéria foi concluída (progresso = 100%), salvar no histórico
-    if (novoStatus === 'concluido') {
-      // Buscar o último agendamento para pegar as informações mais recentes
+    // Atualiza o status das matérias baseado no progresso geral
+    for (const materia of materias) {
+      const novoStatus: StatusConteudo =
+        progresso >= 100
+          ? 'concluido'
+          : progresso > 0
+          ? 'em_progresso'
+          : 'pendente'
+
+      // Buscar o último agendamento para verificar o status atual
       const ultimoAgendamento = await db.diaDisciplinaMateria.findFirst({
         where: { materiaId: materia.id },
         orderBy: { atualizadoEm: 'desc' },
       })
 
-      if (ultimoAgendamento) {
-        await db.historicoEstudo.create({
-          data: {
-            tituloDaMateria: materia.titulo,
-            disciplina: materia.disciplina,
-            dataEstudo: new Date(),
-            tempoEstudado: ultimoAgendamento.tempoEstudado ?? 0,
-            anotacoes: ultimoAgendamento.anotacoes,
-            progresso: ultimoAgendamento.progresso,
-            planoId: ultimoAgendamento.planoId,
-          },
-        })
+      // Atualizar todos os agendamentos desta matéria
+      await db.diaDisciplinaMateria.updateMany({
+        where: { materiaId: materia.id },
+        data: { status: novoStatus },
+      })
+
+      if (!ultimoAgendamento) continue
+
+      // Se a matéria foi concluída (progresso = 100%), salvar no histórico
+      if (novoStatus === 'concluido' && ultimoAgendamento.status !== 'concluido') {
+        try {
+          const dataBrasil = getBrazilianDate()
+          await db.historicoEstudo.create({
+            data: {
+              tituloDaMateria: materia.titulo,
+              disciplina: materia.disciplina,
+              dataEstudo: dataBrasil,
+              tempoEstudado: ultimoAgendamento.tempoEstudado ?? 0,
+              anotacoes: ultimoAgendamento.anotacoes,
+              progresso: ultimoAgendamento.progresso,
+              planoId: ultimoAgendamento.planoId,
+            }
+          })
+        } catch (historyError) {
+          console.error('Erro ao salvar no histórico:', historyError)
+        }
+      }
+      // Se a matéria estava concluída e agora não está mais, remover do histórico
+      else if (novoStatus !== 'concluido' && ultimoAgendamento.status === 'concluido') {
+        try {
+          const dataBrasil = getBrazilianDate()
+          const dataInicio = getStartOfDay(dataBrasil)
+          const dataFim = getEndOfDay(dataBrasil)
+
+          await db.historicoEstudo.deleteMany({
+            where: {
+              tituloDaMateria: materia.titulo,
+              disciplina: materia.disciplina,
+              dataEstudo: {
+                gte: dataInicio,
+                lte: dataFim
+              }
+            }
+          })
+        } catch (historyError) {
+          console.error('Erro ao remover do histórico:', historyError)
+        }
       }
     }
+
+    revalidatePath('/dashboard')
+    revalidatePath('/historico')
+  } catch (error) {
+    console.error('Erro ao atualizar progresso da disciplina:', error)
+    throw error
   }
 }
 

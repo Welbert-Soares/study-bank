@@ -6,6 +6,8 @@ import type {
   DisciplinaNome,
   StatusConteudo,
 } from '@/generated/prisma'
+import { formatDateToYYYYMMDD } from '@/lib/date'
+import { type HistoricoEstudo } from '@/generated/prisma'
 
 export interface MateriaDoDia {
   id: string
@@ -25,6 +27,48 @@ export interface DisciplinaDoDia {
 export interface RegistroDiario {
   data: string
   disciplinas: DisciplinaDoDia[]
+}
+
+// Função auxiliar para agrupar registros por data no formato brasileiro
+function agruparRegistrosPorDataBrasileira(
+  registros: HistoricoEstudo[],
+): Record<string, DisciplinaDoDia[]> {
+  return registros.reduce<Record<string, DisciplinaDoDia[]>>((acc, registro) => {
+    // Converte para horário brasileiro e formata como YYYY-MM-DD
+    const dataBrasileira = formatDateToYYYYMMDD(registro.dataEstudo)
+
+    if (!acc[dataBrasileira]) {
+      acc[dataBrasileira] = []
+    }
+
+    // Encontrar disciplina existente ou criar nova
+    const disciplinaIndex = acc[dataBrasileira].findIndex(
+      (d) => d.disciplina === registro.disciplina,
+    )
+
+    const materiaItem: MateriaDoDia = {
+      id: registro.id,
+      titulo: registro.tituloDaMateria,
+      descricao: null, // O histórico não mantém a descrição
+      status: 'concluido' as StatusConteudo, // Histórico só guarda concluídos
+      progresso: registro.progresso,
+      tempoEstudado: registro.tempoEstudado,
+      anotacoes: registro.anotacoes,
+    }
+
+    if (disciplinaIndex === -1) {
+      // Nova disciplina
+      acc[dataBrasileira].push({
+        disciplina: registro.disciplina,
+        materias: [materiaItem],
+      })
+    } else {
+      // Adicionar matéria à disciplina existente
+      acc[dataBrasileira][disciplinaIndex].materias.push(materiaItem)
+    }
+
+    return acc
+  }, {})
 }
 
 export async function buscarHistoricoPorDia(): Promise<RegistroDiario[]> {
@@ -175,45 +219,7 @@ export async function buscarHistoricoDeEstudos(): Promise<RegistroDiario[]> {
       },
     })
 
-    // Agrupar por dia
-    const historicoAgrupado = registros.reduce<
-      Record<string, DisciplinaDoDia[]>
-    >((acc, registro) => {
-      // Formata a data como YYYY-MM-DD para agrupar por dia
-      const data = registro.dataEstudo.toISOString().split('T')[0]
-
-      if (!acc[data]) {
-        acc[data] = []
-      }
-
-      // Encontrar disciplina existente ou criar nova
-      const disciplinaIndex = acc[data].findIndex(
-        (d) => d.disciplina === registro.disciplina,
-      )
-
-      const materiaItem: MateriaDoDia = {
-        id: registro.id,
-        titulo: registro.tituloDaMateria,
-        descricao: null, // O histórico não mantém a descrição
-        status: 'concluido' as StatusConteudo, // Histórico só guarda concluídos
-        progresso: registro.progresso,
-        tempoEstudado: registro.tempoEstudado,
-        anotacoes: registro.anotacoes,
-      }
-
-      if (disciplinaIndex === -1) {
-        // Nova disciplina
-        acc[data].push({
-          disciplina: registro.disciplina,
-          materias: [materiaItem],
-        })
-      } else {
-        // Adicionar matéria à disciplina existente
-        acc[data][disciplinaIndex].materias.push(materiaItem)
-      }
-
-      return acc
-    }, {})
+    const historicoAgrupado = agruparRegistrosPorDataBrasileira(registros)
 
     // Converter objeto agrupado para array
     return Object.entries(historicoAgrupado).map(([data, disciplinas]) => ({
@@ -232,14 +238,15 @@ export async function buscarHistoricoDeEstudosPorDia(
 ): Promise<DisciplinaDoDia[]> {
   try {
     const [ano, mes, dia] = data.split('-').map(Number)
-    const dataInicio = new Date(ano, mes - 1, dia)
-    const dataFim = new Date(ano, mes - 1, dia + 1)
+    // Criar data no fuso horário brasileiro
+    const dataInicio = new Date(Date.UTC(ano, mes - 1, dia, -3, 0, 0, 0)) // UTC-3 para Brasil
+    const dataFim = new Date(Date.UTC(ano, mes - 1, dia, 20, 59, 59, 999)) // UTC-3 para Brasil
 
     const registros = await db.historicoEstudo.findMany({
       where: {
         dataEstudo: {
           gte: dataInicio,
-          lt: dataFim,
+          lte: dataFim,
         },
       },
       orderBy: {
@@ -252,26 +259,23 @@ export async function buscarHistoricoDeEstudosPorDia(
       [K in DisciplinaNome]?: MateriaDoDia[]
     }
 
-    const disciplinas = registros.reduce(
-      (acc: AgrupamentoDisciplinas, registro) => {
-        const disciplina = registro.disciplina
-        if (!acc[disciplina]) {
-          acc[disciplina] = []
-        }
+    const disciplinas = registros.reduce((acc: AgrupamentoDisciplinas, registro) => {
+      const disciplina = registro.disciplina
+      if (!acc[disciplina]) {
+        acc[disciplina] = []
+      }
 
-        acc[disciplina]?.push({
-          id: registro.id,
-          titulo: registro.tituloDaMateria,
-          descricao: null, // O histórico não mantém a descrição
-          status: 'concluido' as StatusConteudo,
-          progresso: registro.progresso,
-          tempoEstudado: registro.tempoEstudado,
-          anotacoes: registro.anotacoes || '',
-        })
-        return acc
-      },
-      {},
-    )
+      acc[disciplina]?.push({
+        id: registro.id,
+        titulo: registro.tituloDaMateria,
+        descricao: null, // O histórico não mantém a descrição
+        status: 'concluido' as StatusConteudo,
+        progresso: registro.progresso,
+        tempoEstudado: registro.tempoEstudado,
+        anotacoes: registro.anotacoes || '',
+      })
+      return acc
+    }, {})
 
     return Object.entries(disciplinas).map(([disciplina, materias]) => ({
       disciplina: disciplina as DisciplinaNome,
