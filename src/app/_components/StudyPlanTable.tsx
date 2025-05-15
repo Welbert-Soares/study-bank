@@ -47,13 +47,29 @@ export function StudyPlanTable({ studyPlan }: StudyPlanTableProps) {
                 <TableRow key={day.day} className="hover:bg-gray-50">
                   <TableCell className="font-medium py-3">{day.day}</TableCell>
                   <TableCell className="py-3">
-                    {day.discipline1 || '-'}
+                    {day.discipline1 ? (
+                      <span className="px-2 py-1  text-cyan-600 font-semibold">
+                        {day.discipline1}
+                      </span>
+                    ) : (
+                      '-'
+                    )}
                   </TableCell>
                   <TableCell className="py-3">
-                    {day.discipline2 || '-'}
+                    {day.discipline2 ? (
+                      <span className="px-2 py-1   text-amber-600 font-semibold">
+                        {day.discipline2}
+                      </span>
+                    ) : (
+                      '-'
+                    )}
                   </TableCell>
                   <TableCell className="py-3">
-                    {day.writing ? '✓' : '-'}
+                    {day.writing ? (
+                      <span className="text-green-600 font-bold">✓</span>
+                    ) : (
+                      '-'
+                    )}
                   </TableCell>
                   <TableCell className="py-3">
                     {day.revisoes > 0 ? (
