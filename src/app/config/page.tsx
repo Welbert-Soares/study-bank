@@ -1,23 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import {
-  getDisciplinas,
-  createMateria,
-  updateMateria,
-  deleteMateria,
-  getAgendamentos,
-  createAgendamento,
-  updateAgendamento,
-  deleteAgendamento,
-} from '../actions/config.actions'
-import {
-  MateriaFromDB,
-  AgendamentoFromDB,
-  MateriaFormData,
-  AgendamentoFormData,
-} from '@/types/config'
+import { useState } from 'react'
+import { MateriaFromDB, AgendamentoFromDB } from '@/types/config'
 import { ConfigPageSkeleton } from '@/components/skeletons/config-skeleton'
+import { useMateriasManager } from '@/hooks/use-materias-manager'
+import { useAgendamentosManager } from '@/hooks/use-agendamentos-manager'
 
 // Import components
 import { ConfigHeader } from './_components/ConfigHeader'
@@ -26,15 +13,30 @@ import { SchedulesCard } from './_components/SchedulesCard'
 import { EditDialog } from './_components/EditDialog'
 
 export default function ConfigPage() {
-  const [materias, setMaterias] = useState<MateriaFromDB[]>([])
-  const [agendamentos, setAgendamentos] = useState<AgendamentoFromDB[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const {
+    materias,
+    isLoading: isLoadingMaterias,
+    addMateria,
+    updateMateriaItem,
+    deleteMateriaItem,
+  } = useMateriasManager()
+
+  const {
+    agendamentos,
+    isLoading: isLoadingAgendamentos,
+    addAgendamento,
+    updateAgendamentoItem,
+    deleteAgendamentoItem,
+  } = useAgendamentosManager()
+
   const [editingItem, setEditingItem] = useState<
     MateriaFromDB | AgendamentoFromDB | null
   >(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   // Helpers
+  const isLoading = isLoadingMaterias || isLoadingAgendamentos
+
   const isAgendamento = (
     item: MateriaFromDB | AgendamentoFromDB,
   ): item is AgendamentoFromDB => {
@@ -47,44 +49,6 @@ export default function ConfigPage() {
     setEditingItem((prev) => (prev ? { ...prev, ...updates } : null))
   }
 
-  useEffect(() => {
-    loadData()
-  }, [])
-
-  async function loadData() {
-    try {
-      setIsLoading(true)
-      const [materiasData, agendamentosData] = await Promise.all([
-        getDisciplinas(),
-        getAgendamentos(),
-      ])
-      setMaterias(materiasData)
-      setAgendamentos(agendamentosData)
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  async function handleAddMateria(novaMateria: MateriaFormData) {
-    try {
-      await createMateria(novaMateria)
-      await loadData()
-    } catch (error) {
-      console.error('Erro ao adicionar matéria:', error)
-    }
-  }
-
-  async function handleAddAgendamento(novoAgendamento: AgendamentoFormData) {
-    try {
-      await createAgendamento(novoAgendamento)
-      await loadData()
-    } catch (error) {
-      console.error('Erro ao adicionar agendamento:', error)
-    }
-  }
-
   async function handleUpdateItem() {
     if (!editingItem) return
 
@@ -95,7 +59,7 @@ export default function ConfigPage() {
         if (!materiaId || !dia) {
           throw new Error('Matéria e dia são campos obrigatórios')
         }
-        await updateAgendamento(id, {
+        await updateAgendamentoItem(id, {
           materiaId,
           dia,
           status,
@@ -103,12 +67,11 @@ export default function ConfigPage() {
           anotacoes: anotacoes ?? undefined,
         })
       } else {
-        const { id, titulo, disciplina, status, ordem } = editingItem
-        await updateMateria(id, { titulo, disciplina, status, ordem })
+        const { id, titulo, disciplina } = editingItem
+        await updateMateriaItem(id, { titulo, disciplina })
       }
       setIsEditDialogOpen(false)
       setEditingItem(null)
-      await loadData()
     } catch (error) {
       console.error('Erro ao atualizar item:', error)
     }
@@ -119,13 +82,12 @@ export default function ConfigPage() {
 
     try {
       if (isAgendamento(editingItem)) {
-        await deleteAgendamento(editingItem.id)
+        await deleteAgendamentoItem(editingItem.id)
       } else {
-        await deleteMateria(editingItem.id)
+        await deleteMateriaItem(editingItem.id)
       }
       setIsEditDialogOpen(false)
       setEditingItem(null)
-      await loadData()
     } catch (error) {
       console.error('Erro ao deletar item:', error)
     }
@@ -147,14 +109,14 @@ export default function ConfigPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <SubjectsCard
               materias={materias}
-              onAddMateria={handleAddMateria}
+              onAddMateria={addMateria}
               onEditMateria={handleEditItem}
             />
 
             <SchedulesCard
               agendamentos={agendamentos}
               materias={materias}
-              onAddAgendamento={handleAddAgendamento}
+              onAddAgendamento={addAgendamento}
               onEditAgendamento={handleEditItem}
             />
           </div>
