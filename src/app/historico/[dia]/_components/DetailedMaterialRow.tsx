@@ -3,7 +3,7 @@
 import { TableRow, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import type { MateriaDoDia } from '@/app/actions/historico.actions'
+import type { MateriaDoDia } from '@/services/historico/types'
 import { getStatusColor } from '../../utils/formatters'
 
 interface DetailedMaterialRowProps {
