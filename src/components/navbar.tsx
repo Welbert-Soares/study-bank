@@ -10,11 +10,11 @@ import {
 } from './ui/navigation-menu'
 
 const routes = [
-  { name: 'Home', path: '/' },
-  { name: 'Dashboard', path: '/dashboard' },
+  { name: 'Início', path: '/' },
+  { name: 'Meta Diária', path: '/dashboard' },
   { name: 'Histórico', path: '/historico' },
   { name: 'Métricas', path: '/metricas' },
-  { name: 'Configurações', path: '/config' },
+  { name: 'Atualizar Meta', path: '/config' },
 ]
 
 export function Navbar() {
