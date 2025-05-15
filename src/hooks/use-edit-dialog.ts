@@ -1,9 +1,20 @@
 import { useState } from 'react'
-import { MateriaFromDB, AgendamentoFromDB } from '@/types/config'
+import {
+  MateriaFromDB,
+  AgendamentoFromDB,
+  MateriaFormData,
+  AgendamentoFormData,
+} from '@/types/config'
 
 type EditItemHandlers = {
-  updateMateriaItem: (id: string, updates: any) => Promise<void>
-  updateAgendamentoItem: (id: string, updates: any) => Promise<void>
+  updateMateriaItem: (
+    id: string,
+    updates: Partial<MateriaFormData>,
+  ) => Promise<void>
+  updateAgendamentoItem: (
+    id: string,
+    updates: Partial<AgendamentoFormData>,
+  ) => Promise<void>
   deleteMateriaItem: (id: string) => Promise<void>
   deleteAgendamentoItem: (id: string) => Promise<void>
 }
@@ -41,16 +52,18 @@ export function useEditDialog(handlers: EditItemHandlers) {
         if (!materiaId || !dia) {
           throw new Error('Matéria e dia são campos obrigatórios')
         }
-        await handlers.updateAgendamentoItem(id, {
+        const updates: Partial<AgendamentoFormData> = {
           materiaId,
           dia,
           status,
           tempoEstudado: tempoEstudado ?? undefined,
           anotacoes: anotacoes ?? undefined,
-        })
+        }
+        await handlers.updateAgendamentoItem(id, updates)
       } else {
         const { id, titulo, disciplina } = editingItem
-        await handlers.updateMateriaItem(id, { titulo, disciplina })
+        const updates: Partial<MateriaFormData> = { titulo, disciplina }
+        await handlers.updateMateriaItem(id, updates)
       }
       setIsEditDialogOpen(false)
       setEditingItem(null)
