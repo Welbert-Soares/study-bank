@@ -13,6 +13,8 @@ import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
 import { getWeeklyPlanAction } from '@/app/actions/home.actions'
 
+export const revalidate = 0 // Disable cache
+
 export default async function Home() {
   const studyPlan = await getWeeklyPlanAction()
 

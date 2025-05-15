@@ -67,6 +67,7 @@ export async function getAgendamentos() {
 export async function createAgendamento(data: AgendamentoFormData) {
   const agendamento = await agendamentosService.criarAgendamento(data)
   revalidatePath('/config')
+  revalidatePath('/') // Revalidate homepage
   return agendamento
 }
 
@@ -85,6 +86,7 @@ export async function updateAgendamento(
 ) {
   const agendamento = await agendamentosService.atualizarAgendamento(id, data)
   revalidatePath('/config')
+  revalidatePath('/') // Revalidate homepage
   return agendamento
 }
 
@@ -94,4 +96,5 @@ export async function updateAgendamento(
 export async function deleteAgendamento(id: string) {
   await agendamentosService.deletarAgendamento(id)
   revalidatePath('/config')
+  revalidatePath('/') // Revalidate homepage
 }
