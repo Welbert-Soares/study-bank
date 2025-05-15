@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from 'react'
 import {
-  DashboardData,
-  getDashboardData,
-  atualizarStatusAtividade,
-  atualizarStatusObjetivo,
-  atualizarProgressoDisciplina,
-  atualizarStatusRevisao,
+  type DashboardData,
+  getDashboardDataAction as getDashboardData,
+  atualizarStatusAtividadeAction as atualizarStatusAtividade,
+  atualizarStatusObjetivoAction as atualizarStatusObjetivo,
+  atualizarProgressoDisciplinaAction as atualizarProgressoDisciplina,
+  atualizarStatusRevisaoAction as atualizarStatusRevisao,
 } from '@/app/actions/dashboard.actions'
-import { StatusConteudo, DisciplinaNome } from '@/generated/prisma'
+import type {
+  StatusConteudo,
+  DisciplinaNome,
+} from '@/generated/prisma/index.js'
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton'
 
 // Import components
