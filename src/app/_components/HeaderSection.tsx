@@ -77,7 +77,7 @@ export function HeaderSection() {
         </div>
       </CardHeader>
 
-      <StudyOptionsModal 
+      <StudyOptionsModal
         isOpen={showStudyOptions}
         onClose={() => setShowStudyOptions(false)}
       />
