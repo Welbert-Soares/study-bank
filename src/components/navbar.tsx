@@ -12,7 +12,7 @@ import {
 const routes = [
   { name: 'Início', path: '/' },
   { name: 'Meta Diária', path: '/dashboard' },
-  { name: 'Histórico', path: '/historico' },
+  // { name: 'Histórico', path: '/historico' },
   { name: 'Métricas', path: '/metricas' },
   { name: 'Atualizar Meta', path: '/config' },
 ]
