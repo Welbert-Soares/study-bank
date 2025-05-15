@@ -5,7 +5,7 @@ import type {
   DiaDaSemana,
   StatusConteudo,
   DisciplinaNome,
-} from '@/generated/prisma/index.js'
+} from '@prisma/client'
 import {
   updateActivityStatus,
   updateObjectiveStatus,
