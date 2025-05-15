@@ -11,10 +11,10 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { Progress } from '@/components/ui/progress'
-import { getWeeklyPlan } from '@/app/actions/home.actions'
+import { getWeeklyPlanAction } from '@/app/actions/home.actions'
 
 export default async function Home() {
-  const studyPlan = await getWeeklyPlan()
+  const studyPlan = await getWeeklyPlanAction()
 
   return (
     <main className="min-h-screen p-4 md:p-8 bg-gray-50">
