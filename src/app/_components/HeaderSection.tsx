@@ -16,6 +16,20 @@ export function HeaderSection() {
             asChild
           >
             <a
+              href="https://www.estrategiaconcursos.com.br/app/dashboard/cursos"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              📚 Estudar
+            </a>
+          </Button>
+          <Button
+            variant="default"
+            size="lg"
+            className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
+            asChild
+          >
+            <a
               href="https://www.notion.so/154e31f45426811f95d3e4522fdf9298?v=154e31f45426810c9af4000c7a64e002"
               target="_blank"
               rel="noopener noreferrer"
