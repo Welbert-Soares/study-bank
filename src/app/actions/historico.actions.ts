@@ -308,12 +308,22 @@ export async function buscarHistoricoDeEstudosPorDia(
           acc[disciplina] = []
         }
 
+        // Define progresso baseado no status
+        let progresso = 0
+        if (registro.status === 'concluido') {
+          progresso = 100
+        } else if (registro.status === 'em_progresso') {
+          progresso = registro.progresso || 50 // Se não tiver progresso, assume 50%
+        } else if (registro.progresso) {
+          progresso = registro.progresso
+        }
+
         acc[disciplina]?.push({
           id: registro.id,
           titulo: registro.materia.titulo,
           descricao: registro.materia.descricao,
           status: registro.status,
-          progresso: registro.progresso,
+          progresso,
           tempoEstudado: registro.tempoEstudado || 0,
           anotacoes: registro.anotacoes || '',
         })
@@ -339,8 +349,8 @@ export async function buscarHistoricoDeEstudosPorDia(
         titulo: registro.tituloDaMateria,
         descricao: null,
         status: 'concluido' as StatusConteudo,
-        progresso: registro.progresso,
-        tempoEstudado: registro.tempoEstudado,
+        progresso: registro.progresso || 100, // Se está no histórico, considera como 100% concluído
+        tempoEstudado: registro.tempoEstudado || 0,
         anotacoes: registro.anotacoes || '',
       }
 
