@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Study Bank
 
-## Getting Started
+Uma plataforma projetada para ajudar estudantes a gerenciar e acompanhar seu progresso nos estudos, criando dashboards, monitorando métricas e organizando seu histórico de estudos.
 
-First, run the development server:
+Este projeto foi desenvolvido com [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Demonstração
+
+Confira a demo online: [Study Bank](https://study-bank.vercel.app/)
+
+## Começando
+
+Primeiro, execute o servidor de desenvolvimento:
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Você pode começar a editar a página modificando `app/page.tsx`. A página atualiza automaticamente conforme você edita o arquivo.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Funcionalidades
 
-## Learn More
+- 📊 Dashboard de Progresso de Estudos
+- 📈 Métricas de Progresso
+- 📝 Histórico de Estudos
+- ⚙️ Configurações Personalizáveis
+- 📱 Design Responsivo
 
-To learn more about Next.js, take a look at the following resources:
+## Tecnologias Utilizadas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js](https://nextjs.org/) - Framework React
+- [Prisma](https://www.prisma.io/) - ORM para banco de dados
+- [Tailwind CSS](https://tailwindcss.com/) - Estilização
+- [Vercel](https://vercel.com/) - Hospedagem
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Implantação na Vercel
 
-## Deploy on Vercel
+O projeto está hospedado na Vercel. Você pode acessá-lo em [https://study-bank.vercel.app/](https://study-bank.vercel.app/).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Para mais informações sobre como implantar aplicativos Next.js, consulte a [documentação de implantação do Next.js](https://nextjs.org/docs/app/building-your-application/deploying).
