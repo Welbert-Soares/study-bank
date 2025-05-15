@@ -1,15 +1,15 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { db } from '@/lib/db'
-import {
-  DiaDaSemana,
+import type {
   DisciplinaNome,
+  DiaDaSemana,
   StatusConteudo,
   Materia,
 } from '@/generated/prisma'
-import { getCorDisciplina } from '@/lib/cores'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
-import { revalidatePath } from 'next/cache'
+import { getCorDisciplina } from '@/lib/cores'
 
 export interface DashboardCronograma {
   id: string
@@ -360,10 +360,9 @@ export async function atualizarStatusAtividade(
       data: { status },
     })
 
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
-    const amanha = new Date(hoje)
-    amanha.setDate(amanha.getDate() + 1)
+    // Get today's range in Brazilian timezone
+    const hoje = getStartOfDay(new Date())
+    const amanha = getEndOfDay(new Date())
 
     // Se marcando como concluído
     if (status === 'concluido') {
@@ -374,7 +373,7 @@ export async function atualizarStatusAtividade(
         data: {
           tituloDaMateria: registro.materia.titulo,
           disciplina: registro.materia.disciplina,
-          dataEstudo: new Date(),
+          dataEstudo: getBrazilianDate(),
           tempoEstudado: registro.tempoEstudado ?? 0,
           anotacoes: registro.anotacoes,
           progresso: registro.progresso,
@@ -393,7 +392,7 @@ export async function atualizarStatusAtividade(
           disciplina: registro.materia.disciplina,
           dataEstudo: {
             gte: hoje,
-            lt: amanha,
+            lte: amanha,
           },
         },
       })
@@ -428,10 +427,9 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
       data: { status: completo ? 'concluido' : 'pendente' },
     })
 
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
-    const amanha = new Date(hoje)
-    amanha.setDate(amanha.getDate() + 1)
+    // Get today's range in Brazilian timezone
+    const hoje = getStartOfDay(new Date())
+    const amanha = getEndOfDay(new Date())
 
     // Se está marcando como completo
     if (completo) {
@@ -442,7 +440,7 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
         data: {
           tituloDaMateria: registro.materia.titulo,
           disciplina: registro.materia.disciplina,
-          dataEstudo: new Date(),
+          dataEstudo: getBrazilianDate(),
           tempoEstudado: registro.tempoEstudado ?? 0,
           anotacoes: registro.anotacoes,
           progresso: registro.progresso,
@@ -461,7 +459,7 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
           disciplina: registro.materia.disciplina,
           dataEstudo: {
             gte: hoje,
-            lt: amanha,
+            lte: amanha,
           },
         },
       })

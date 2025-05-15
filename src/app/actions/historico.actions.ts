@@ -5,9 +5,14 @@ import type {
   DiaDaSemana,
   DisciplinaNome,
   StatusConteudo,
+  HistoricoEstudo,
 } from '@/generated/prisma'
-import { formatDateToYYYYMMDD } from '@/lib/date'
-import { type HistoricoEstudo } from '@/generated/prisma'
+import {
+  formatDateToYYYYMMDD,
+  getStartOfDay,
+  getEndOfDay,
+  getBrazilianDate,
+} from '@/lib/date'
 
 export interface MateriaDoDia {
   id: string
@@ -35,8 +40,9 @@ function agruparRegistrosPorDataBrasileira(
 ): Record<string, DisciplinaDoDia[]> {
   return registros.reduce<Record<string, DisciplinaDoDia[]>>(
     (acc, registro) => {
-      // Converte para horário brasileiro e formata como YYYY-MM-DD
-      const dataBrasileira = formatDateToYYYYMMDD(registro.dataEstudo)
+      // Converte a data para horário brasileiro e formata como YYYY-MM-DD
+      const dataBrasil = getBrazilianDate(registro.dataEstudo)
+      const dataBrasileira = formatDateToYYYYMMDD(dataBrasil)
 
       if (!acc[dataBrasileira]) {
         acc[dataBrasileira] = []
@@ -240,10 +246,13 @@ export async function buscarHistoricoDeEstudosPorDia(
   data: string,
 ): Promise<DisciplinaDoDia[]> {
   try {
+    // Converter a data passada para Date usando a hora 00:00:00 local
     const [ano, mes, dia] = data.split('-').map(Number)
-    // Criar data no fuso horário brasileiro
-    const dataInicio = new Date(Date.UTC(ano, mes - 1, dia, -3, 0, 0, 0)) // UTC-3 para Brasil
-    const dataFim = new Date(Date.UTC(ano, mes - 1, dia, 20, 59, 59, 999)) // UTC-3 para Brasil
+    const dataBase = new Date(ano, mes - 1, dia)
+    
+    // Usar nossas funções utilitárias que já tratam o fuso horário do Brasil
+    const dataInicio = getStartOfDay(dataBase)
+    const dataFim = getEndOfDay(dataBase)
 
     const registros = await db.historicoEstudo.findMany({
       where: {
