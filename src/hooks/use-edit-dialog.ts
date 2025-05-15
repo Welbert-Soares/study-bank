@@ -9,7 +9,9 @@ type EditItemHandlers = {
 }
 
 export function useEditDialog(handlers: EditItemHandlers) {
-  const [editingItem, setEditingItem] = useState<MateriaFromDB | AgendamentoFromDB | null>(null)
+  const [editingItem, setEditingItem] = useState<
+    MateriaFromDB | AgendamentoFromDB | null
+  >(null)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
 
   const isAgendamento = (
@@ -18,7 +20,9 @@ export function useEditDialog(handlers: EditItemHandlers) {
     return 'materiaId' in item
   }
 
-  const updateEditingItem = (updates: Partial<MateriaFromDB | AgendamentoFromDB>) => {
+  const updateEditingItem = (
+    updates: Partial<MateriaFromDB | AgendamentoFromDB>,
+  ) => {
     setEditingItem((prev) => (prev ? { ...prev, ...updates } : null))
   }
 
@@ -32,7 +36,8 @@ export function useEditDialog(handlers: EditItemHandlers) {
 
     try {
       if (isAgendamento(editingItem)) {
-        const { id, materiaId, dia, status, tempoEstudado, anotacoes } = editingItem
+        const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
+          editingItem
         if (!materiaId || !dia) {
           throw new Error('Matéria e dia são campos obrigatórios')
         }
@@ -77,6 +82,6 @@ export function useEditDialog(handlers: EditItemHandlers) {
     handleEditItem,
     handleUpdateItem,
     handleDeleteItem,
-    setIsEditDialogOpen
+    setIsEditDialogOpen,
   }
 }

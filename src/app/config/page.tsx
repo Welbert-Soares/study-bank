@@ -1,6 +1,5 @@
 'use client'
 
-
 import { ConfigPageSkeleton } from '@/components/skeletons/config-skeleton'
 import { useMateriasManager } from '@/hooks/use-materias-manager'
 import { useAgendamentosManager } from '@/hooks/use-agendamentos-manager'
