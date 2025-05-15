@@ -249,7 +249,7 @@ export async function buscarHistoricoDeEstudosPorDia(
     // Converter a data passada para Date usando a hora 00:00:00 local
     const [ano, mes, dia] = data.split('-').map(Number)
     const dataBase = new Date(ano, mes - 1, dia)
-    
+
     // Usar nossas funções utilitárias que já tratam o fuso horário do Brasil
     const dataInicio = getStartOfDay(dataBase)
     const dataFim = getEndOfDay(dataBase)
