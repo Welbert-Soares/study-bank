@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Badge } from '@/components/ui/badge'
-import type { DisciplinaDoDia } from '@/app/actions/historico.actions'
+import type { DisciplinaDoDia } from '@/services/historico/types'
 import { StudyMaterialItem } from './StudyMaterialItem'
 
 interface SubjectItemProps {

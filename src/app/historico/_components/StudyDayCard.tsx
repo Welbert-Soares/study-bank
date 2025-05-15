@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import type { RegistroDiario } from '@/app/actions/historico.actions'
+import type { RegistroDiario } from '@/services/historico/types'
 import { Accordion } from '@/components/ui/accordion'
 import Link from 'next/link'
 import { SubjectItem } from './SubjectItem'

@@ -3,7 +3,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
-import { MateriaDoDia } from '@/app/actions/historico.actions'
+import { MateriaDoDia } from '@/services/historico/types'
 import { getStatusColor } from '../utils/formatters'
 
 interface StudyMaterialItemProps {
