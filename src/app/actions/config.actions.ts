@@ -6,7 +6,7 @@ import type {
   DisciplinaNome,
   DiaDaSemana,
   StatusConteudo,
-} from '@/generated/prisma'
+} from '@prisma/client'
 import { disciplinasService } from '@/services/config/disciplinas.service'
 import { agendamentosService } from '@/services/config/agendamentos.service'
 

@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { DiaDaSemana, DisciplinaNome } from '@/generated/prisma'
+import { DiaDaSemana, DisciplinaNome } from '@prisma/client'
 
 export interface PlanoEstudoDia {
   day: DiaDaSemana

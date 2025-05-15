@@ -1,4 +1,4 @@
-import type { DisciplinaNome, StatusConteudo } from '@/generated/prisma'
+import type { DisciplinaNome, StatusConteudo } from '@prisma/client'
 
 export interface MateriaDoDia {
   id: string

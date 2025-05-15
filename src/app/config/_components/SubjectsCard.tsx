@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { DisciplinaNome } from '@/generated/prisma'
+import { DisciplinaNome } from '@prisma/client'
 import { MateriaFromDB, MateriaFormData } from '@/types/config'
 
 interface SubjectsCardProps {

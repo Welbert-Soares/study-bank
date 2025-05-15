@@ -1,4 +1,4 @@
-import { DisciplinaNome } from '@/generated/prisma'
+import { DisciplinaNome } from '@prisma/client'
 import { db } from '@/lib/db'
 import { getCorDisciplina } from '@/lib/cores'
 

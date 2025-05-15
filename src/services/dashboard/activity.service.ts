@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { StatusConteudo } from '@/generated/prisma'
+import { StatusConteudo } from '@prisma/client'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 
 export async function updateActivityStatus(

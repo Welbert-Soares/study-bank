@@ -1,4 +1,4 @@
-import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@/generated/prisma'
+import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@prisma/client'
 
 export interface MateriaFormData {
   titulo: string

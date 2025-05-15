@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
-import type { DisciplinaNome } from '@/generated/prisma'
-import { StatusConteudo } from '@/generated/prisma'
+import type { DisciplinaNome } from '@prisma/client'
+import { StatusConteudo } from '@prisma/client'
 import type { MateriaFormData } from '@/types/config'
 
 export const disciplinasService = {
