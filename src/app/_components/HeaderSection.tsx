@@ -1,7 +1,12 @@
+'use client'
+
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
+import { StudyOptionsModal } from '@/components/ui/study-options-modal'
 
 export function HeaderSection() {
+  const [showStudyOptions, setShowStudyOptions] = useState(false)
   return (
     <Card className="border-none shadow-none bg-transparent">
       <CardHeader>
@@ -15,13 +20,9 @@ export function HeaderSection() {
             className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
             asChild
           >
-            <a
-              href="https://www.estrategiaconcursos.com.br/app/dashboard/cursos"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <button onClick={() => setShowStudyOptions(true)}>
               📚 Estudar
-            </a>
+            </button>
           </Button>
           <Button
             variant="default"
@@ -75,6 +76,11 @@ export function HeaderSection() {
           </Button>
         </div>
       </CardHeader>
+
+      <StudyOptionsModal 
+        isOpen={showStudyOptions}
+        onClose={() => setShowStudyOptions(false)}
+      />
     </Card>
   )
 }
