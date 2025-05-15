@@ -1,40 +1,35 @@
 'use server'
 
-import { db } from '@/lib/db'
-import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@/generated/prisma'
-import { MateriaFormData, AgendamentoFormData } from '@/types/config'
 import { revalidatePath } from 'next/cache'
+import type { MateriaFormData, AgendamentoFormData } from '@/types/config'
+import type {
+  DisciplinaNome,
+  DiaDaSemana,
+  StatusConteudo,
+} from '@/generated/prisma'
+import { disciplinasService } from '@/services/config/disciplinas.service'
+import { agendamentosService } from '@/services/config/agendamentos.service'
 
+/**
+ * Action para listar todas as disciplinas
+ */
 export async function getDisciplinas() {
-  try {
-    const materias = await db.materia.findMany({
-      orderBy: {
-        ordem: 'asc',
-      },
-    })
-    return materias
-  } catch (error) {
-    console.error('Erro ao buscar disciplinas:', error)
-    throw new Error('Não foi possível carregar as disciplinas')
-  }
+  const materias = await disciplinasService.listarDisciplinas()
+  return materias
 }
 
+/**
+ * Action para criar uma nova matéria
+ */
 export async function createMateria(data: MateriaFormData) {
-  try {
-    const materia = await db.materia.create({
-      data: {
-        ...data,
-        status: StatusConteudo.pendente,
-      },
-    })
-    revalidatePath('/config')
-    return materia
-  } catch (error) {
-    console.error('Erro ao criar matéria:', error)
-    throw new Error('Não foi possível criar a matéria')
-  }
+  const materia = await disciplinasService.criarMateria(data)
+  revalidatePath('/config')
+  return materia
 }
 
+/**
+ * Action para atualizar uma matéria existente
+ */
 export async function updateMateria(
   id: string,
   data: {
@@ -45,167 +40,39 @@ export async function updateMateria(
     disciplina?: DisciplinaNome
   },
 ) {
-  try {
-    const materia = await db.materia.update({
-      where: { id },
-      data,
-    })
-    revalidatePath('/config')
-    return materia
-  } catch (error) {
-    console.error('Erro ao atualizar matéria:', error)
-    throw new Error('Não foi possível atualizar a matéria')
-  }
+  const materia = await disciplinasService.atualizarMateria(id, data)
+  revalidatePath('/config')
+  return materia
 }
 
+/**
+ * Action para deletar uma matéria
+ */
 export async function deleteMateria(id: string) {
-  try {
-    // Primeiro, buscar a matéria e seus agendamentos para preservar o histórico
-    const materiaComAgendamentos = await db.materia.findUnique({
-      where: { id },
-      include: {
-        agendamentos: true,
-      },
-    })
-
-    if (!materiaComAgendamentos) {
-      throw new Error('Matéria não encontrada')
-    }
-
-    // Criar registros históricos para cada agendamento
-    if (materiaComAgendamentos.agendamentos.length > 0) {
-      await db.historicoEstudo.createMany({
-        data: materiaComAgendamentos.agendamentos.map((agendamento) => ({
-          tituloDaMateria: materiaComAgendamentos.titulo,
-          disciplina: materiaComAgendamentos.disciplina,
-          dataEstudo: agendamento.criadoEm,
-          tempoEstudado: agendamento.tempoEstudado || 0,
-          anotacoes: agendamento.anotacoes,
-          progresso: agendamento.progresso,
-          planoId: agendamento.planoId,
-        })),
-      })
-    }
-
-    // Depois, deletar todos os agendamentos
-    await db.diaDisciplinaMateria.deleteMany({
-      where: { materiaId: id },
-    })
-
-    // Por fim, deletar a matéria
-    await db.materia.delete({
-      where: { id },
-    })
-
-    revalidatePath('/config')
-  } catch (error) {
-    console.error('Erro ao deletar matéria:', error)
-    throw new Error('Não foi possível deletar a matéria')
-  }
+  await disciplinasService.deletarMateria(id)
+  revalidatePath('/config')
 }
 
+/**
+ * Action para listar todos os agendamentos
+ */
 export async function getAgendamentos() {
-  try {
-    const agendamentos = await db.diaDisciplinaMateria.findMany({
-      include: {
-        materia: true,
-      },
-      orderBy: [
-        {
-          dia: 'asc',
-        },
-        {
-          materia: {
-            ordem: 'asc',
-          },
-        },
-      ],
-    })
-    return agendamentos
-  } catch (error) {
-    console.error('Erro ao buscar agendamentos:', error)
-    throw new Error('Não foi possível carregar os agendamentos')
-  }
+  const agendamentos = await agendamentosService.listarAgendamentos()
+  return agendamentos
 }
 
-function getDiaSeguinte(dia: DiaDaSemana): DiaDaSemana {
-  const dias: DiaDaSemana[] = [
-    'Domingo',
-    'Segunda',
-    'Terca',
-    'Quarta',
-    'Quinta',
-    'Sexta',
-    'Sabado',
-  ]
-  const index = dias.indexOf(dia)
-  const proximoIndex = (index + 1) % 7
-  return dias[proximoIndex]
-}
-
-async function criarRevisao(materiaId: string, diaOriginal: DiaDaSemana) {
-  try {
-    // Busca a matéria original
-    const materiaOriginal = await db.materia.findUnique({
-      where: { id: materiaId },
-    })
-
-    if (!materiaOriginal) return
-
-    // Cria uma nova matéria de revisão
-    const materiaRevisao = await db.materia.create({
-      data: {
-        titulo: `Revisar: ${materiaOriginal.titulo}`,
-        disciplina: 'Revisoes',
-        ordem: materiaOriginal.ordem,
-        status: 'pendente',
-      },
-    })
-
-    // Agenda para o dia seguinte
-    const diaRevisao = getDiaSeguinte(diaOriginal)
-
-    await db.diaDisciplinaMateria.create({
-      data: {
-        dia: diaRevisao,
-        materiaId: materiaRevisao.id,
-        status: 'pendente',
-      },
-    })
-  } catch (error) {
-    console.error('Erro ao criar revisão:', error)
-    throw new Error('Não foi possível criar a revisão')
-  }
-}
-
+/**
+ * Action para criar um novo agendamento
+ */
 export async function createAgendamento(data: AgendamentoFormData) {
-  try {
-    const agendamento = await db.diaDisciplinaMateria.create({
-      data: {
-        dia: data.dia,
-        materiaId: data.materiaId,
-        status: data.status ?? StatusConteudo.pendente,
-        tempoEstudado: data.tempoEstudado,
-        anotacoes: data.anotacoes,
-      },
-      include: {
-        materia: true,
-      },
-    })
-
-    // Se solicitado, criar revisão automaticamente
-    if (data.criarRevisao) {
-      await criarRevisao(data.materiaId, data.dia)
-    }
-
-    revalidatePath('/config')
-    return agendamento
-  } catch (error) {
-    console.error('Erro ao criar agendamento:', error)
-    throw new Error('Não foi possível criar o agendamento')
-  }
+  const agendamento = await agendamentosService.criarAgendamento(data)
+  revalidatePath('/config')
+  return agendamento
 }
 
+/**
+ * Action para atualizar um agendamento existente
+ */
 export async function updateAgendamento(
   id: string,
   data: {
@@ -216,72 +83,15 @@ export async function updateAgendamento(
     anotacoes?: string
   },
 ) {
-  try {
-    // Validate input parameters
-    if (!id) {
-      throw new Error('ID do agendamento não fornecido')
-    }
-
-    // Buscar o agendamento atual para comparar mudanças
-    const agendamentoAtual = await db.diaDisciplinaMateria.findUnique({
-      where: { id },
-      include: { materia: true },
-    })
-
-    if (!agendamentoAtual) {
-      throw new Error('Agendamento não encontrado')
-    }
-
-    // Prepare update data, using current values if not provided
-    const updateData = {
-      materiaId: data.materiaId ?? agendamentoAtual.materiaId,
-      dia: data.dia ?? agendamentoAtual.dia,
-      status: data.status ?? agendamentoAtual.status,
-      tempoEstudado: data.tempoEstudado ?? agendamentoAtual.tempoEstudado,
-      anotacoes: data.anotacoes ?? agendamentoAtual.anotacoes,
-    }
-
-    // Validate required fields
-    if (!updateData.materiaId) {
-      throw new Error('materiaId é obrigatório')
-    }
-    if (!updateData.dia) {
-      throw new Error('dia é obrigatório')
-    }
-
-    // Atualizar o agendamento
-    const agendamento = await db.diaDisciplinaMateria.update({
-      where: { id },
-      data: updateData,
-      include: {
-        materia: true,
-      },
-    })
-
-    revalidatePath('/config')
-    return agendamento
-  } catch (error) {
-    console.error('Erro ao atualizar agendamento:', error)
-    if (error instanceof Error) {
-      throw new Error(
-        `Não foi possível atualizar o agendamento: ${error.message}`,
-      )
-    } else {
-      throw new Error(
-        'Não foi possível atualizar o agendamento: erro desconhecido',
-      )
-    }
-  }
+  const agendamento = await agendamentosService.atualizarAgendamento(id, data)
+  revalidatePath('/config')
+  return agendamento
 }
 
+/**
+ * Action para deletar um agendamento
+ */
 export async function deleteAgendamento(id: string) {
-  try {
-    await db.diaDisciplinaMateria.delete({
-      where: { id },
-    })
-    revalidatePath('/config')
-  } catch (error) {
-    console.error('Erro ao deletar agendamento:', error)
-    throw new Error('Não foi possível deletar o agendamento')
-  }
+  await agendamentosService.deletarAgendamento(id)
+  revalidatePath('/config')
 }
