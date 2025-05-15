@@ -1,4 +1,4 @@
-# Study Bank
+# Study Planner
 
 Uma plataforma projetada para ajudar estudantes a gerenciar e acompanhar seu progresso nos estudos, criando dashboards, monitorando métricas e organizando seu histórico de estudos.
 
@@ -6,7 +6,7 @@ Este projeto foi desenvolvido com [`create-next-app`](https://nextjs.org/docs/ap
 
 ## Demonstração
 
-Confira a demo online: [Study Bank](https://study-bank.vercel.app/)
+Confira a demo online: [Study Planner](https://study-bank.vercel.app/)
 
 ## Começando
 
