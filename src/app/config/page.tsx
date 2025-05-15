@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { MateriaFromDB, AgendamentoFromDB } from '@/types/config'
+
 import { ConfigPageSkeleton } from '@/components/skeletons/config-skeleton'
 import { useMateriasManager } from '@/hooks/use-materias-manager'
 import { useAgendamentosManager } from '@/hooks/use-agendamentos-manager'
+import { useEditDialog } from '@/hooks/use-edit-dialog'
 
 // Import components
 import { ConfigHeader } from './_components/ConfigHeader'
@@ -29,74 +29,23 @@ export default function ConfigPage() {
     deleteAgendamentoItem,
   } = useAgendamentosManager()
 
-  const [editingItem, setEditingItem] = useState<
-    MateriaFromDB | AgendamentoFromDB | null
-  >(null)
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const {
+    editingItem,
+    isEditDialogOpen,
+    updateEditingItem,
+    handleEditItem,
+    handleUpdateItem,
+    handleDeleteItem,
+    setIsEditDialogOpen,
+  } = useEditDialog({
+    updateMateriaItem,
+    updateAgendamentoItem,
+    deleteMateriaItem,
+    deleteAgendamentoItem,
+  })
 
   // Helpers
   const isLoading = isLoadingMaterias || isLoadingAgendamentos
-
-  const isAgendamento = (
-    item: MateriaFromDB | AgendamentoFromDB,
-  ): item is AgendamentoFromDB => {
-    return 'materiaId' in item
-  }
-
-  const updateEditingItem = (
-    updates: Partial<MateriaFromDB | AgendamentoFromDB>,
-  ) => {
-    setEditingItem((prev) => (prev ? { ...prev, ...updates } : null))
-  }
-
-  async function handleUpdateItem() {
-    if (!editingItem) return
-
-    try {
-      if (isAgendamento(editingItem)) {
-        const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
-          editingItem
-        if (!materiaId || !dia) {
-          throw new Error('Matéria e dia são campos obrigatórios')
-        }
-        await updateAgendamentoItem(id, {
-          materiaId,
-          dia,
-          status,
-          tempoEstudado: tempoEstudado ?? undefined,
-          anotacoes: anotacoes ?? undefined,
-        })
-      } else {
-        const { id, titulo, disciplina } = editingItem
-        await updateMateriaItem(id, { titulo, disciplina })
-      }
-      setIsEditDialogOpen(false)
-      setEditingItem(null)
-    } catch (error) {
-      console.error('Erro ao atualizar item:', error)
-    }
-  }
-
-  async function handleDeleteItem() {
-    if (!editingItem?.id) return
-
-    try {
-      if (isAgendamento(editingItem)) {
-        await deleteAgendamentoItem(editingItem.id)
-      } else {
-        await deleteMateriaItem(editingItem.id)
-      }
-      setIsEditDialogOpen(false)
-      setEditingItem(null)
-    } catch (error) {
-      console.error('Erro ao deletar item:', error)
-    }
-  }
-
-  const handleEditItem = (item: MateriaFromDB | AgendamentoFromDB) => {
-    setEditingItem(item)
-    setIsEditDialogOpen(true)
-  }
 
   return (
     <main className="w-full min-h-screen p-4 md:p-8 bg-gray-50">
