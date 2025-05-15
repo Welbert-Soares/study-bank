@@ -101,7 +101,6 @@ model HistoricoEstudo {
 
   // Add unique constraint
   @@unique([tituloDaMateria, disciplina, dataEstudo])
-
   @@index([disciplina])
   @@index([dataEstudo])
 }

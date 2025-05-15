@@ -368,7 +368,7 @@ export async function atualizarStatusAtividade(
     // Se marcando como concluído
     if (status === 'concluido') {
       console.log('Criando histórico para:', registro.materia.titulo)
-      
+
       // Criar entrada no histórico
       await db.historicoEstudo.create({
         data: {
@@ -381,11 +381,11 @@ export async function atualizarStatusAtividade(
           planoId: registro.planoId,
         },
       })
-    } 
+    }
     // Se desmarcando de concluído
     else if (registro.status === 'concluido') {
       console.log('Removendo histórico para:', registro.materia.titulo)
-      
+
       // Remover do histórico
       await db.historicoEstudo.deleteMany({
         where: {
@@ -393,9 +393,9 @@ export async function atualizarStatusAtividade(
           disciplina: registro.materia.disciplina,
           dataEstudo: {
             gte: hoje,
-            lt: amanha
-          }
-        }
+            lt: amanha,
+          },
+        },
       })
     }
 
@@ -404,7 +404,6 @@ export async function atualizarStatusAtividade(
     revalidatePath('/historico')
 
     return registro
-
   } catch (error) {
     console.error('Erro ao atualizar status da atividade:', error)
     throw new Error('Falha ao atualizar status: ' + (error as Error).message)
@@ -437,7 +436,7 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
     // Se está marcando como completo
     if (completo) {
       console.log('Criando histórico para objetivo:', registro.materia.titulo)
-      
+
       // Criar entrada no histórico
       await db.historicoEstudo.create({
         data: {
@@ -450,11 +449,11 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
           planoId: registro.planoId,
         },
       })
-    } 
+    }
     // Se está desmarcando como completo
     else {
       console.log('Removendo histórico para objetivo:', registro.materia.titulo)
-      
+
       // Remover do histórico
       await db.historicoEstudo.deleteMany({
         where: {
@@ -462,16 +461,15 @@ export async function atualizarStatusObjetivo(id: string, completo: boolean) {
           disciplina: registro.materia.disciplina,
           dataEstudo: {
             gte: hoje,
-            lt: amanha
-          }
-        }
+            lt: amanha,
+          },
+        },
       })
     }
 
     // Forçar revalidação das páginas
     revalidatePath('/dashboard')
     revalidatePath('/historico')
-
   } catch (error) {
     console.error('Erro ao atualizar status do objetivo:', error)
     throw new Error('Falha ao atualizar objetivo: ' + (error as Error).message)
@@ -512,7 +510,10 @@ export async function atualizarProgressoDisciplina(
       if (!ultimoAgendamento) continue
 
       // Se a matéria foi concluída (progresso = 100%), salvar no histórico
-      if (novoStatus === 'concluido' && ultimoAgendamento.status !== 'concluido') {
+      if (
+        novoStatus === 'concluido' &&
+        ultimoAgendamento.status !== 'concluido'
+      ) {
         try {
           const dataBrasil = getBrazilianDate()
           await db.historicoEstudo.create({
@@ -524,14 +525,17 @@ export async function atualizarProgressoDisciplina(
               anotacoes: ultimoAgendamento.anotacoes,
               progresso: ultimoAgendamento.progresso,
               planoId: ultimoAgendamento.planoId,
-            }
+            },
           })
         } catch (historyError) {
           console.error('Erro ao salvar no histórico:', historyError)
         }
       }
       // Se a matéria estava concluída e agora não está mais, remover do histórico
-      else if (novoStatus !== 'concluido' && ultimoAgendamento.status === 'concluido') {
+      else if (
+        novoStatus !== 'concluido' &&
+        ultimoAgendamento.status === 'concluido'
+      ) {
         try {
           const dataBrasil = getBrazilianDate()
           const dataInicio = getStartOfDay(dataBrasil)
@@ -543,9 +547,9 @@ export async function atualizarProgressoDisciplina(
               disciplina: materia.disciplina,
               dataEstudo: {
                 gte: dataInicio,
-                lte: dataFim
-              }
-            }
+                lte: dataFim,
+              },
+            },
           })
         } catch (historyError) {
           console.error('Erro ao remover do histórico:', historyError)

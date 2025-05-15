@@ -33,42 +33,45 @@ export interface RegistroDiario {
 function agruparRegistrosPorDataBrasileira(
   registros: HistoricoEstudo[],
 ): Record<string, DisciplinaDoDia[]> {
-  return registros.reduce<Record<string, DisciplinaDoDia[]>>((acc, registro) => {
-    // Converte para horário brasileiro e formata como YYYY-MM-DD
-    const dataBrasileira = formatDateToYYYYMMDD(registro.dataEstudo)
+  return registros.reduce<Record<string, DisciplinaDoDia[]>>(
+    (acc, registro) => {
+      // Converte para horário brasileiro e formata como YYYY-MM-DD
+      const dataBrasileira = formatDateToYYYYMMDD(registro.dataEstudo)
 
-    if (!acc[dataBrasileira]) {
-      acc[dataBrasileira] = []
-    }
+      if (!acc[dataBrasileira]) {
+        acc[dataBrasileira] = []
+      }
 
-    // Encontrar disciplina existente ou criar nova
-    const disciplinaIndex = acc[dataBrasileira].findIndex(
-      (d) => d.disciplina === registro.disciplina,
-    )
+      // Encontrar disciplina existente ou criar nova
+      const disciplinaIndex = acc[dataBrasileira].findIndex(
+        (d) => d.disciplina === registro.disciplina,
+      )
 
-    const materiaItem: MateriaDoDia = {
-      id: registro.id,
-      titulo: registro.tituloDaMateria,
-      descricao: null, // O histórico não mantém a descrição
-      status: 'concluido' as StatusConteudo, // Histórico só guarda concluídos
-      progresso: registro.progresso,
-      tempoEstudado: registro.tempoEstudado,
-      anotacoes: registro.anotacoes,
-    }
+      const materiaItem: MateriaDoDia = {
+        id: registro.id,
+        titulo: registro.tituloDaMateria,
+        descricao: null, // O histórico não mantém a descrição
+        status: 'concluido' as StatusConteudo, // Histórico só guarda concluídos
+        progresso: registro.progresso,
+        tempoEstudado: registro.tempoEstudado,
+        anotacoes: registro.anotacoes,
+      }
 
-    if (disciplinaIndex === -1) {
-      // Nova disciplina
-      acc[dataBrasileira].push({
-        disciplina: registro.disciplina,
-        materias: [materiaItem],
-      })
-    } else {
-      // Adicionar matéria à disciplina existente
-      acc[dataBrasileira][disciplinaIndex].materias.push(materiaItem)
-    }
+      if (disciplinaIndex === -1) {
+        // Nova disciplina
+        acc[dataBrasileira].push({
+          disciplina: registro.disciplina,
+          materias: [materiaItem],
+        })
+      } else {
+        // Adicionar matéria à disciplina existente
+        acc[dataBrasileira][disciplinaIndex].materias.push(materiaItem)
+      }
 
-    return acc
-  }, {})
+      return acc
+    },
+    {},
+  )
 }
 
 export async function buscarHistoricoPorDia(): Promise<RegistroDiario[]> {
@@ -259,23 +262,26 @@ export async function buscarHistoricoDeEstudosPorDia(
       [K in DisciplinaNome]?: MateriaDoDia[]
     }
 
-    const disciplinas = registros.reduce((acc: AgrupamentoDisciplinas, registro) => {
-      const disciplina = registro.disciplina
-      if (!acc[disciplina]) {
-        acc[disciplina] = []
-      }
+    const disciplinas = registros.reduce(
+      (acc: AgrupamentoDisciplinas, registro) => {
+        const disciplina = registro.disciplina
+        if (!acc[disciplina]) {
+          acc[disciplina] = []
+        }
 
-      acc[disciplina]?.push({
-        id: registro.id,
-        titulo: registro.tituloDaMateria,
-        descricao: null, // O histórico não mantém a descrição
-        status: 'concluido' as StatusConteudo,
-        progresso: registro.progresso,
-        tempoEstudado: registro.tempoEstudado,
-        anotacoes: registro.anotacoes || '',
-      })
-      return acc
-    }, {})
+        acc[disciplina]?.push({
+          id: registro.id,
+          titulo: registro.tituloDaMateria,
+          descricao: null, // O histórico não mantém a descrição
+          status: 'concluido' as StatusConteudo,
+          progresso: registro.progresso,
+          tempoEstudado: registro.tempoEstudado,
+          anotacoes: registro.anotacoes || '',
+        })
+        return acc
+      },
+      {},
+    )
 
     return Object.entries(disciplinas).map(([disciplina, materias]) => ({
       disciplina: disciplina as DisciplinaNome,
