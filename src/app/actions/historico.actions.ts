@@ -254,6 +254,7 @@ export async function buscarHistoricoDeEstudosPorDia(
     const dataInicio = getStartOfDay(dataBase)
     const dataFim = getEndOfDay(dataBase)
 
+    // Buscar registros do histórico para o dia
     const registros = await db.historicoEstudo.findMany({
       where: {
         dataEstudo: {
@@ -266,31 +267,91 @@ export async function buscarHistoricoDeEstudosPorDia(
       },
     })
 
+    // Converter a data para o dia da semana
+    const dataObj = new Date(ano, mes - 1, dia)
+    const diasDaSemana: DiaDaSemana[] = [
+      'Domingo',
+      'Segunda',
+      'Terca',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sabado',
+    ]
+    const diaDaSemana = diasDaSemana[dataObj.getDay()]
+
+    // Buscar também as matérias agendadas para este dia
+    const materiasDoDia = await db.diaDisciplinaMateria.findMany({
+      where: {
+        dia: diaDaSemana,
+      },
+      include: {
+        materia: true,
+      },
+      orderBy: {
+        materia: {
+          ordem: 'asc',
+        },
+      },
+    })
+
     // Agrupar por disciplina
     type AgrupamentoDisciplinas = {
       [K in DisciplinaNome]?: MateriaDoDia[]
     }
 
-    const disciplinas = registros.reduce(
+    // Primeiro, criar um mapa com todas as matérias agendadas para o dia
+    const disciplinas = materiasDoDia.reduce(
       (acc: AgrupamentoDisciplinas, registro) => {
-        const disciplina = registro.disciplina
+        const disciplina = registro.materia.disciplina
         if (!acc[disciplina]) {
           acc[disciplina] = []
         }
 
         acc[disciplina]?.push({
           id: registro.id,
-          titulo: registro.tituloDaMateria,
-          descricao: null, // O histórico não mantém a descrição
-          status: 'concluido' as StatusConteudo,
+          titulo: registro.materia.titulo,
+          descricao: registro.materia.descricao,
+          status: registro.status,
           progresso: registro.progresso,
-          tempoEstudado: registro.tempoEstudado,
+          tempoEstudado: registro.tempoEstudado || 0,
           anotacoes: registro.anotacoes || '',
         })
         return acc
       },
       {},
     )
+
+    // Depois, adicionar ou atualizar com os registros do histórico
+    registros.forEach((registro) => {
+      const disciplina = registro.disciplina
+      if (!disciplinas[disciplina]) {
+        disciplinas[disciplina] = []
+      }
+
+      // Procurar se já existe uma matéria com o mesmo título
+      const materiaIndex = disciplinas[disciplina]?.findIndex(
+        (m) => m.titulo === registro.tituloDaMateria,
+      )
+
+      const materiaItem = {
+        id: registro.id,
+        titulo: registro.tituloDaMateria,
+        descricao: null,
+        status: 'concluido' as StatusConteudo,
+        progresso: registro.progresso,
+        tempoEstudado: registro.tempoEstudado,
+        anotacoes: registro.anotacoes || '',
+      }
+
+      if (materiaIndex !== -1) {
+        // Atualizar a matéria existente
+        disciplinas[disciplina]![materiaIndex] = materiaItem
+      } else {
+        // Adicionar nova matéria
+        disciplinas[disciplina]?.push(materiaItem)
+      }
+    })
 
     return Object.entries(disciplinas).map(([disciplina, materias]) => ({
       disciplina: disciplina as DisciplinaNome,
