@@ -1,9 +1,6 @@
 import { getCorDisciplina } from '@/lib/cores'
 import { db } from '@/lib/db'
-import type {
-  DisciplinaNome,
-  StatusConteudo,
-} from '@/generated/prisma/index.js'
+import type { DisciplinaNome, StatusConteudo } from '@prisma/client'
 import type { DashboardMetrica } from './types'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 

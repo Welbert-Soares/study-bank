@@ -9,10 +9,7 @@ import {
   atualizarProgressoDisciplinaAction as atualizarProgressoDisciplina,
   atualizarStatusRevisaoAction as atualizarStatusRevisao,
 } from '@/app/actions/dashboard.actions'
-import type {
-  StatusConteudo,
-  DisciplinaNome,
-} from '@/generated/prisma/index.js'
+import type { StatusConteudo, DisciplinaNome } from '@prisma/client'
 import { DashboardSkeleton } from '@/components/skeletons/dashboard-skeleton'
 
 // Import components
