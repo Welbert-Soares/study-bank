@@ -2,7 +2,7 @@
 
 import { TableRow, TableCell } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import type { DisciplinaDoDia } from '@/app/actions/historico.actions'
+import type { DisciplinaDoDia } from '@/services/historico/types'
 
 interface DetailedSubjectRowProps {
   disciplina: DisciplinaDoDia

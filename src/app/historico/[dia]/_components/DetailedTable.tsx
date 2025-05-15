@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { DisciplinaDoDia } from '@/app/actions/historico.actions'
+import type { DisciplinaDoDia } from '@/services/historico/types'
 import { DetailedSubjectRow } from './DetailedSubjectRow'
 import { DetailedMaterialRow } from './DetailedMaterialRow'
 
