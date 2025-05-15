@@ -1,7 +1,6 @@
 // Use type import from zod schema or enums
 import type {
   DisciplinaNome,
-  DiaDaSemana,
   StatusConteudo,
 } from '@/generated/prisma/index.js'
 

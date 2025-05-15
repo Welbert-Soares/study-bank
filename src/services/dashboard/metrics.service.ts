@@ -5,6 +5,7 @@ import type {
   StatusConteudo,
 } from '@/generated/prisma/index.js'
 import type { DashboardMetrica } from './types'
+import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 
 type MateriaComAgendamento = {
   materia: { disciplina: DisciplinaNome; titulo: string }
@@ -94,6 +95,44 @@ export async function updateDisciplineProgress(
         where: { materiaId: materia.id },
         data: { status: novoStatus },
       })
+
+      // Se a matéria foi concluída e não estava antes
+      if (
+        novoStatus === 'concluido' &&
+        ultimoAgendamento?.status !== 'concluido'
+      ) {
+        await db.historicoEstudo.create({
+          data: {
+            tituloDaMateria: materia.titulo,
+            disciplina: materia.disciplina,
+            dataEstudo: getBrazilianDate(),
+            tempoEstudado: ultimoAgendamento?.tempoEstudado ?? 0,
+            anotacoes: ultimoAgendamento?.anotacoes,
+            progresso: progresso,
+            planoId: ultimoAgendamento?.planoId,
+          },
+        })
+      }
+      // Se a matéria foi desmarcada como concluída
+      else if (
+        novoStatus !== 'concluido' &&
+        ultimoAgendamento?.status === 'concluido'
+      ) {
+        const dataBrasil = getBrazilianDate()
+        const dataInicio = getStartOfDay(dataBrasil)
+        const dataFim = getEndOfDay(dataBrasil)
+
+        await db.historicoEstudo.deleteMany({
+          where: {
+            tituloDaMateria: materia.titulo,
+            disciplina: materia.disciplina,
+            dataEstudo: {
+              gte: dataInicio,
+              lte: dataFim,
+            },
+          },
+        })
+      }
     }
   } catch (error) {
     console.error('Erro ao atualizar progresso da disciplina:', error)
