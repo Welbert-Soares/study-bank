@@ -1,4 +1,8 @@
 import type { Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
+import { neobrutalism } from '@clerk/themes'
+import { ptBR } from '@clerk/localizations'
+
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Navbar } from '@/components/navbar'
 import './globals.css'
@@ -24,17 +28,24 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <Navbar />
-        </nav>
-        <main className="flex min-h-screen flex-col items-center p-4">
-          {children}
-        </main>
-      </body>
-    </html>
+    <ClerkProvider
+      localization={ptBR}
+      appearance={{
+        baseTheme: neobrutalism,
+      }}
+    >
+      <html lang="pt-BR">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <Navbar />
+          </nav>
+          <main className="flex min-h-screen flex-col items-center p-4">
+            {children}
+          </main>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

@@ -12,6 +12,9 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@clerk/localizations": "^3.16.1",
+    "@clerk/nextjs": "^6.19.5",
+    "@clerk/themes": "^2.2.46",
     "@hookform/resolvers": "^5.0.1",
     "@notionhq/client": "^3.0.1",
     "@prisma/client": "^6.7.0",
