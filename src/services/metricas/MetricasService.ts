@@ -57,15 +57,48 @@ export class MetricasService {
     }
   }
 
-  public async obterMetricasGerais(): Promise<MetricaGeral[]> {
-    const disciplinas = Object.values(DisciplinaNome)
-    const metricas: MetricaGeral[] = []
+  public async obterMetricasGerais(userId: string): Promise<MetricaGeral[]> {
+    try {
+      const materias = await db.materia.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          agendamentos: true,
+        },
+      })
 
-    for (const disciplina of disciplinas) {
-      const progresso = await this.calcularProgressoDisciplina(disciplina)
-      metricas.push(this.criarMetricaGeral(disciplina, progresso))
+      const metricasPorDisciplina = new Map<DisciplinaNome, number>()
+      let totalAgendamentos = 0
+
+      materias.forEach((materia) => {
+        const agendamentosConcluidos = materia.agendamentos.filter(
+          (a) => a.status === 'concluido',
+        ).length
+        const totalAgendamentosDisciplina = materia.agendamentos.length
+
+        if (totalAgendamentosDisciplina > 0) {
+          const progressoAtual =
+            metricasPorDisciplina.get(materia.disciplina) || 0
+          const novoProgresso =
+            progressoAtual +
+            (agendamentosConcluidos / totalAgendamentosDisciplina) * 100
+          metricasPorDisciplina.set(materia.disciplina, novoProgresso)
+          totalAgendamentos++
+        }
+      })
+
+      return Array.from(metricasPorDisciplina.entries()).map(
+        ([disciplina, progresso]) => ({
+          id: disciplina,
+          disciplina,
+          progresso: Math.round(progresso / totalAgendamentos),
+          cor: getCorDisciplina(disciplina),
+        }),
+      )
+    } catch (error) {
+      console.error('Erro ao calcular métricas gerais:', error)
+      return []
     }
-
-    return metricas
   }
 }

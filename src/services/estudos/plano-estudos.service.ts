@@ -54,9 +54,12 @@ export class PlanoEstudosService {
     }
   }
 
-  async obterPlanoSemanal(): Promise<PlanoEstudoDia[]> {
+  async obterPlanoSemanal(userId: string): Promise<PlanoEstudoDia[]> {
     // Buscar todas as disciplinas agendadas
     const agendamentos = await db.diaDisciplinaMateria.findMany({
+      where: {
+        userId: userId,
+      },
       include: {
         materia: true,
       },

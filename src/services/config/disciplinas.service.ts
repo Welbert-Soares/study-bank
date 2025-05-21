@@ -4,9 +4,12 @@ import { StatusConteudo } from '@prisma/client'
 import type { MateriaFormData } from '@/types/config'
 
 export const disciplinasService = {
-  async listarDisciplinas() {
+  async listarDisciplinas(userId: string) {
     try {
       return await db.materia.findMany({
+        where: {
+          userId: userId, // Filter by userId
+        },
         orderBy: {
           ordem: 'asc',
         },
@@ -17,11 +20,12 @@ export const disciplinasService = {
     }
   },
 
-  async criarMateria(data: MateriaFormData) {
+  async criarMateria(data: MateriaFormData, userId: string) {
     try {
       return await db.materia.create({
         data: {
           ...data,
+          userId, // Simplifica a criação usando o userId diretamente
           status: StatusConteudo.pendente,
         },
       })
@@ -40,10 +44,14 @@ export const disciplinasService = {
       ordem?: number
       disciplina?: DisciplinaNome
     },
+    userId: string,
   ) {
     try {
       return await db.materia.update({
-        where: { id },
+        where: {
+          id,
+          userId: userId, // Only allow updating own content
+        },
         data,
       })
     } catch (error) {
@@ -52,26 +60,32 @@ export const disciplinasService = {
     }
   },
 
-  async deletarMateria(id: string) {
+  async deletarMateria(id: string, userId: string) {
     try {
-      // Primeiro, buscar a matéria e seus agendamentos para preservar o histórico
-      const materiaComAgendamentos = await db.materia.findUnique({
-        where: { id },
+      // First, check if the user owns this material
+      const materia = await db.materia.findFirst({
+        where: {
+          id,
+          userId: userId,
+        },
         include: {
           agendamentos: true,
         },
       })
 
-      if (!materiaComAgendamentos) {
-        throw new Error('Matéria não encontrada')
+      if (!materia) {
+        throw new Error(
+          'Matéria não encontrada ou você não tem permissão para excluí-la',
+        )
       }
 
-      // Criar registros históricos para cada agendamento
-      if (materiaComAgendamentos.agendamentos.length > 0) {
+      // Create historic records for each schedule
+      if (materia.agendamentos.length > 0) {
         await db.historicoEstudo.createMany({
-          data: materiaComAgendamentos.agendamentos.map((agendamento) => ({
-            tituloDaMateria: materiaComAgendamentos.titulo,
-            disciplina: materiaComAgendamentos.disciplina,
+          data: materia.agendamentos.map((agendamento) => ({
+            userId: userId,
+            tituloDaMateria: materia.titulo,
+            disciplina: materia.disciplina,
             dataEstudo: agendamento.criadoEm,
             tempoEstudado: agendamento.tempoEstudado || 0,
             anotacoes: agendamento.anotacoes,
@@ -81,14 +95,20 @@ export const disciplinasService = {
         })
       }
 
-      // Depois, deletar todos os agendamentos
+      // Delete all schedules
       await db.diaDisciplinaMateria.deleteMany({
-        where: { materiaId: id },
+        where: {
+          materiaId: id,
+          userId: userId,
+        },
       })
 
-      // Por fim, deletar a matéria
+      // Finally, delete the subject
       return await db.materia.delete({
-        where: { id },
+        where: {
+          id,
+          userId: userId,
+        },
       })
     } catch (error) {
       console.error('Erro ao deletar matéria:', error)

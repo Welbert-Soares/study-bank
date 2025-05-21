@@ -5,6 +5,7 @@ import type { DashboardRevisao } from './types'
 
 export async function createRevisionItem(
   originalMateria: Materia,
+  userId: string,
 ): Promise<Materia> {
   return await db.materia.create({
     data: {
@@ -12,6 +13,7 @@ export async function createRevisionItem(
       disciplina: 'Revisoes',
       ordem: originalMateria.ordem,
       status: 'pendente',
+      userId: userId,
     },
   })
 }
@@ -19,8 +21,9 @@ export async function createRevisionItem(
 export async function scheduleRevision(
   originalMateria: Materia,
   originalDay: DiaDaSemana,
+  userId: string,
 ) {
-  const revisionMateria = await createRevisionItem(originalMateria)
+  const revisionMateria = await createRevisionItem(originalMateria, userId)
   const revisionDay = getDiaSeguinte(originalDay)
 
   await db.diaDisciplinaMateria.create({
@@ -28,16 +31,21 @@ export async function scheduleRevision(
       dia: revisionDay,
       materiaId: revisionMateria.id,
       status: 'pendente',
+      userId: userId,
     },
   })
 }
 
-export async function getRevisions(date: Date): Promise<DashboardRevisao[]> {
+export async function getRevisions(
+  date: Date,
+  userId: string,
+): Promise<DashboardRevisao[]> {
   const currentDay = getDiaDaSemana(date)
 
   const revisions = await db.diaDisciplinaMateria.findMany({
     where: {
       dia: currentDay,
+      userId: userId,
       materia: {
         disciplina: 'Revisoes',
       },

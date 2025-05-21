@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { auth } from '@clerk/nextjs/server'
 import type {
   DiaDaSemana,
   StatusConteudo,
@@ -30,7 +31,9 @@ export type {
 export async function getDashboardDataAction(
   date: Date,
 ): Promise<DashboardData> {
-  return getDashboardData(date)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  return getDashboardData(date, session.userId)
 }
 
 export async function agendarMateriaAction(
@@ -38,7 +41,9 @@ export async function agendarMateriaAction(
   dia: DiaDaSemana,
   criarRevisao: boolean = false,
 ): Promise<void> {
-  await scheduleSubject(materiaId, dia, criarRevisao)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  await scheduleSubject(materiaId, dia, criarRevisao, session.userId)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
 }
@@ -47,7 +52,9 @@ export async function atualizarStatusAtividadeAction(
   id: string,
   status: StatusConteudo,
 ): Promise<void> {
-  await updateActivityStatus(id, status)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  await updateActivityStatus(id, status, session.userId)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
   revalidatePath('/metricas')
@@ -57,7 +64,9 @@ export async function atualizarStatusObjetivoAction(
   id: string,
   completo: boolean,
 ): Promise<void> {
-  await updateObjectiveStatus(id, completo)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  await updateObjectiveStatus(id, completo, session.userId)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
 }
@@ -66,7 +75,9 @@ export async function atualizarProgressoDisciplinaAction(
   disciplina: DisciplinaNome,
   progresso: number,
 ): Promise<void> {
-  await updateDisciplineProgress(disciplina, progresso)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  await updateDisciplineProgress(disciplina, progresso, session.userId)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
   revalidatePath('/metricas')
@@ -76,7 +87,9 @@ export async function atualizarStatusRevisaoAction(
   id: string,
   status: StatusConteudo,
 ): Promise<void> {
-  await updateActivityStatus(id, status)
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+  await updateActivityStatus(id, status, session.userId)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
 }

@@ -5,19 +5,28 @@ import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 export async function updateActivityStatus(
   id: string,
   status: StatusConteudo,
+  userId: string,
 ): Promise<void> {
-  const registro = await db.diaDisciplinaMateria.findUnique({
-    where: { id },
+  const registro = await db.diaDisciplinaMateria.findFirst({
+    where: {
+      id,
+      userId: userId,
+    },
     include: { materia: true },
   })
 
   if (!registro) {
-    throw new Error('Activity not found')
+    throw new Error(
+      'Activity not found or you dont have permission to update it',
+    )
   }
 
   // Update status
   await db.diaDisciplinaMateria.update({
-    where: { id },
+    where: {
+      id,
+      userId: userId,
+    },
     data: { status },
   })
 
@@ -30,6 +39,7 @@ export async function updateActivityStatus(
     // Create history entry
     await db.historicoEstudo.create({
       data: {
+        userId: userId,
         tituloDaMateria: registro.materia.titulo,
         disciplina: registro.materia.disciplina,
         dataEstudo: getBrazilianDate(),
@@ -45,6 +55,7 @@ export async function updateActivityStatus(
     // Remove from history
     await db.historicoEstudo.deleteMany({
       where: {
+        userId: userId,
         tituloDaMateria: registro.materia.titulo,
         disciplina: registro.materia.disciplina,
         dataEstudo: {
@@ -59,21 +70,30 @@ export async function updateActivityStatus(
 export async function updateObjectiveStatus(
   id: string,
   completo: boolean,
+  userId: string,
 ): Promise<void> {
   try {
-    // Buscar o registro para ter acesso aos dados da matéria
-    const registro = await db.diaDisciplinaMateria.findUnique({
-      where: { id },
+    // Get the record to access subject data
+    const registro = await db.diaDisciplinaMateria.findFirst({
+      where: {
+        id,
+        userId: userId,
+      },
       include: { materia: true },
     })
 
     if (!registro) {
-      throw new Error('Objetivo não encontrado')
+      throw new Error(
+        'Objetivo não encontrado ou você não tem permissão para atualizá-lo',
+      )
     }
 
-    // Atualizar o status
+    // Update status
     await db.diaDisciplinaMateria.update({
-      where: { id },
+      where: {
+        id,
+        userId: userId,
+      },
       data: { status: completo ? 'concluido' : 'pendente' },
     })
 
@@ -81,11 +101,12 @@ export async function updateObjectiveStatus(
     const hoje = getStartOfDay(new Date())
     const amanha = getEndOfDay(new Date())
 
-    // Se está marcando como completo
+    // If marking as complete
     if (completo) {
-      // Criar entrada no histórico
+      // Create history entry
       await db.historicoEstudo.create({
         data: {
+          userId: userId,
           tituloDaMateria: registro.materia.titulo,
           disciplina: registro.materia.disciplina,
           dataEstudo: getBrazilianDate(),
@@ -96,11 +117,12 @@ export async function updateObjectiveStatus(
         },
       })
     }
-    // Se está desmarcando como completo
+    // If unmarking from complete
     else {
-      // Remover do histórico
+      // Remove from history
       await db.historicoEstudo.deleteMany({
         where: {
+          userId: userId,
           tituloDaMateria: registro.materia.titulo,
           disciplina: registro.materia.disciplina,
           dataEstudo: {

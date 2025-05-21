@@ -9,13 +9,17 @@ import type {
   DashboardObjetivo,
 } from './types'
 
-export async function getDashboardData(date: Date): Promise<DashboardData> {
+export async function getDashboardData(
+  date: Date,
+  userId: string,
+): Promise<DashboardData> {
   const diaSemana = getDiaDaSemana(date)
 
   // Fetch all activities for the day, including revisions
   const materiasHoje = await db.diaDisciplinaMateria.findMany({
     where: {
       dia: diaSemana,
+      userId: userId,
     },
     include: {
       materia: true,
@@ -33,7 +37,7 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   )
 
   // Get revisions using the specialized function
-  const revisoes = await getRevisions(date)
+  const revisoes = await getRevisions(date, userId)
 
   // Create schedule with regular subjects only
   const cronograma: DashboardCronograma[] = materiasRegulares.map((item) => ({
@@ -58,7 +62,7 @@ export async function getDashboardData(date: Date): Promise<DashboardData> {
   }))
 
   // Get upcoming content
-  const proximosConteudos = await getUpcomingContent(diaSemana)
+  const proximosConteudos = await getUpcomingContent(diaSemana, userId)
 
   return {
     cronograma,

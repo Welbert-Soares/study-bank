@@ -19,9 +19,12 @@ function getDiaSeguinte(dia: DiaDaSemana): DiaDaSemana {
 }
 
 export const agendamentosService = {
-  async listarAgendamentos() {
+  async listarAgendamentos(userId: string) {
     try {
       return await db.diaDisciplinaMateria.findMany({
+        where: {
+          userId: userId,
+        },
         include: {
           materia: true,
         },
@@ -42,15 +45,27 @@ export const agendamentosService = {
     }
   },
 
-  async criarAgendamento(data: AgendamentoFormData) {
+  async criarAgendamento(data: AgendamentoFormData, userId: string) {
     try {
+      // Primeiro, verifica se o usuário possui a matéria
+      const materia = await db.materia.findFirst({
+        where: {
+          id: data.materiaId,
+          userId: userId,
+        },
+      })
+
+      if (!materia) {
+        throw new Error(
+          'Matéria não encontrada ou você não tem permissão para agendá-la',
+        )
+      }
+
       const agendamento = await db.diaDisciplinaMateria.create({
         data: {
-          dia: data.dia,
-          materiaId: data.materiaId,
+          ...data,
+          userId: userId,
           status: data.status ?? StatusConteudo.pendente,
-          tempoEstudado: data.tempoEstudado,
-          anotacoes: data.anotacoes,
         },
         include: {
           materia: true,
@@ -59,7 +74,7 @@ export const agendamentosService = {
 
       // Se solicitado, criar revisão automaticamente
       if (data.criarRevisao) {
-        await this.criarRevisao(data.materiaId, data.dia)
+        await this.criarRevisao(data.materiaId, data.dia, userId)
       }
 
       return agendamento
@@ -69,11 +84,18 @@ export const agendamentosService = {
     }
   },
 
-  async criarRevisao(materiaId: string, diaOriginal: DiaDaSemana) {
+  async criarRevisao(
+    materiaId: string,
+    diaOriginal: DiaDaSemana,
+    userId: string,
+  ) {
     try {
       // Busca a matéria original
-      const materiaOriginal = await db.materia.findUnique({
-        where: { id: materiaId },
+      const materiaOriginal = await db.materia.findFirst({
+        where: {
+          id: materiaId,
+          userId: userId,
+        },
       })
 
       if (!materiaOriginal) return
@@ -85,6 +107,7 @@ export const agendamentosService = {
           disciplina: 'Revisoes',
           ordem: materiaOriginal.ordem,
           status: 'pendente',
+          userId: userId,
         },
       })
 
@@ -96,6 +119,7 @@ export const agendamentosService = {
           dia: diaRevisao,
           materiaId: materiaRevisao.id,
           status: 'pendente',
+          userId: userId,
         },
       })
     } catch (error) {
@@ -113,23 +137,45 @@ export const agendamentosService = {
       tempoEstudado?: number
       anotacoes?: string
     },
+    userId: string,
   ) {
     try {
       if (!id) {
         throw new Error('ID do agendamento não fornecido')
       }
 
-      // Buscar o agendamento atual para comparar mudanças
-      const agendamentoAtual = await db.diaDisciplinaMateria.findUnique({
-        where: { id },
+      // Buscar o agendamento atual para comparar mudanças e verificar propriedade
+      const agendamentoAtual = await db.diaDisciplinaMateria.findFirst({
+        where: {
+          id,
+          userId: userId,
+        },
         include: { materia: true },
       })
 
       if (!agendamentoAtual) {
-        throw new Error('Agendamento não encontrado')
+        throw new Error(
+          'Agendamento não encontrado ou você não tem permissão para alterá-lo',
+        )
       }
 
-      // Prepare update data, using current values if not provided
+      // Se estiver mudando a matéria, verifica a propriedade da nova matéria
+      if (data.materiaId && data.materiaId !== agendamentoAtual.materiaId) {
+        const novaMateria = await db.materia.findFirst({
+          where: {
+            id: data.materiaId,
+            userId: userId,
+          },
+        })
+
+        if (!novaMateria) {
+          throw new Error(
+            'Nova matéria não encontrada ou você não tem permissão para usá-la',
+          )
+        }
+      }
+
+      // Prepare os dados da atualização, usando os valores atuais se não forem fornecidos
       const updateData = {
         materiaId: data.materiaId ?? agendamentoAtual.materiaId,
         dia: data.dia ?? agendamentoAtual.dia,
@@ -138,17 +184,12 @@ export const agendamentosService = {
         anotacoes: data.anotacoes ?? agendamentoAtual.anotacoes,
       }
 
-      // Validate required fields
-      if (!updateData.materiaId) {
-        throw new Error('materiaId é obrigatório')
-      }
-      if (!updateData.dia) {
-        throw new Error('dia é obrigatório')
-      }
-
       // Atualizar o agendamento
       return await db.diaDisciplinaMateria.update({
-        where: { id },
+        where: {
+          id,
+          userId: userId,
+        },
         data: updateData,
         include: {
           materia: true,
@@ -156,22 +197,17 @@ export const agendamentosService = {
       })
     } catch (error) {
       console.error('Erro ao atualizar agendamento:', error)
-      if (error instanceof Error) {
-        throw new Error(
-          `Não foi possível atualizar o agendamento: ${error.message}`,
-        )
-      } else {
-        throw new Error(
-          'Não foi possível atualizar o agendamento: erro desconhecido',
-        )
-      }
+      throw new Error('Não foi possível atualizar o agendamento')
     }
   },
 
-  async deletarAgendamento(id: string) {
+  async deletarAgendamento(id: string, userId: string) {
     try {
-      await db.diaDisciplinaMateria.delete({
-        where: { id },
+      await db.diaDisciplinaMateria.deleteMany({
+        where: {
+          id,
+          userId: userId,
+        },
       })
     } catch (error) {
       console.error('Erro ao deletar agendamento:', error)

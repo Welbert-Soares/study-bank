@@ -9,12 +9,14 @@ import type {
 } from '@prisma/client'
 import { disciplinasService } from '@/services/config/disciplinas.service'
 import { agendamentosService } from '@/services/config/agendamentos.service'
+import { getOrCreateUser } from '@/lib/user'
 
 /**
  * Action para listar todas as disciplinas
  */
 export async function getDisciplinas() {
-  const materias = await disciplinasService.listarDisciplinas()
+  const user = await getOrCreateUser()
+  const materias = await disciplinasService.listarDisciplinas(user.id)
   return materias
 }
 
@@ -22,7 +24,8 @@ export async function getDisciplinas() {
  * Action para criar uma nova matéria
  */
 export async function createMateria(data: MateriaFormData) {
-  const materia = await disciplinasService.criarMateria(data)
+  const user = await getOrCreateUser()
+  const materia = await disciplinasService.criarMateria(data, user.id)
   revalidatePath('/config')
   return materia
 }
@@ -40,7 +43,8 @@ export async function updateMateria(
     disciplina?: DisciplinaNome
   },
 ) {
-  const materia = await disciplinasService.atualizarMateria(id, data)
+  const user = await getOrCreateUser()
+  const materia = await disciplinasService.atualizarMateria(id, data, user.id)
   revalidatePath('/config')
   return materia
 }
@@ -49,7 +53,8 @@ export async function updateMateria(
  * Action para deletar uma matéria
  */
 export async function deleteMateria(id: string) {
-  await disciplinasService.deletarMateria(id)
+  const user = await getOrCreateUser()
+  await disciplinasService.deletarMateria(id, user.id)
   revalidatePath('/config')
 }
 
@@ -57,7 +62,8 @@ export async function deleteMateria(id: string) {
  * Action para listar todos os agendamentos
  */
 export async function getAgendamentos() {
-  const agendamentos = await agendamentosService.listarAgendamentos()
+  const user = await getOrCreateUser()
+  const agendamentos = await agendamentosService.listarAgendamentos(user.id)
   return agendamentos
 }
 
@@ -65,7 +71,8 @@ export async function getAgendamentos() {
  * Action para criar um novo agendamento
  */
 export async function createAgendamento(data: AgendamentoFormData) {
-  const agendamento = await agendamentosService.criarAgendamento(data)
+  const user = await getOrCreateUser()
+  const agendamento = await agendamentosService.criarAgendamento(data, user.id)
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento
@@ -84,7 +91,12 @@ export async function updateAgendamento(
     anotacoes?: string
   },
 ) {
-  const agendamento = await agendamentosService.atualizarAgendamento(id, data)
+  const user = await getOrCreateUser()
+  const agendamento = await agendamentosService.atualizarAgendamento(
+    id,
+    data,
+    user.id,
+  )
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento
@@ -94,7 +106,8 @@ export async function updateAgendamento(
  * Action para deletar um agendamento
  */
 export async function deleteAgendamento(id: string) {
-  await agendamentosService.deletarAgendamento(id)
+  const user = await getOrCreateUser()
+  await agendamentosService.deletarAgendamento(id, user.id)
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
 }

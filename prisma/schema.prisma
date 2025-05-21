@@ -14,6 +14,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id
+  email     String   @unique
+  name      String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relações
+  materias         Materia[]
+  agendamentos     DiaDisciplinaMateria[]
+  planosDeEstudo   PlanoDeEstudos[]
+  historicosEstudo HistoricoEstudo[]
+}
+
 enum DisciplinaNome {
   TI
   Ingles
@@ -45,6 +60,7 @@ enum StatusConteudo {
 
 model Materia {
   id           String         @id @default(cuid())
+  userId       String // Relação com o usuário
   titulo       String
   descricao    String?
   status       StatusConteudo @default(pendente)
@@ -54,11 +70,15 @@ model Materia {
   atualizadoEm DateTime       @updatedAt
 
   // Relações
+  user         User                   @relation(fields: [userId], references: [id])
   agendamentos DiaDisciplinaMateria[]
+
+  @@index([userId])
 }
 
 model DiaDisciplinaMateria {
   id            String          @id @default(cuid())
+  userId        String // Relação com o usuário
   dia           DiaDaSemana
   materiaId     String
   materia       Materia         @relation(fields: [materiaId], references: [id])
@@ -71,12 +91,17 @@ model DiaDisciplinaMateria {
   criadoEm      DateTime        @default(now())
   atualizadoEm  DateTime        @updatedAt
 
+  // Relações
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
   @@index([materiaId])
   @@index([planoId])
 }
 
 model PlanoDeEstudos {
   id             String                 @id @default(cuid())
+  userId         String // Relação com o usuário
   titulo         String
   dataInicio     DateTime
   dataFim        DateTime?
@@ -85,11 +110,17 @@ model PlanoDeEstudos {
   registros      DiaDisciplinaMateria[] // Relação com os registros de estudo
   criadoEm       DateTime               @default(now())
   atualizadoEm   DateTime               @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 // Tabela para armazenar o histórico de estudos de matérias deletadas
 model HistoricoEstudo {
   id              String         @id @default(cuid())
+  userId          String // Relação com o usuário
   tituloDaMateria String // Nome da matéria quando foi deletada
   disciplina      DisciplinaNome
   dataEstudo      DateTime
@@ -99,6 +130,10 @@ model HistoricoEstudo {
   planoId         String? // Referência opcional ao plano de estudos, caso existisse 
   criadoEm        DateTime       @default(now())
 
+  // Relações
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
   @@index([disciplina])
   @@index([dataEstudo])
 }

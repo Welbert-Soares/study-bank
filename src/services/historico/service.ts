@@ -8,9 +8,9 @@ import type {
 } from './types'
 
 export const historicoService = {
-  async buscarHistoricoPorDia() {
+  async buscarHistoricoPorDia(userId: string) {
     try {
-      const registros = await historicoRepository.buscarTodosRegistros()
+      const registros = await historicoRepository.buscarTodosRegistros(userId)
 
       // Agrupar por data
       const historicoAgrupado = registros.reduce<
@@ -70,13 +70,14 @@ export const historicoService = {
     }
   },
 
-  async buscarHistoricoDoDia(data: string) {
+  async buscarHistoricoDoDia(data: string, userId: string) {
     try {
       const [ano, mes, dia] = data.split('-').map(Number)
       const dataFiltro = new Date(ano, mes - 1, dia)
 
       const materiasPorDia = await historicoRepository.buscarRegistrosPorDia(
         dataFiltro,
+        userId,
       )
 
       const disciplinas = materiasPorDia.reduce(

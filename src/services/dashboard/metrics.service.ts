@@ -12,123 +12,104 @@ type MateriaComAgendamento = {
 export async function calculateDailyMetrics(
   materias: MateriaComAgendamento[],
 ): Promise<DashboardMetrica[]> {
-  const disciplinasMap = new Map<DisciplinaNome, MateriaComAgendamento[]>()
-
-  // Group subjects by discipline, mapping revisions to their original disciplines
-  for (const item of materias) {
-    let disciplina = item.materia.disciplina
-
-    // If it's a revision, extract the original discipline from the title
-    if (disciplina === 'Revisoes') {
-      const tituloOriginal = item.materia.titulo.replace('Revisão: ', '')
-      const materiaOriginal = materias.find(
-        (m) =>
-          m.materia.disciplina !== 'Revisoes' &&
-          tituloOriginal.includes(m.materia.titulo),
-      )
-      if (materiaOriginal) {
-        disciplina = materiaOriginal.materia.disciplina
+  const disciplinas = materias.reduce<Map<DisciplinaNome, number>>(
+    (acc, { materia: { disciplina }, status }) => {
+      if (status === 'concluido') {
+        const atual = acc.get(disciplina) || 0
+        acc.set(disciplina, atual + 100)
+      } else if (status === 'em_progresso') {
+        const atual = acc.get(disciplina) || 0
+        acc.set(disciplina, atual + 50)
       }
-    }
+      return acc
+    },
+    new Map(),
+  )
 
-    if (!disciplinasMap.has(disciplina)) {
-      disciplinasMap.set(disciplina, [])
-    }
-    disciplinasMap.get(disciplina)!.push(item)
-  }
-
-  const metricas: DashboardMetrica[] = []
-
-  // Calculate progress for each discipline
-  for (const [disciplina, items] of disciplinasMap.entries()) {
-    const total = items.length
-    const completed = items.filter((item) => item.status === 'concluido').length
-    const inProgress = items.filter(
-      (item) => item.status === 'em_progresso',
-    ).length
-
-    // Calculate progress considering in-progress items as 50% complete
-    const progresso =
-      total > 0 ? Math.round(((completed + inProgress * 0.5) / total) * 100) : 0
-
-    metricas.push({
-      id: String(disciplina),
-      disciplina,
-      progresso,
-      cor: getCorDisciplina(disciplina),
-    })
-  }
-
-  return metricas
+  return Array.from(disciplinas.entries()).map(([disciplina, total]) => ({
+    id: disciplina,
+    disciplina,
+    progresso: Math.round(total / materias.length),
+    cor: getCorDisciplina(disciplina),
+  }))
 }
 
 export async function updateDisciplineProgress(
   disciplina: DisciplinaNome,
   progresso: number,
+  userId: string,
 ): Promise<void> {
   try {
+    // Get all materials of this discipline for today
+    const hoje = getStartOfDay(getBrazilianDate())
+    const amanha = getEndOfDay(getBrazilianDate())
+
     const materias = await db.materia.findMany({
-      where: { disciplina },
-      include: { agendamentos: true },
-    })
-
-    // Atualiza o status das matérias baseado no progresso geral
-    for (const materia of materias) {
-      const novoStatus: StatusConteudo =
-        progresso >= 100
-          ? 'concluido'
-          : progresso > 0
-          ? 'em_progresso'
-          : 'pendente'
-
-      // Buscar o último agendamento para verificar o status atual
-      const ultimoAgendamento = await db.diaDisciplinaMateria.findFirst({
-        where: { materiaId: materia.id },
-        orderBy: { atualizadoEm: 'desc' },
-      })
-
-      // Atualizar todos os agendamentos desta matéria
-      await db.diaDisciplinaMateria.updateMany({
-        where: { materiaId: materia.id },
-        data: { status: novoStatus },
-      })
-
-      // Se a matéria foi concluída e não estava antes
-      if (
-        novoStatus === 'concluido' &&
-        ultimoAgendamento?.status !== 'concluido'
-      ) {
-        await db.historicoEstudo.create({
-          data: {
-            tituloDaMateria: materia.titulo,
-            disciplina: materia.disciplina,
-            dataEstudo: getBrazilianDate(),
-            tempoEstudado: ultimoAgendamento?.tempoEstudado ?? 0,
-            anotacoes: ultimoAgendamento?.anotacoes,
-            progresso: progresso,
-            planoId: ultimoAgendamento?.planoId,
-          },
-        })
-      }
-      // Se a matéria foi desmarcada como concluída
-      else if (
-        novoStatus !== 'concluido' &&
-        ultimoAgendamento?.status === 'concluido'
-      ) {
-        const dataBrasil = getBrazilianDate()
-        const dataInicio = getStartOfDay(dataBrasil)
-        const dataFim = getEndOfDay(dataBrasil)
-
-        await db.historicoEstudo.deleteMany({
-          where: {
-            tituloDaMateria: materia.titulo,
-            disciplina: materia.disciplina,
-            dataEstudo: {
-              gte: dataInicio,
-              lte: dataFim,
+      where: {
+        disciplina,
+        userId: userId,
+        agendamentos: {
+          some: {
+            status: {
+              in: ['pendente', 'em_progresso'],
+            },
+            criadoEm: {
+              gte: hoje,
+              lte: amanha,
             },
           },
+        },
+      },
+      include: {
+        agendamentos: {
+          where: {
+            criadoEm: {
+              gte: hoje,
+              lte: amanha,
+            },
+          },
+        },
+      },
+    })
+
+    // Update each material
+    for (const materia of materias) {
+      const ultimoAgendamento = materia.agendamentos[0]
+      if (ultimoAgendamento) {
+        // Update schedule with new status
+        const novoStatus = progresso >= 100 ? 'concluido' : 'em_progresso'
+        await db.diaDisciplinaMateria.update({
+          where: {
+            id: ultimoAgendamento.id,
+            userId: userId,
+          },
+          data: {
+            status: novoStatus,
+            progresso,
+          },
         })
+
+        // Add to history if completed
+        if (
+          novoStatus === 'concluido' &&
+          ultimoAgendamento?.status === 'concluido'
+        ) {
+          const dataBrasil = getBrazilianDate()
+          const dataInicio = getStartOfDay(dataBrasil)
+          const dataFim = getEndOfDay(dataBrasil)
+
+          await db.historicoEstudo.deleteMany({
+            where: {
+              userId: userId,
+              tituloDaMateria: materia.titulo,
+              disciplina: materia.disciplina,
+              dataEstudo: {
+                gte: dataInicio,
+                lte: dataFim,
+              },
+            },
+          })
+        }
       }
     }
   } catch (error) {
