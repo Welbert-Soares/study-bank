@@ -7,63 +7,50 @@ export async function updateActivityStatus(
   status: StatusConteudo,
   userId: string,
 ): Promise<void> {
-  const registro = await db.diaDisciplinaMateria.findFirst({
-    where: {
-      id,
-      userId: userId,
-    },
-    include: { materia: true },
-  })
-
-  if (!registro) {
-    throw new Error(
-      'Activity not found or you dont have permission to update it',
-    )
-  }
-
-  // Update status
-  await db.diaDisciplinaMateria.update({
-    where: {
-      id,
-      userId: userId,
-    },
-    data: { status },
-  })
-
-  // Get today's range in Brazilian timezone
-  const hoje = getStartOfDay(new Date())
-  const amanha = getEndOfDay(new Date())
-
-  // If marking as completed
-  if (status === 'concluido') {
-    // Create history entry
-    await db.historicoEstudo.create({
-      data: {
-        userId: userId,
-        tituloDaMateria: registro.materia.titulo,
-        disciplina: registro.materia.disciplina,
-        dataEstudo: getBrazilianDate(),
-        tempoEstudado: registro.tempoEstudado ?? 0,
-        anotacoes: registro.anotacoes,
-        progresso: registro.progresso,
-        planoId: registro.planoId,
-      },
-    })
-  }
-  // If unmarking from completed
-  else if (registro.status === 'concluido') {
-    // Remove from history
-    await db.historicoEstudo.deleteMany({
+  try {
+    // Verify the activity belongs to user first
+    const activity = await db.diaDisciplinaMateria.findFirst({
       where: {
+        id: id,
         userId: userId,
-        tituloDaMateria: registro.materia.titulo,
-        disciplina: registro.materia.disciplina,
-        dataEstudo: {
-          gte: hoje,
-          lte: amanha,
-        },
+      },
+      include: {
+        materia: true,
       },
     })
+
+    if (!activity) {
+      throw new Error('Activity not found or unauthorized')
+    }
+
+    // Update the activity status
+    await db.diaDisciplinaMateria.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status,
+      },
+    })
+
+    if (status === 'concluido') {
+      // Create historical record
+      await db.historicoEstudo.create({
+        data: {
+          userId: userId,
+          tituloDaMateria: activity.materia.titulo,
+          disciplina: activity.materia.disciplina,
+          dataEstudo: getBrazilianDate(),
+          tempoEstudado: activity.tempoEstudado ?? 0,
+          progresso: activity.progresso ?? 0,
+          anotacoes: activity.anotacoes ?? '',
+          planoId: activity.planoId,
+        },
+      })
+    }
+  } catch (error) {
+    console.error('Error updating activity status:', error)
+    throw new Error('Failed to update activity status')
   }
 }
 
@@ -73,37 +60,37 @@ export async function updateObjectiveStatus(
   userId: string,
 ): Promise<void> {
   try {
-    // Get the record to access subject data
+    // Verify the objective belongs to user first
     const registro = await db.diaDisciplinaMateria.findFirst({
       where: {
-        id,
+        id: id,
         userId: userId,
       },
-      include: { materia: true },
+      include: {
+        materia: true,
+      },
     })
 
     if (!registro) {
-      throw new Error(
-        'Objetivo não encontrado ou você não tem permissão para atualizá-lo',
-      )
+      throw new Error('Objective not found or unauthorized')
     }
 
-    // Update status
+    // Update the objective status
     await db.diaDisciplinaMateria.update({
       where: {
-        id,
-        userId: userId,
+        id: id,
       },
-      data: { status: completo ? 'concluido' : 'pendente' },
+      data: {
+        status: completo ? 'concluido' : 'pendente',
+      },
     })
 
-    // Get today's range in Brazilian timezone
-    const hoje = getStartOfDay(new Date())
-    const amanha = getEndOfDay(new Date())
+    const hoje = getStartOfDay(getBrazilianDate())
+    const amanha = getEndOfDay(getBrazilianDate())
 
     // If marking as complete
     if (completo) {
-      // Create history entry
+      // Create historical record
       await db.historicoEstudo.create({
         data: {
           userId: userId,
@@ -111,15 +98,13 @@ export async function updateObjectiveStatus(
           disciplina: registro.materia.disciplina,
           dataEstudo: getBrazilianDate(),
           tempoEstudado: registro.tempoEstudado ?? 0,
-          anotacoes: registro.anotacoes,
-          progresso: registro.progresso,
+          progresso: registro.progresso ?? 0,
+          anotacoes: registro.anotacoes ?? '',
           planoId: registro.planoId,
         },
       })
-    }
-    // If unmarking from complete
-    else {
-      // Remove from history
+    } else {
+      // If unmarking as complete, remove from history
       await db.historicoEstudo.deleteMany({
         where: {
           userId: userId,
@@ -133,7 +118,7 @@ export async function updateObjectiveStatus(
       })
     }
   } catch (error) {
-    console.error('Erro ao atualizar status do objetivo:', error)
-    throw new Error('Falha ao atualizar objetivo: ' + (error as Error).message)
+    console.error('Error updating objective status:', error)
+    throw new Error('Failed to update objective status')
   }
 }
