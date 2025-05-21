@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { DiaDaSemana, StatusConteudo } from '@prisma/client'
+import { DiaDaSemana, StatusConteudo } from '@/app/generated/prisma'
 import {
   MateriaFromDB,
   AgendamentoFromDB,

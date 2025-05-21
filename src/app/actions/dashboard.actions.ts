@@ -6,7 +6,7 @@ import type {
   DiaDaSemana,
   StatusConteudo,
   DisciplinaNome,
-} from '@prisma/client'
+} from '@/app/generated/prisma'
 import {
   updateActivityStatus,
   updateObjectiveStatus,

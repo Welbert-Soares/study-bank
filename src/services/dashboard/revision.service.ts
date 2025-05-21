@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { DiaDaSemana, Materia } from '@prisma/client'
+import { DiaDaSemana, Materia } from '@/app/genenerated/prisma'
 import { getDiaSeguinte, getDiaDaSemana } from './utils'
 import type { DashboardRevisao } from './types'
 

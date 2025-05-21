@@ -1,4 +1,4 @@
-import { DiaDaSemana } from '@prisma/client'
+import { DiaDaSemana } from '@/app/genenerated/prisma'
 
 export function getDiaDaSemana(date: Date): DiaDaSemana {
   const dias: DiaDaSemana[] = [

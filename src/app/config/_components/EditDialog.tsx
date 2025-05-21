@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@prisma/client'
+import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@/app/generated/prisma'
 import { MateriaFromDB, AgendamentoFromDB } from '@/types/config'
 
 interface EditDialogProps {
