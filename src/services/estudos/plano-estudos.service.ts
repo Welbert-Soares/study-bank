@@ -55,41 +55,53 @@ export class PlanoEstudosService {
   }
 
   async obterPlanoSemanal(userId: string): Promise<PlanoEstudoDia[]> {
-    // Buscar todas as disciplinas agendadas
-    const agendamentos = await db.diaDisciplinaMateria.findMany({
-      where: {
-        userId: userId,
-      },
-      include: {
-        materia: true,
-      },
-      orderBy: {
-        dia: 'asc',
-      },
-    })
+    try {
+      if (!userId) {
+        throw new Error('Usuário não autenticado')
+      }
+      
+      // Buscar todas as disciplinas agendadas com suas matérias
+      const agendamentos = await db.diaDisciplinaMateria.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          materia: true,
+        },
+        orderBy: {
+          dia: 'asc',
+        },
+      })
 
-    // Criar um mapa para agrupar por dia
-    const planoSemanal = new Map<DiaDaSemana, PlanoEstudoDia>()
+      // Criar um mapa para agrupar por dia
+      const planoSemanal = new Map<DiaDaSemana, PlanoEstudoDia>()
 
-    // Inicializar os dias da semana
-    Object.values(DiaDaSemana).forEach((day) => {
-      planoSemanal.set(day, this.initializarDiaDaSemana(day))
-    })
+      // Inicializar os dias da semana
+      Object.values(DiaDaSemana).forEach((day) => {
+        planoSemanal.set(day, this.initializarDiaDaSemana(day))
+      })
 
-    // Preencher o plano com as disciplinas
-    agendamentos.forEach((agendamento) => {
-      const diaPlano = planoSemanal.get(agendamento.dia)!
+      // Preencher o plano com as disciplinas
+      agendamentos
+        .filter(agendamento => agendamento.materia !== null)
+        .forEach((agendamento) => {
+          const diaPlano = planoSemanal.get(agendamento.dia)
+          if (diaPlano && agendamento.materia) {
+            this.processarDisciplina(
+              diaPlano,
+              agendamento.materia.disciplina,
+              agendamento.materia.titulo,
+            )
 
-      this.processarDisciplina(
-        diaPlano,
-        agendamento.materia.disciplina,
-        agendamento.materia.titulo,
-      )
+            this.calcularProgressoDia(diaPlano, agendamento.status)
+          }
+        })
 
-      this.calcularProgressoDia(diaPlano, agendamento.status)
-    })
-
-    return Array.from(planoSemanal.values())
+      return Array.from(planoSemanal.values())
+    } catch (error) {
+      console.error('Erro ao obter plano semanal:', error)
+      throw new Error('Não foi possível carregar o plano de estudos')
+    }
   }
 }
 
