@@ -1,4 +1,4 @@
-import { DisciplinaNome } from '@/app/genenerated/prisma'
+import { DisciplinaNome } from '@/app/generated/prisma'
 import { db } from '@/lib/db'
 import { getCorDisciplina } from '@/lib/cores'
 
@@ -10,9 +10,15 @@ export interface MetricaGeral {
 }
 
 export class MetricasService {
-  private async calcularProgressoMateria(materiaId: string): Promise<number> {
-    const materia = await db.materia.findUnique({
-      where: { id: materiaId },
+  private async calcularProgressoMateria(
+    materiaId: string,
+    userId: string,
+  ): Promise<number> {
+    const materia = await db.materia.findFirst({
+      where: {
+        id: materiaId,
+        userId: userId,
+      },
       include: { agendamentos: true },
     })
 
@@ -26,9 +32,13 @@ export class MetricasService {
 
   private async calcularProgressoDisciplina(
     disciplina: DisciplinaNome,
+    userId: string,
   ): Promise<number> {
     const materias = await db.materia.findMany({
-      where: { disciplina },
+      where: {
+        disciplina,
+        userId: userId,
+      },
       include: { agendamentos: true },
     })
 
@@ -64,7 +74,11 @@ export class MetricasService {
           userId: userId,
         },
         include: {
-          agendamentos: true,
+          agendamentos: {
+            where: {
+              userId: userId,
+            },
+          },
         },
       })
 

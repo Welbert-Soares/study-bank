@@ -7,16 +7,18 @@ import type {
   DiaDaSemana,
   StatusConteudo,
 } from '@/app/generated/prisma'
+import { auth } from '@clerk/nextjs/server'
 import { disciplinasService } from '@/services/config/disciplinas.service'
 import { agendamentosService } from '@/services/config/agendamentos.service'
-import { getOrCreateUser } from '@/lib/user'
 
 /**
  * Action para listar todas as disciplinas
  */
 export async function getDisciplinas() {
-  const user = await getOrCreateUser()
-  const materias = await disciplinasService.listarDisciplinas(user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  const materias = await disciplinasService.listarDisciplinas(userId)
   return materias
 }
 
@@ -24,8 +26,10 @@ export async function getDisciplinas() {
  * Action para criar uma nova matéria
  */
 export async function createMateria(data: MateriaFormData) {
-  const user = await getOrCreateUser()
-  const materia = await disciplinasService.criarMateria(data, user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  const materia = await disciplinasService.criarMateria(data, userId)
   revalidatePath('/config')
   return materia
 }
@@ -43,8 +47,10 @@ export async function updateMateria(
     disciplina?: DisciplinaNome
   },
 ) {
-  const user = await getOrCreateUser()
-  const materia = await disciplinasService.atualizarMateria(id, data, user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  const materia = await disciplinasService.atualizarMateria(id, data, userId)
   revalidatePath('/config')
   return materia
 }
@@ -53,8 +59,10 @@ export async function updateMateria(
  * Action para deletar uma matéria
  */
 export async function deleteMateria(id: string) {
-  const user = await getOrCreateUser()
-  await disciplinasService.deletarMateria(id, user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  await disciplinasService.deletarMateria(id, userId)
   revalidatePath('/config')
 }
 
@@ -62,8 +70,10 @@ export async function deleteMateria(id: string) {
  * Action para listar todos os agendamentos
  */
 export async function getAgendamentos() {
-  const user = await getOrCreateUser()
-  const agendamentos = await agendamentosService.listarAgendamentos(user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+  
+  const agendamentos = await agendamentosService.listarAgendamentos(userId)
   return agendamentos
 }
 
@@ -71,8 +81,10 @@ export async function getAgendamentos() {
  * Action para criar um novo agendamento
  */
 export async function createAgendamento(data: AgendamentoFormData) {
-  const user = await getOrCreateUser()
-  const agendamento = await agendamentosService.criarAgendamento(data, user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  const agendamento = await agendamentosService.criarAgendamento(data, userId)
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento
@@ -91,12 +103,10 @@ export async function updateAgendamento(
     anotacoes?: string
   },
 ) {
-  const user = await getOrCreateUser()
-  const agendamento = await agendamentosService.atualizarAgendamento(
-    id,
-    data,
-    user.id,
-  )
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  const agendamento = await agendamentosService.atualizarAgendamento(id, data, userId)
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento
@@ -106,8 +116,10 @@ export async function updateAgendamento(
  * Action para deletar um agendamento
  */
 export async function deleteAgendamento(id: string) {
-  const user = await getOrCreateUser()
-  await agendamentosService.deletarAgendamento(id, user.id)
+  const { userId } = await auth()
+  if (!userId) throw new Error('Unauthorized')
+
+  await agendamentosService.deletarAgendamento(id, userId)
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
 }

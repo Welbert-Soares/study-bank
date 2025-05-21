@@ -63,9 +63,12 @@ export const agendamentosService = {
 
       const agendamento = await db.diaDisciplinaMateria.create({
         data: {
-          ...data,
+          dia: data.dia,
+          materiaId: data.materiaId,
           userId: userId,
           status: data.status ?? StatusConteudo.pendente,
+          tempoEstudado: data.tempoEstudado,
+          anotacoes: data.anotacoes,
         },
         include: {
           materia: true,
@@ -197,7 +200,15 @@ export const agendamentosService = {
       })
     } catch (error) {
       console.error('Erro ao atualizar agendamento:', error)
-      throw new Error('Não foi possível atualizar o agendamento')
+      if (error instanceof Error) {
+        throw new Error(
+          `Não foi possível atualizar o agendamento: ${error.message}`,
+        )
+      } else {
+        throw new Error(
+          'Não foi possível atualizar o agendamento: erro desconhecido',
+        )
+      }
     }
   },
 

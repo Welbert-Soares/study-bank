@@ -1,12 +1,25 @@
 import { getCorDisciplina } from '@/lib/cores'
 import { db } from '@/lib/db'
-import type { DisciplinaNome, StatusConteudo } from '@/app/genenerated/prisma'
+import type { DisciplinaNome, StatusConteudo, DiaDaSemana } from '@/app/generated/prisma'
 import type { DashboardMetrica } from './types'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 
 type MateriaComAgendamento = {
   materia: { disciplina: DisciplinaNome; titulo: string }
   status: StatusConteudo
+}
+
+function getDiaDaSemana(date: Date): DiaDaSemana {
+  const dias: DiaDaSemana[] = [
+    'Domingo',
+    'Segunda',
+    'Terca',
+    'Quarta',
+    'Quinta',
+    'Sexta',
+    'Sabado',
+  ]
+  return dias[date.getDay()]
 }
 
 export async function calculateDailyMetrics(
@@ -40,76 +53,55 @@ export async function updateDisciplineProgress(
   userId: string,
 ): Promise<void> {
   try {
-    // Get all materials of this discipline for today
-    const hoje = getStartOfDay(getBrazilianDate())
-    const amanha = getEndOfDay(getBrazilianDate())
+    const date = getBrazilianDate()
+    const dataInicio = getStartOfDay(date)
+    const dataFim = getEndOfDay(date)
+    const diaDaSemana = getDiaDaSemana(date)
 
+    // Buscar todas as matérias da disciplina do usuário
     const materias = await db.materia.findMany({
       where: {
         disciplina,
         userId: userId,
-        agendamentos: {
-          some: {
-            status: {
-              in: ['pendente', 'em_progresso'],
-            },
-            criadoEm: {
-              gte: hoje,
-              lte: amanha,
-            },
-          },
-        },
-      },
-      include: {
-        agendamentos: {
-          where: {
-            criadoEm: {
-              gte: hoje,
-              lte: amanha,
-            },
-          },
-        },
       },
     })
 
-    // Update each material
+    // Para cada matéria, atualizar os agendamentos do dia
     for (const materia of materias) {
-      const ultimoAgendamento = materia.agendamentos[0]
-      if (ultimoAgendamento) {
-        // Update schedule with new status
-        const novoStatus = progresso >= 100 ? 'concluido' : 'em_progresso'
-        await db.diaDisciplinaMateria.update({
-          where: {
-            id: ultimoAgendamento.id,
-            userId: userId,
-          },
+      const agendamentos = await db.diaDisciplinaMateria.findMany({
+        where: {
+          materiaId: materia.id,
+          userId: userId,
+        },
+      })
+
+      if (agendamentos.length > 0) {
+        // Criar registro histórico
+        await db.historicoEstudo.create({
           data: {
-            status: novoStatus,
-            progresso,
+            userId: userId,
+            tituloDaMateria: materia.titulo,
+            disciplina: materia.disciplina,
+            dataEstudo: date,
+            progresso: progresso,
+            // Busca anotações e tempo estudado do último agendamento do dia
+            tempoEstudado: agendamentos[0].tempoEstudado || 0,
+            anotacoes: agendamentos[0].anotacoes,
+            planoId: 'metricas',
           },
         })
 
-        // Add to history if completed
-        if (
-          novoStatus === 'concluido' &&
-          ultimoAgendamento?.status === 'concluido'
-        ) {
-          const dataBrasil = getBrazilianDate()
-          const dataInicio = getStartOfDay(dataBrasil)
-          const dataFim = getEndOfDay(dataBrasil)
-
-          await db.historicoEstudo.deleteMany({
-            where: {
-              userId: userId,
-              tituloDaMateria: materia.titulo,
-              disciplina: materia.disciplina,
-              dataEstudo: {
-                gte: dataInicio,
-                lte: dataFim,
-              },
-            },
-          })
-        }
+        // Atualizar contadores gerais
+        await db.diaDisciplinaMateria.updateMany({
+          where: {
+            materiaId: materia.id,
+            userId: userId,
+            dia: diaDaSemana,
+          },
+          data: {
+            progresso,
+          },
+        })
       }
     }
   } catch (error) {
