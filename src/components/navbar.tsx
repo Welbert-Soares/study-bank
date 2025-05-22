@@ -94,19 +94,20 @@ export function Navbar() {
         <>
           <SignedOut>
             <div className="flex gap-2">
+              {' '}
               <Button
                 asChild
                 variant="default"
                 className="bg-primary text-white hover:bg-primary/90 hover:text-white"
               >
-                <SignInButton />
+                <SignInButton>Entrar</SignInButton>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 className="border-primary/10 hover:bg-primary/10"
               >
-                <SignUpButton />
+                <SignUpButton>Criar conta</SignUpButton>
               </Button>
             </div>
           </SignedOut>
