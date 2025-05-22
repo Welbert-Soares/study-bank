@@ -5,6 +5,7 @@ import { ptBR } from '@clerk/localizations'
 
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Navbar } from '@/components/navbar'
+import { AuthCheck } from '@/components/auth-check'
 import './globals.css'
 
 const geistSans = Geist({
@@ -38,6 +39,7 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+          <AuthCheck />
           <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <Navbar />
           </nav>
