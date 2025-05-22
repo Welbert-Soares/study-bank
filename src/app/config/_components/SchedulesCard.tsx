@@ -142,7 +142,6 @@ export function SchedulesCard({
                   )}
                 />
               </div>
-
               <div className="space-y-4">
                 <FormField
                   control={form.control}
@@ -195,10 +194,9 @@ export function SchedulesCard({
                     </FormItem>
                   )}
                 />
-              </div>
-
+              </div>{' '}
               <Button type="submit" className="w-full">
-                Adicionar Agendamento
+                Agendar Matéria
               </Button>
             </form>
           </Form>

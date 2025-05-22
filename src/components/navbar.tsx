@@ -45,8 +45,8 @@ const navbarItems = [
   { href: '/', children: 'Início' },
   { href: '/dashboard', children: 'Meta Diária' },
   // { name: 'Histórico', path: '/historico' },
-  { href: '/metricas', children: 'Métricas' },
-  { href: '/config', children: 'Atualizar Meta' },
+  { href: '/metricas', children: 'Progresso' },
+  { href: '/config', children: 'Matérias' },
 ]
 
 export function Navbar() {
@@ -86,8 +86,9 @@ export function Navbar() {
         </div>
       </SignedIn>{' '}
       <SignedOut>
+        {' '}
         <div className="text-4xl tracking-tighter font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 hover:from-primary hover:to-primary/80 transition-all select-none">
-          STUDYFLOW
+          STUDY PLAN
         </div>
       </SignedOut>
       <div className="hidden lg:flex gap-2">
