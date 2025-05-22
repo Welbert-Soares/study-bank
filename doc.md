@@ -1,7 +1,9 @@
 
 <!-- 
 
-DATABASE_URL="postgresql://neondb_owner:npg_mzXUJT6pYLq4@ep-purple-glade-acd4172d-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require"
+NODE_ENV=development
+
+DATABASE_URL="postgresql://neondb_owner:npg_mKgxbW4h3lXJ@ep-small-rain-acoaylp1-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require"
 
 NOTION_API_KEY="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"
 NOTION_DATABASE_ID="154e31f45426811f95d3e4522fdf9298"
@@ -16,6 +18,7 @@ NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/
 NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/
+
 
 
 -->
