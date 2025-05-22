@@ -13,28 +13,28 @@ export function QuickLinks() {
           className="w-full justify-start bg-blue-50 hover:bg-blue-100 text-blue-700"
           asChild
         >
-          <a href="/dashboard">📊 Dashboard de Hoje</a>
+          <a href="#">📊 Dashboard de Hoje</a>
         </Button>
         <Button
           variant="outline"
           className="w-full justify-start bg-green-50 hover:bg-green-100 text-green-700"
           asChild
         >
-          <a href="/doc/metricas-progresso.md">📈 Métricas de Progresso</a>
+          <a href="#">📈 Métricas de Progresso</a>
         </Button>
         <Button
           variant="outline"
           className="w-full justify-start bg-yellow-50 hover:bg-yellow-100 text-yellow-700"
           asChild
         >
-          <a href="/doc/anotacoes/exercicios">✍️ Exercícios</a>
+          <a href="#">✍️ Exercícios</a>
         </Button>
         <Button
           variant="outline"
           className="w-full justify-start bg-purple-50 hover:bg-purple-100 text-purple-700"
           asChild
         >
-          <a href="/doc/anotacoes/resumos">📝 Resumos</a>
+          <a href="#">📝 Resumos</a>
         </Button>
       </CardContent>
     </Card>
