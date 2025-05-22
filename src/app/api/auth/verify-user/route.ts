@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getOrCreateUser } from '@/lib/user'
 import { auth } from '@clerk/nextjs/server'
 import { ZodError } from 'zod'
-import { Prisma, PrismaClient } from '@prisma/client'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export async function POST(req: NextRequest) {

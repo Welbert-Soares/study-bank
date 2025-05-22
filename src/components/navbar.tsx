@@ -57,7 +57,7 @@ export function Navbar() {
   return (
     <nav className="h-20 flex items-center border-b border-primary/10 justify-between font-medium p-3">
       <div className="flex justify-center items-center cursor-pointer">
-        <Link href="/library">
+        <Link href="/">
           <img
             src="/logo.svg"
             alt="logo"
