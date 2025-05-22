@@ -54,16 +54,28 @@ export async function updateMateria(
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  // Validar dados de entrada
-  const validatedData = materiaSchema.partial().parse(data)
+  try {
+    // Validar dados de entrada
+    const validatedData = materiaSchema.partial().parse(data)
 
-  const materia = await disciplinasService.atualizarMateria(
-    id,
-    validatedData,
-    userId,
-  )
-  revalidatePath('/config')
-  return materia
+    // Atualizar a matéria
+    const materia = await disciplinasService.atualizarMateria(
+      id,
+      validatedData,
+      userId,
+    )
+
+    // Revalidar os caminhos
+    revalidatePath('/config')
+    revalidatePath('/dashboard')
+    revalidatePath('/historico')
+
+    // Retornar a matéria atualizada
+    return materia
+  } catch (error) {
+    console.error('Falha ao atualizar matéria:', error)
+    throw error
+  }
 }
 
 /**

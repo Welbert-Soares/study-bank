@@ -77,9 +77,9 @@ export function EditDialog({
   ): item is AgendamentoFromDB => {
     return 'materiaId' in item
   }
-
   const materiaForm = useForm<MateriaFormData>({
     resolver: zodResolver(materiaSchema),
+    mode: 'onChange',
   })
 
   const agendamentoForm = useForm<AgendamentoFormData>({
@@ -103,20 +103,84 @@ export function EditDialog({
           descricao: editingItem.descricao ?? undefined,
           disciplina: editingItem.disciplina,
           ordem: editingItem.ordem,
+          status: editingItem.status,
         })
       }
     }
   }, [editingItem, materiaForm, agendamentoForm])
 
+  // Watch form changes
+  useEffect(() => {
+    if (!editingItem || isAgendamento(editingItem)) return
+
+    const subscription = materiaForm.watch((value) => {
+      console.log('Form value changed:', value)
+      if (value.titulo || value.disciplina || value.ordem || value.status) {
+        updateEditingItem({
+          ...editingItem,
+          ...value,
+        })
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [editingItem, materiaForm, updateEditingItem, isAgendamento])
+
+  useEffect(() => {
+    if (!editingItem || !isAgendamento(editingItem)) return
+
+    const subscription = agendamentoForm.watch((value) => {
+      console.log('Agendamento form value changed:', value)
+      if (value.materiaId || value.dia || value.status) {
+        updateEditingItem({
+          ...editingItem,
+          ...value,
+        })
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [editingItem, agendamentoForm, updateEditingItem, isAgendamento])
   const handleSubmit = async (data: MateriaFormData | AgendamentoFormData) => {
+    const originalItem = editingItem!
     try {
-      updateEditingItem(data)
-      await onUpdateItem()
-      toast.success('Item atualizado com sucesso!')
+      console.log('Dados do formulário antes do envio:', data)
+      console.log('Item original:', originalItem)
+
+      // Get current form values
+      const currentValues = isAgendamento(originalItem)
+        ? agendamentoForm.getValues()
+        : materiaForm.getValues()
+
+      console.log('Valores atuais do formulário:', currentValues)
+
+      // Update with current form values
+      updateEditingItem({
+        ...originalItem,
+        ...currentValues,
+      })
+
+      console.log('Estado após updateEditingItem:', editingItem)
+
+      await onUpdateItem() // Then persist to database
+
+      // Only close dialog and show success after both the state update and database persist are done
+      const itemType = isAgendamento(originalItem) ? 'Agendamento' : 'Matéria'
+      const itemName = isAgendamento(originalItem)
+        ? `da matéria "${
+            materias.find(
+              (m) => m.id === (data as AgendamentoFormData).materiaId,
+            )?.titulo
+          }"`
+        : `"${(data as MateriaFormData).titulo}"`
+      toast.success(`${itemType} ${itemName} atualizado(a) com sucesso!`)
       onClose()
     } catch (error) {
-      toast.error('Erro ao atualizar item')
+      const itemType = isAgendamento(originalItem) ? 'agendamento' : 'matéria'
+      toast.error(`Erro ao atualizar ${itemType}. Por favor, tente novamente.`)
       console.error('Erro ao atualizar item:', error)
+      // Restore original state on error
+      updateEditingItem(originalItem)
     }
   }
   const handleDelete = async () => {
@@ -370,6 +434,34 @@ export function EditDialog({
                           }
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={materiaForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione o status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {Object.values(StatusConteudo).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {status}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

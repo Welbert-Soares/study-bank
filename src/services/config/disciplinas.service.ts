@@ -34,7 +34,6 @@ export const disciplinasService = {
       throw new Error('Não foi possível criar a matéria')
     }
   },
-
   async atualizarMateria(
     id: string,
     data: {
@@ -47,15 +46,60 @@ export const disciplinasService = {
     userId: string,
   ) {
     try {
-      return await db.materia.update({
+      console.log('Iniciando atualização da matéria:', { id, userId, data })
+
+      // Primeiro, verificar se a matéria existe e pertence ao usuário
+      const existingMateria = await db.materia.findFirst({
         where: {
           id,
-          userId: userId, // Only allow updating own content
+          userId,
         },
-        data,
       })
+
+      console.log('Matéria encontrada:', existingMateria)
+
+      if (!existingMateria) {
+        throw new Error(
+          'Matéria não encontrada ou você não tem permissão para editá-la',
+        )
+      }
+
+      // Validar campos obrigatórios
+      if (!data.titulo && !existingMateria.titulo) {
+        throw new Error('O título da matéria é obrigatório')
+      }
+
+      if (!data.disciplina && !existingMateria.disciplina) {
+        throw new Error('A disciplina da matéria é obrigatória')
+      }
+
+      // Construir o objeto de atualização preservando valores existentes
+      const updateData = {
+        titulo: data.titulo ?? existingMateria.titulo,
+        descricao: data.descricao ?? existingMateria.descricao,
+        status: data.status ?? existingMateria.status,
+        ordem: data.ordem ?? existingMateria.ordem,
+        disciplina: data.disciplina ?? existingMateria.disciplina,
+      }
+
+      console.log('Dados para atualização:', updateData)
+
+      // Atualizar a matéria
+      const updatedMateria = await db.materia.update({
+        where: {
+          id,
+          userId,
+        },
+        data: updateData,
+      })
+
+      console.log('Matéria atualizada com sucesso:', updatedMateria)
+      return updatedMateria
     } catch (error) {
       console.error('Erro ao atualizar matéria:', error)
+      if (error instanceof Error) {
+        throw error
+      }
       throw new Error('Não foi possível atualizar a matéria')
     }
   },

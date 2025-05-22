@@ -9,6 +9,7 @@ export const materiaSchema = z.object({
     errorMap: () => ({ message: 'Disciplina inválida' }),
   }),
   ordem: z.number().int().min(0),
+  status: z.nativeEnum(StatusConteudo).default('pendente'),
 })
 
 // Schema para validação de Agendamento

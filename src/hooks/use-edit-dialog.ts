@@ -34,7 +34,13 @@ export function useEditDialog(handlers: EditItemHandlers) {
   const updateEditingItem = (
     updates: Partial<MateriaFromDB | AgendamentoFromDB>,
   ) => {
-    setEditingItem((prev) => (prev ? { ...prev, ...updates } : null))
+    console.log('Atualizando item com:', updates)
+    setEditingItem((prev) => {
+      if (!prev) return null
+      const updated = { ...prev, ...updates }
+      console.log('Novo estado do item:', updated)
+      return updated
+    })
   }
 
   const handleEditItem = (item: MateriaFromDB | AgendamentoFromDB) => {
@@ -45,30 +51,53 @@ export function useEditDialog(handlers: EditItemHandlers) {
   const handleUpdateItem = async () => {
     if (!editingItem) return
 
+    console.log('Iniciando atualização no useEditDialog:', editingItem)
     try {
       if (isAgendamento(editingItem)) {
+        // For agendamentos, all fields are required
         const { id, materiaId, dia, status, tempoEstudado, anotacoes } =
           editingItem
         if (!materiaId || !dia) {
           throw new Error('Matéria e dia são campos obrigatórios')
         }
-        const updates: Partial<AgendamentoFormData> = {
+        await handlers.updateAgendamentoItem(id, {
           materiaId,
           dia,
           status,
           tempoEstudado: tempoEstudado ?? undefined,
           anotacoes: anotacoes ?? undefined,
-        }
-        await handlers.updateAgendamentoItem(id, updates)
+        })
       } else {
-        const { id, titulo, disciplina } = editingItem
-        const updates: Partial<MateriaFormData> = { titulo, disciplina }
-        await handlers.updateMateriaItem(id, updates)
+        // For materias, titulo and disciplina are required
+        const { id, titulo, descricao, disciplina, ordem, status } = editingItem
+        if (!titulo || !disciplina) {
+          throw new Error('Título e disciplina são campos obrigatórios')
+        }
+
+        console.log('Enviando atualização de matéria:', {
+          id,
+          titulo,
+          descricao,
+          disciplina,
+          ordem,
+          status,
+        })
+
+        await handlers.updateMateriaItem(id, {
+          titulo,
+          descricao: descricao ?? undefined,
+          disciplina,
+          ordem,
+          status,
+        })
+
+        console.log('Matéria atualizada com sucesso:', id)
       }
-      setIsEditDialogOpen(false)
-      setEditingItem(null)
+
+      // Don't clear dialog state here - let the EditDialog component handle it after onUpdateItem completes
     } catch (error) {
       console.error('Erro ao atualizar item:', error)
+      throw error // Re-throw to let EditDialog handle the error UI
     }
   }
 

@@ -5,6 +5,7 @@ export interface MateriaFormData {
   descricao?: string
   disciplina: DisciplinaNome
   ordem: number
+  status?: StatusConteudo
 }
 
 export interface AgendamentoFormData {
