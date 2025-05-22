@@ -1,7 +1,15 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  output: 'standalone',
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        'localhost:3000',
+        'study-bank-6y85a0k72-welbert-soares-projects.vercel.app',
+      ],
+    },
+  },
+}
 
-export default nextConfig;
+export default nextConfig

@@ -1,11 +1,3 @@
-import { PrismaClient } from '@/app/generated/prisma'
-import { withAccelerate } from '@prisma/extension-accelerate'
+import prisma from './prisma'
 
-const globalForPrisma = global as unknown as {
-  prisma: PrismaClient
-}
-
-const db =
-  globalForPrisma.prisma || new PrismaClient().$extends(withAccelerate())
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
-export { db }
+export const db = prisma
