@@ -9,6 +9,7 @@ export async function getUpcomingContent(
 ): Promise<string[]> {
   try {
     const nextDays = getProximosDias(currentDay, 3)
+    console.log('Próximos dias:', nextDays)
 
     const materias = await db.diaDisciplinaMateria.findMany({
       where: {
@@ -30,6 +31,7 @@ export async function getUpcomingContent(
       take: 5,
     })
 
+    console.log('Matérias encontradas:', materias)
     return materias.map((m) => `${m.materia.titulo} (${m.dia})`)
   } catch (error) {
     console.error('Error getting upcoming content:', error)
