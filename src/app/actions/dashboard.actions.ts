@@ -77,7 +77,7 @@ export async function atualizarProgressoDisciplinaAction(
 ): Promise<void> {
   const session = await auth()
   if (!session.userId) throw new Error('Unauthorized')
-  await updateDisciplineProgress(disciplina, progresso, session.userId)
+  await updateDisciplineProgress(disciplina, session.userId, progresso)
   revalidatePath('/dashboard')
   revalidatePath('/historico')
   revalidatePath('/metricas')
