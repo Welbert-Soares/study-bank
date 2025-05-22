@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getOrCreateUser } from '@/lib/user'
 import { auth } from '@clerk/nextjs/server'
 import { ZodError } from 'zod'
-import { Prisma } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,8 +34,7 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       )
     }
-
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error instanceof PrismaClientKnownRequestError) {
       // Handle unique constraint violations
       if (error.code === 'P2002') {
         return NextResponse.json(
