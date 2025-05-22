@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ClerkProvider } from '@clerk/nextjs'
 import { neobrutalism } from '@clerk/themes'
 import { ptBR } from '@clerk/localizations'
+import { Toaster } from 'sonner'
 
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Navbar } from '@/components/navbar'
@@ -46,6 +47,7 @@ export default function RootLayout({
           <main className="flex min-h-screen flex-col items-center p-4">
             {children}
           </main>
+          <Toaster richColors position="top-right" />
         </body>
       </html>
     </ClerkProvider>

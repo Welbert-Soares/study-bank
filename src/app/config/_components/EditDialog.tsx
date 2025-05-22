@@ -1,5 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Dialog,
   DialogContent,
@@ -7,6 +10,14 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
 import {
   Select,
@@ -18,7 +29,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { DisciplinaNome, DiaDaSemana, StatusConteudo } from '@prisma/client'
-import { MateriaFromDB, AgendamentoFromDB } from '@/types/config'
+import {
+  MateriaFromDB,
+  AgendamentoFromDB,
+  MateriaFormData,
+  AgendamentoFormData,
+} from '@/types/config'
+import { materiaSchema, agendamentoSchema } from '@/lib/validations/schemas'
+import { toast } from 'sonner'
 
 interface EditDialogProps {
   isOpen: boolean
@@ -47,6 +65,48 @@ export function EditDialog({
     return 'materiaId' in item
   }
 
+  const materiaForm = useForm<MateriaFormData>({
+    resolver: zodResolver(materiaSchema),
+  })
+
+  const agendamentoForm = useForm<AgendamentoFormData>({
+    resolver: zodResolver(agendamentoSchema),
+  })
+
+  useEffect(() => {
+    if (editingItem) {
+      if (isAgendamento(editingItem)) {
+        agendamentoForm.reset({
+          materiaId: editingItem.materiaId,
+          dia: editingItem.dia,
+          status: editingItem.status,
+          tempoEstudado: editingItem.tempoEstudado ?? undefined,
+          anotacoes: editingItem.anotacoes ?? undefined,
+          criarRevisao: false,
+        })
+      } else {
+        materiaForm.reset({
+          titulo: editingItem.titulo,
+          descricao: editingItem.descricao ?? undefined,
+          disciplina: editingItem.disciplina,
+          ordem: editingItem.ordem,
+        })
+      }
+    }
+  }, [editingItem, materiaForm, agendamentoForm])
+
+  const handleSubmit = async (data: MateriaFormData | AgendamentoFormData) => {
+    try {
+      updateEditingItem(data)
+      await onUpdateItem()
+      toast.success('Item atualizado com sucesso!')
+      onClose()
+    } catch (error) {
+      toast.error('Erro ao atualizar item')
+      console.error('Erro ao atualizar item:', error)
+    }
+  }
+
   if (!editingItem) return null
 
   return (
@@ -59,138 +119,219 @@ export function EditDialog({
               : 'Editar Matéria'}
           </DialogTitle>
         </DialogHeader>
+
         {isAgendamento(editingItem) ? (
-          <div className="space-y-4">
-            <Select
-              value={editingItem.materiaId}
-              onValueChange={(value) => updateEditingItem({ materiaId: value })}
+          <Form {...agendamentoForm}>
+            <form
+              onSubmit={agendamentoForm.handleSubmit(handleSubmit)}
+              className="space-y-4"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione a matéria" />
-              </SelectTrigger>
-              <SelectContent>
-                {materias.map((materia) => (
-                  <SelectItem key={materia.id} value={materia.id}>
-                    {materia.titulo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <FormField
+                control={agendamentoForm.control}
+                name="materiaId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Matéria</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a matéria" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {materias.map((materia) => (
+                          <SelectItem key={materia.id} value={materia.id}>
+                            {materia.titulo}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Select
-              value={editingItem.dia}
-              onValueChange={(value) =>
-                updateEditingItem({ dia: value as DiaDaSemana })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Dia da semana" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(DiaDaSemana).map((dia) => (
-                  <SelectItem key={dia} value={dia}>
-                    {dia}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <FormField
+                control={agendamentoForm.control}
+                name="dia"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dia da Semana</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o dia" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(DiaDaSemana).map((dia) => (
+                          <SelectItem key={dia} value={dia}>
+                            {dia}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Select
-              value={editingItem.status}
-              onValueChange={(value) =>
-                updateEditingItem({ status: value as StatusConteudo })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(StatusConteudo).map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <FormField
+                control={agendamentoForm.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(StatusConteudo).map((status) => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Criar Revisão</label>
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="criarRevisao"
-                    checked={editingItem.criarRevisao === true}
-                    onChange={() => updateEditingItem({ criarRevisao: true })}
-                    className="h-4 w-4"
-                  />
-                  <span>Sim</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="criarRevisao"
-                    checked={editingItem.criarRevisao === false}
-                    onChange={() => updateEditingItem({ criarRevisao: false })}
-                    className="h-4 w-4"
-                  />
-                  <span>Não</span>
-                </label>
-              </div>
-            </div>
+              <FormField
+                control={agendamentoForm.control}
+                name="anotacoes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Anotações</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Anotações (opcional)"
+                        className="resize-none"
+                        {...field}
+                        value={field.value ?? ''}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Textarea
-              placeholder="Anotações (opcional)"
-              value={editingItem.anotacoes ?? ''}
-              onChange={(e) => updateEditingItem({ anotacoes: e.target.value })}
-            />
-          </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onDeleteItem}
+                  className="bg-red-50 hover:bg-red-100 text-red-600"
+                >
+                  Excluir
+                </Button>
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         ) : (
-          <div className="space-y-4">
-            <Input
-              placeholder="Título"
-              value={editingItem.titulo}
-              onChange={(e) => updateEditingItem({ titulo: e.target.value })}
-            />
-
-            <Select
-              value={editingItem.disciplina}
-              onValueChange={(value) =>
-                updateEditingItem({ disciplina: value as DisciplinaNome })
-              }
+          <Form {...materiaForm}>
+            <form
+              onSubmit={materiaForm.handleSubmit(handleSubmit)}
+              className="space-y-4"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Disciplina" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.values(DisciplinaNome).map((disciplina) => (
-                  <SelectItem key={disciplina} value={disciplina}>
-                    {disciplina}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <FormField
+                control={materiaForm.control}
+                name="titulo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Título</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Input
-              type="number"
-              placeholder="Ordem"
-              value={editingItem.ordem}
-              onChange={(e) =>
-                updateEditingItem({ ordem: parseInt(e.target.value) || 0 })
-              }
-            />
-          </div>
+              <FormField
+                control={materiaForm.control}
+                name="disciplina"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Disciplina</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a disciplina" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {Object.values(DisciplinaNome).map((disciplina) => (
+                          <SelectItem key={disciplina} value={disciplina}>
+                            {disciplina}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={materiaForm.control}
+                name="ordem"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ordem</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        {...field}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? Number(e.target.value) : '',
+                          )
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onDeleteItem}
+                  className="bg-red-50 hover:bg-red-100 text-red-600"
+                >
+                  Excluir
+                </Button>
+                <Button type="button" variant="secondary" onClick={onClose}>
+                  Cancelar
+                </Button>
+                <Button type="submit">Salvar</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         )}
-
-        <DialogFooter className="space-x-2">
-          <Button variant="outline" onClick={onDeleteItem}>
-            Excluir
-          </Button>
-          <Button variant="secondary" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={onUpdateItem}>Salvar</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

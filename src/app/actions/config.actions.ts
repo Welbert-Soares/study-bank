@@ -10,6 +10,7 @@ import type {
 import { auth } from '@clerk/nextjs/server'
 import { disciplinasService } from '@/services/config/disciplinas.service'
 import { agendamentosService } from '@/services/config/agendamentos.service'
+import { materiaSchema, agendamentoSchema } from '@/lib/validations/schemas'
 
 /**
  * Action para listar todas as disciplinas
@@ -29,7 +30,10 @@ export async function createMateria(data: MateriaFormData) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  const materia = await disciplinasService.criarMateria(data, userId)
+  // Validar dados de entrada
+  const validatedData = materiaSchema.parse(data)
+
+  const materia = await disciplinasService.criarMateria(validatedData, userId)
   revalidatePath('/config')
   return materia
 }
@@ -50,7 +54,14 @@ export async function updateMateria(
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  const materia = await disciplinasService.atualizarMateria(id, data, userId)
+  // Validar dados de entrada
+  const validatedData = materiaSchema.partial().parse(data)
+
+  const materia = await disciplinasService.atualizarMateria(
+    id,
+    validatedData,
+    userId,
+  )
   revalidatePath('/config')
   return materia
 }
@@ -84,7 +95,13 @@ export async function createAgendamento(data: AgendamentoFormData) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  const agendamento = await agendamentosService.criarAgendamento(data, userId)
+  // Validar dados de entrada
+  const validatedData = agendamentoSchema.parse(data)
+
+  const agendamento = await agendamentosService.criarAgendamento(
+    validatedData,
+    userId,
+  )
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento
@@ -106,9 +123,12 @@ export async function updateAgendamento(
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
+  // Validar dados de entrada
+  const validatedData = agendamentoSchema.partial().parse(data)
+
   const agendamento = await agendamentosService.atualizarAgendamento(
     id,
-    data,
+    validatedData,
     userId,
   )
   revalidatePath('/config')
