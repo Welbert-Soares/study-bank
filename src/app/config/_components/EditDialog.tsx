@@ -114,7 +114,6 @@ export function EditDialog({
     if (!editingItem || isAgendamento(editingItem)) return
 
     const subscription = materiaForm.watch((value) => {
-      console.log('Form value changed:', value)
       if (value.titulo || value.disciplina || value.ordem || value.status) {
         updateEditingItem({
           ...editingItem,
@@ -130,7 +129,6 @@ export function EditDialog({
     if (!editingItem || !isAgendamento(editingItem)) return
 
     const subscription = agendamentoForm.watch((value) => {
-      console.log('Agendamento form value changed:', value)
       if (value.materiaId || value.dia || value.status) {
         updateEditingItem({
           ...editingItem,
@@ -141,26 +139,20 @@ export function EditDialog({
 
     return () => subscription.unsubscribe()
   }, [editingItem, agendamentoForm, updateEditingItem, isAgendamento])
+
   const handleSubmit = async (data: MateriaFormData | AgendamentoFormData) => {
     const originalItem = editingItem!
     try {
-      console.log('Dados do formulário antes do envio:', data)
-      console.log('Item original:', originalItem)
-
       // Get current form values
       const currentValues = isAgendamento(originalItem)
         ? agendamentoForm.getValues()
         : materiaForm.getValues()
-
-      console.log('Valores atuais do formulário:', currentValues)
 
       // Update with current form values
       updateEditingItem({
         ...originalItem,
         ...currentValues,
       })
-
-      console.log('Estado após updateEditingItem:', editingItem)
 
       await onUpdateItem() // Then persist to database
 
@@ -183,6 +175,7 @@ export function EditDialog({
       updateEditingItem(originalItem)
     }
   }
+
   const handleDelete = async () => {
     setIsDeleting(true)
     try {

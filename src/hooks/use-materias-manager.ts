@@ -39,9 +39,7 @@ export function useMateriasManager() {
     updates: Partial<MateriaFormData>,
   ) => {
     try {
-      console.log('Enviando atualização para matéria:', id, updates)
       await updateMateria(id, updates)
-      console.log('Atualização da matéria concluída')
       await loadMaterias()
     } catch (error) {
       console.error('Erro ao atualizar matéria:', error)

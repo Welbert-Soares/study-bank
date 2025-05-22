@@ -46,8 +46,6 @@ export const disciplinasService = {
     userId: string,
   ) {
     try {
-      console.log('Iniciando atualização da matéria:', { id, userId, data })
-
       // Primeiro, verificar se a matéria existe e pertence ao usuário
       const existingMateria = await db.materia.findFirst({
         where: {
@@ -55,8 +53,6 @@ export const disciplinasService = {
           userId,
         },
       })
-
-      console.log('Matéria encontrada:', existingMateria)
 
       if (!existingMateria) {
         throw new Error(
@@ -82,8 +78,6 @@ export const disciplinasService = {
         disciplina: data.disciplina ?? existingMateria.disciplina,
       }
 
-      console.log('Dados para atualização:', updateData)
-
       // Atualizar a matéria
       const updatedMateria = await db.materia.update({
         where: {
@@ -93,7 +87,6 @@ export const disciplinasService = {
         data: updateData,
       })
 
-      console.log('Matéria atualizada com sucesso:', updatedMateria)
       return updatedMateria
     } catch (error) {
       console.error('Erro ao atualizar matéria:', error)
@@ -143,19 +136,22 @@ export const disciplinasService = {
       await db.diaDisciplinaMateria.deleteMany({
         where: {
           materiaId: id,
-          userId: userId,
+          userId,
         },
       })
 
-      // Finally, delete the subject
+      // Excluir a matéria
       return await db.materia.delete({
         where: {
           id,
-          userId: userId,
+          userId,
         },
       })
     } catch (error) {
       console.error('Erro ao deletar matéria:', error)
+      if (error instanceof Error) {
+        throw error
+      }
       throw new Error('Não foi possível deletar a matéria')
     }
   },

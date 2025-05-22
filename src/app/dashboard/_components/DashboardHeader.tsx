@@ -16,7 +16,7 @@ export function DashboardHeader({ dataFormatada }: DashboardHeaderProps) {
       </div>
       <div className="flex gap-4">
         <Button variant="outline" size="lg" className="gap-2" asChild>
-          <Link href="/config">⚙️ Configurar</Link>
+          <Link href="/config">📚 Gerenciar Matérias</Link>
         </Button>
         <Button variant="outline" size="lg" className="gap-2" asChild>
           <Link href="/">← Voltar ao Início</Link>

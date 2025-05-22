@@ -34,11 +34,9 @@ export function useEditDialog(handlers: EditItemHandlers) {
   const updateEditingItem = (
     updates: Partial<MateriaFromDB | AgendamentoFromDB>,
   ) => {
-    console.log('Atualizando item com:', updates)
     setEditingItem((prev) => {
       if (!prev) return null
       const updated = { ...prev, ...updates }
-      console.log('Novo estado do item:', updated)
       return updated
     })
   }
@@ -51,7 +49,6 @@ export function useEditDialog(handlers: EditItemHandlers) {
   const handleUpdateItem = async () => {
     if (!editingItem) return
 
-    console.log('Iniciando atualização no useEditDialog:', editingItem)
     try {
       if (isAgendamento(editingItem)) {
         // For agendamentos, all fields are required
@@ -74,15 +71,6 @@ export function useEditDialog(handlers: EditItemHandlers) {
           throw new Error('Título e disciplina são campos obrigatórios')
         }
 
-        console.log('Enviando atualização de matéria:', {
-          id,
-          titulo,
-          descricao,
-          disciplina,
-          ordem,
-          status,
-        })
-
         await handlers.updateMateriaItem(id, {
           titulo,
           descricao: descricao ?? undefined,
@@ -90,8 +78,6 @@ export function useEditDialog(handlers: EditItemHandlers) {
           ordem,
           status,
         })
-
-        console.log('Matéria atualizada com sucesso:', id)
       }
 
       // Don't clear dialog state here - let the EditDialog component handle it after onUpdateItem completes
