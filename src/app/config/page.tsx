@@ -10,6 +10,7 @@ import { ConfigHeader } from './_components/ConfigHeader'
 import { SubjectsCard } from './_components/SubjectsCard'
 import { SchedulesCard } from './_components/SchedulesCard'
 import { EditDialog } from './_components/EditDialog'
+import { FerramentasSection } from './_components/FerramentasSection'
 
 export default function ConfigPage() {
   const {
@@ -54,19 +55,23 @@ export default function ConfigPage() {
         {isLoading ? (
           <ConfigPageSkeleton />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <SubjectsCard
-              materias={materias}
-              onAddMateria={addMateria}
-              onEditMateria={handleEditItem}
-            />
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <SubjectsCard
+                materias={materias}
+                onAddMateria={addMateria}
+                onEditMateria={handleEditItem}
+              />
 
-            <SchedulesCard
-              agendamentos={agendamentos}
-              materias={materias}
-              onAddAgendamento={addAgendamento}
-              onEditAgendamento={handleEditItem}
-            />
+              <SchedulesCard
+                agendamentos={agendamentos}
+                materias={materias}
+                onAddAgendamento={addAgendamento}
+                onEditAgendamento={handleEditItem}
+              />
+            </div>
+
+            <FerramentasSection />
           </div>
         )}
 

@@ -1,12 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { StudyOptionsModal } from '@/components/ui/study-options-modal'
+import { listarFerramentasAction } from '@/app/actions/ferramentas.actions'
+import { FerramentaPersonalizada } from '@/types/ferramentas'
 
 export function HeaderSection() {
   const [showStudyOptions, setShowStudyOptions] = useState(false)
+  const [ferramentas, setFerramentas] = useState<FerramentaPersonalizada[]>([])
+
+  useEffect(() => {
+    async function carregarFerramentas() {
+      const response = await listarFerramentasAction()
+      if (response.data) {
+        setFerramentas(response.data)
+      }
+    }
+    carregarFerramentas()
+  }, [])
+
   return (
     <Card className="border-none shadow-none bg-transparent">
       <CardHeader>
@@ -14,58 +28,24 @@ export function HeaderSection() {
           Banco do Brasil - Concurso TI
         </CardTitle>
         <div className="flex flex-wrap gap-4">
-          <Button
-            variant="default"
-            size="lg"
-            className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
-            asChild
-          >
-            <button onClick={() => setShowStudyOptions(true)}>
-              📚 Estudar
-            </button>
-          </Button>
-          <Button
-            variant="default"
-            size="lg"
-            className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
-            asChild
-          >
-            <a
-              href="https://acrobat.adobe.com/link/documents/files/?theme=dark&x_api_client_id=aweb_bookmark&uri=urn%3Aaaid%3Asc%3AUS%3Ac875d06a-30be-4b0f-8e92-bb152c1eb031"
-              target="_blank"
-              rel="noopener noreferrer"
+          {ferramentas.map((ferramenta) => (
+            <Button
+              key={ferramenta.id}
+              variant="default"
+              size="lg"
+              className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
+              asChild
             >
-              📖 Continuar Estudos
-            </a>
-          </Button>
-          <Button
-            variant="default"
-            size="lg"
-            className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
-            asChild
-          >
-            <a
-              href="https://www.notion.so/154e31f45426811f95d3e4522fdf9298?v=154e31f45426810c9af4000c7a64e002"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              📊 Kanban Board (Notion)
-            </a>
-          </Button>
-          <Button
-            variant="default"
-            size="lg"
-            className="bg-white hover:bg-blue-50 text-blue-600 hover:text-blue-800 border shadow-sm hover:shadow-md transition-all"
-            asChild
-          >
-            <a
-              href="https://quizlet.com/user/Welbert_Soares/folders/banco-do-brasil?i=6jvs8z&x=1xqt"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🗂️ Flashcards (Quizlet)
-            </a>
-          </Button>
+              <a
+                href={ferramenta.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={ferramenta.descricao || ferramenta.nome}
+              >
+                {ferramenta.icone} {ferramenta.nome}
+              </a>
+            </Button>
+          ))}
           <Button
             variant="default"
             size="lg"
@@ -76,7 +56,6 @@ export function HeaderSection() {
           </Button>
         </div>
       </CardHeader>
-
       <StudyOptionsModal
         isOpen={showStudyOptions}
         onClose={() => setShowStudyOptions(false)}

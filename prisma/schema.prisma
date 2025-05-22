@@ -14,18 +14,18 @@ datasource db {
 }
 
 model User {
-  id        String   @id
-  email     String   @unique
-  name      String?
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id               String                    @id
+  email            String                    @unique
+  name             String?
+  imageUrl         String?
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
   // Relações
   materias         Materia[]
   agendamentos     DiaDisciplinaMateria[]
   planosDeEstudo   PlanoDeEstudos[]
   historicosEstudo HistoricoEstudo[]
+  ferramentas      FerramentaPersonalizada[]
 }
 
 enum DisciplinaNome {
@@ -96,6 +96,24 @@ model DiaDisciplinaMateria {
   @@index([userId])
   @@index([materiaId])
   @@index([planoId])
+}
+
+model FerramentaPersonalizada {
+  id           String   @id @default(cuid())
+  userId       String // Relação com o usuário
+  nome         String
+  descricao    String?
+  url          String
+  tipo         String // Exemplo: "kanban", "flashcards", "estudar", "continuar"
+  icone        String?
+  ordem        Int      @default(0)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 model PlanoDeEstudos {
