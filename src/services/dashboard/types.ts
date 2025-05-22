@@ -1,5 +1,5 @@
 // Use type import from zod schema or enums
-import type { DisciplinaNome, StatusConteudo } from '@/app/genenerated/prisma'
+import type { DisciplinaNome, StatusConteudo } from '@/app/generated/prisma'
 
 export interface DashboardCronograma {
   id: string
