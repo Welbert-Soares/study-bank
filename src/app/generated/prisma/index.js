@@ -214,7 +214,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\Welbert\\Documents\\github\\study-bank\\src\\app\\generated\\prisma",
+      "value": "C:\\Users\\welbert\\Documents\\github\\study-bank\\src\\app\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -228,11 +228,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\Welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\welbert\\Documents\\github\\study-bank\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../../.env"
   },
   "relativePath": "../../../../prisma",
