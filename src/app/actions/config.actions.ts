@@ -6,7 +6,7 @@ import type {
   DisciplinaNome,
   DiaDaSemana,
   StatusConteudo,
-} from '@/app/generated/prisma'
+} from '@prisma/client'
 import { auth } from '@clerk/nextjs/server'
 import { disciplinasService } from '@/services/config/disciplinas.service'
 import { agendamentosService } from '@/services/config/agendamentos.service'
@@ -72,7 +72,7 @@ export async function deleteMateria(id: string) {
 export async function getAgendamentos() {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
-  
+
   const agendamentos = await agendamentosService.listarAgendamentos(userId)
   return agendamentos
 }
@@ -106,7 +106,11 @@ export async function updateAgendamento(
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
 
-  const agendamento = await agendamentosService.atualizarAgendamento(id, data, userId)
+  const agendamento = await agendamentosService.atualizarAgendamento(
+    id,
+    data,
+    userId,
+  )
   revalidatePath('/config')
   revalidatePath('/') // Revalidate homepage
   return agendamento

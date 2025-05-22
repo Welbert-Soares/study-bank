@@ -1,6 +1,6 @@
 import { db } from '@/lib/db'
-import type { DiaDaSemana } from '@/app/generated/prisma'
-import { StatusConteudo } from '@/app/generated/prisma'
+import type { DiaDaSemana } from '@prisma/client'
+import { StatusConteudo } from '@prisma/client'
 import type { AgendamentoFormData } from '@/types/config'
 
 function getDiaSeguinte(dia: DiaDaSemana): DiaDaSemana {

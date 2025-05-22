@@ -1,4 +1,4 @@
-import { DisciplinaNome } from '@/app/generated/prisma'
+import { DisciplinaNome } from '@prisma/client'
 import { formatDateToYYYYMMDD } from '@/lib/date'
 import { historicoRepository } from './repository'
 import type {

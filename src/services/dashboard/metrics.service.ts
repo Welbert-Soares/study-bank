@@ -4,7 +4,7 @@ import type {
   DisciplinaNome,
   StatusConteudo,
   DiaDaSemana,
-} from '@/app/generated/prisma'
+} from '@prisma/client'
 import type { DashboardMetrica } from './types'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 

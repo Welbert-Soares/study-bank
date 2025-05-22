@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { DiaDaSemana, Materia } from '@/app/generated/prisma'
+import { DiaDaSemana, Materia } from '@prisma/client'
 import { getDiaSeguinte, getDiaDaSemana } from './utils'
 import type { DashboardRevisao } from './types'
 
@@ -9,16 +9,16 @@ export async function createRevisionItem(
 ): Promise<Materia> {
   try {
     const titulo = `Revisar: ${originalMateria.titulo}`
-    
+
     // Check if revision already exists
     const existingRevision = await db.materia.findFirst({
       where: {
         titulo: titulo,
         userId: userId,
         disciplina: 'Revisoes',
-      }
+      },
     })
-    
+
     if (existingRevision) {
       return existingRevision
     }

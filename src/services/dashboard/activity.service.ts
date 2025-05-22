@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { StatusConteudo } from '@/app/generated/prisma'
+import { StatusConteudo } from '@prisma/client'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 import { MetricasService } from '@/services/metricas/MetricasService'
 

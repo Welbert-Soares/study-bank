@@ -1,4 +1,4 @@
-import { DisciplinaNome } from '@/app/generated/prisma'
+import { DisciplinaNome } from '@prisma/client'
 
 export function getCorDisciplina(disciplina: DisciplinaNome): string {
   const cores: Record<DisciplinaNome, string> = {

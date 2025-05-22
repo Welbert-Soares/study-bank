@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { DiaDaSemana, DisciplinaNome } from "@/app/generated/prisma"
+import { DiaDaSemana, DisciplinaNome } from '@prisma/client'
 
 export interface PlanoEstudoDia {
   day: DiaDaSemana
@@ -59,7 +59,7 @@ export class PlanoEstudosService {
       if (!userId) {
         throw new Error('Usuário não autenticado')
       }
-      
+
       // Buscar todas as disciplinas agendadas com suas matérias
       const agendamentos = await db.diaDisciplinaMateria.findMany({
         where: {
@@ -83,7 +83,7 @@ export class PlanoEstudosService {
 
       // Preencher o plano com as disciplinas
       agendamentos
-        .filter(agendamento => agendamento.materia !== null)
+        .filter((agendamento) => agendamento.materia !== null)
         .forEach((agendamento) => {
           const diaPlano = planoSemanal.get(agendamento.dia)
           if (diaPlano && agendamento.materia) {
