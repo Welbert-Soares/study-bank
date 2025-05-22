@@ -1,6 +1,10 @@
 import { getCorDisciplina } from '@/lib/cores'
 import { db } from '@/lib/db'
-import type { DisciplinaNome, StatusConteudo, DiaDaSemana } from '@/app/generated/prisma'
+import type {
+  DisciplinaNome,
+  StatusConteudo,
+  DiaDaSemana,
+} from '@/app/generated/prisma'
 import type { DashboardMetrica } from './types'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
 
@@ -49,8 +53,8 @@ export async function calculateDailyMetrics(
 
 export async function updateDisciplineProgress(
   disciplina: DisciplinaNome,
-  progresso: number,
   userId: string,
+  progresso: number,
 ): Promise<void> {
   try {
     const date = getBrazilianDate()

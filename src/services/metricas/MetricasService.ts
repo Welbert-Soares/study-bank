@@ -19,15 +19,23 @@ export class MetricasService {
         id: materiaId,
         userId: userId,
       },
-      include: { agendamentos: true },
+      include: {
+        agendamentos: true,
+        _count: {
+          select: {
+            agendamentos: true,
+          },
+        },
+      },
     })
 
-    if (!materia || !materia.agendamentos.length) return 0
+    if (!materia || materia._count.agendamentos === 0) return 0
 
     const concluidos = materia.agendamentos.filter(
       (a) => a.status === 'concluido',
     ).length
-    return concluidos / materia.agendamentos.length
+
+    return Math.round((concluidos / materia._count.agendamentos) * 100)
   }
 
   private async calcularProgressoDisciplina(
@@ -39,20 +47,32 @@ export class MetricasService {
         disciplina,
         userId: userId,
       },
-      include: { agendamentos: true },
+      include: {
+        agendamentos: true,
+        _count: {
+          select: {
+            agendamentos: true,
+          },
+        },
+      },
     })
 
     if (!materias.length) return 0
 
-    const progressos = materias.map((materia) => {
-      const concluidos = materia.agendamentos.filter(
-        (a) => a.status === 'concluido',
-      ).length
-      return concluidos / (materia.agendamentos.length || 1)
-    })
+    // Calcula o progresso baseado em agendamentos concluídos
+    const totalAgendamentos = materias.reduce(
+      (sum, m) => sum + m._count.agendamentos,
+      0,
+    )
+    if (totalAgendamentos === 0) return 0
 
-    const totalProgresso = progressos.reduce((sum, p) => sum + p, 0)
-    return Math.round((totalProgresso / materias.length) * 100)
+    const concluidos = materias.reduce(
+      (sum, m) =>
+        sum + m.agendamentos.filter((a) => a.status === 'concluido').length,
+      0,
+    )
+
+    return Math.round((concluidos / totalAgendamentos) * 100)
   }
 
   private criarMetricaGeral(
@@ -66,50 +86,32 @@ export class MetricasService {
       cor: getCorDisciplina(disciplina),
     }
   }
-
   public async obterMetricasGerais(userId: string): Promise<MetricaGeral[]> {
     try {
-      const materias = await db.materia.findMany({
-        where: {
-          userId: userId,
-        },
-        include: {
-          agendamentos: {
-            where: {
-              userId: userId,
-            },
-          },
-        },
+      // Busca todas as disciplinas únicas do usuário
+      const disciplinasUnicas = await db.materia.findMany({
+        where: { userId },
+        select: { disciplina: true },
+        distinct: ['disciplina'],
       })
 
-      const metricasPorDisciplina = new Map<DisciplinaNome, number>()
-      let totalAgendamentos = 0
-
-      materias.forEach((materia) => {
-        const agendamentosConcluidos = materia.agendamentos.filter(
-          (a) => a.status === 'concluido',
-        ).length
-        const totalAgendamentosDisciplina = materia.agendamentos.length
-
-        if (totalAgendamentosDisciplina > 0) {
-          const progressoAtual =
-            metricasPorDisciplina.get(materia.disciplina) || 0
-          const novoProgresso =
-            progressoAtual +
-            (agendamentosConcluidos / totalAgendamentosDisciplina) * 100
-          metricasPorDisciplina.set(materia.disciplina, novoProgresso)
-          totalAgendamentos++
-        }
-      })
-
-      return Array.from(metricasPorDisciplina.entries()).map(
-        ([disciplina, progresso]) => ({
-          id: disciplina,
-          disciplina,
-          progresso: Math.round(progresso / totalAgendamentos),
-          cor: getCorDisciplina(disciplina),
+      // Calcula o progresso para cada disciplina
+      const metricas = await Promise.all(
+        disciplinasUnicas.map(async ({ disciplina }) => {
+          const progresso = await this.calcularProgressoDisciplina(
+            disciplina,
+            userId,
+          )
+          return {
+            id: disciplina,
+            disciplina,
+            progresso,
+            cor: getCorDisciplina(disciplina),
+          }
         }),
       )
+
+      return metricas
     } catch (error) {
       console.error('Erro ao calcular métricas gerais:', error)
       return []

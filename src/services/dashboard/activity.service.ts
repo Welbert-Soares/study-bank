@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import { StatusConteudo } from '@/app/generated/prisma'
 import { getBrazilianDate, getStartOfDay, getEndOfDay } from '@/lib/date'
+import { MetricasService } from '@/services/metricas/MetricasService'
 
 export async function updateActivityStatus(
   id: string,
@@ -47,6 +48,10 @@ export async function updateActivityStatus(
           planoId: activity.planoId,
         },
       })
+
+      // Atualiza as métricas gerais
+      const metricasService = new MetricasService()
+      await metricasService.obterMetricasGerais(userId)
     }
   } catch (error) {
     console.error('Error updating activity status:', error)
