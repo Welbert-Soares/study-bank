@@ -130,6 +130,7 @@ export async function updateAgendamento(
     status?: StatusConteudo
     tempoEstudado?: number
     anotacoes?: string
+    criarRevisao?: boolean
   },
 ) {
   const { userId } = await auth()

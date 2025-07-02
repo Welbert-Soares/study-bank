@@ -139,6 +139,7 @@ export const agendamentosService = {
       status?: StatusConteudo
       tempoEstudado?: number
       anotacoes?: string
+      criarRevisao?: boolean
     },
     userId: string,
   ) {
@@ -188,7 +189,7 @@ export const agendamentosService = {
       }
 
       // Atualizar o agendamento
-      return await db.diaDisciplinaMateria.update({
+      const agendamentoAtualizado = await db.diaDisciplinaMateria.update({
         where: {
           id,
           userId: userId,
@@ -198,6 +199,13 @@ export const agendamentosService = {
           materia: true,
         },
       })
+
+      // Se solicitado, criar revisão automaticamente
+      if (data.criarRevisao) {
+        await this.criarRevisao(updateData.materiaId, updateData.dia, userId)
+      }
+
+      return agendamentoAtualizado
     } catch (error) {
       console.error('Erro ao atualizar agendamento:', error)
       if (error instanceof Error) {

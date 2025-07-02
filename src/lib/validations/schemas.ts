@@ -21,6 +21,7 @@ export const agendamentoSchema = z.object({
   tempoEstudado: z.number().min(0).optional(),
   anotacoes: z.string().optional(),
   status: z.nativeEnum(StatusConteudo).default('pendente'),
+  criarRevisao: z.boolean().optional().default(false),
 })
 
 // Schema para validação de Plano de Estudos
