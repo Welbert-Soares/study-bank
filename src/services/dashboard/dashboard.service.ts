@@ -49,6 +49,7 @@ export async function getDashboardData(
       titulo: item.materia.titulo,
       disciplina: item.materia.disciplina,
       status: item.status,
+      anotacoes: item.anotacoes,
     }))
 
     // Calculate metrics including all activities

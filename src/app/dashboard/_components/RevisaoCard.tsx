@@ -18,6 +18,7 @@ interface Revisao {
   titulo: string
   disciplina: string
   status: string
+  anotacoes?: string | null
 }
 
 interface RevisaoCardProps {
@@ -37,6 +38,7 @@ export function RevisaoCard({ revisoes, onStatusChange }: RevisaoCardProps) {
             <TableRow>
               <TableHead>Matéria</TableHead>
               <TableHead>Disciplina</TableHead>
+              <TableHead>Anotações</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Ação</TableHead>
             </TableRow>
@@ -46,6 +48,20 @@ export function RevisaoCard({ revisoes, onStatusChange }: RevisaoCardProps) {
               <TableRow key={index}>
                 <TableCell className="font-medium">{item.titulo}</TableCell>
                 <TableCell>{item.disciplina}</TableCell>
+                <TableCell className="max-w-xs">
+                  {item.anotacoes ? (
+                    <div
+                      className="text-sm text-gray-600 truncate"
+                      title={item.anotacoes}
+                    >
+                      {item.anotacoes}
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      Sem anotações
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"

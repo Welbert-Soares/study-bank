@@ -106,6 +106,7 @@ export async function getRevisions(
       titulo: item.materia.titulo,
       disciplina: item.materia.disciplina,
       status: item.status,
+      anotacoes: item.anotacoes,
     }))
   } catch (error) {
     console.error('Error getting revisions:', error)

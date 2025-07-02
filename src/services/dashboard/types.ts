@@ -6,6 +6,7 @@ export interface DashboardCronograma {
   titulo: string
   disciplina: DisciplinaNome
   status: StatusConteudo
+  anotacoes?: string | null
 }
 
 export interface DashboardMetrica {
@@ -27,6 +28,7 @@ export interface DashboardRevisao {
   titulo: string
   disciplina: DisciplinaNome
   status: StatusConteudo
+  anotacoes?: string | null
 }
 
 export interface DashboardData {

@@ -18,6 +18,7 @@ interface Atividade {
   titulo: string
   disciplina: string
   status: string
+  anotacoes?: string | null
 }
 
 interface CronogramaCardProps {
@@ -40,6 +41,7 @@ export function CronogramaCard({
             <TableRow>
               <TableHead>Atividade</TableHead>
               <TableHead>Disciplina</TableHead>
+              <TableHead>Anotações</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-[100px]">Ações</TableHead>
             </TableRow>
@@ -58,6 +60,20 @@ export function CronogramaCard({
               >
                 <TableCell className="font-medium">{item.titulo}</TableCell>
                 <TableCell>{item.disciplina}</TableCell>
+                <TableCell className="max-w-xs">
+                  {item.anotacoes ? (
+                    <div
+                      className="text-sm text-gray-600 truncate"
+                      title={item.anotacoes}
+                    >
+                      {item.anotacoes}
+                    </div>
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      Sem anotações
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="capitalize">
                     {item.status}
