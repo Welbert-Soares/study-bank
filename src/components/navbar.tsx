@@ -43,6 +43,7 @@ const NavbarItem = ({ href, children, isActive }: NavbarItemProps) => {
 
 const navbarItems = [
   { href: '/', children: 'Início' },
+  { href: '/planos', children: 'Planos' },
   { href: '/dashboard', children: 'Meta Diária' },
   // { name: 'Histórico', path: '/historico' },
   { href: '/metricas', children: 'Progresso' },

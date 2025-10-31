@@ -26,6 +26,10 @@ model User {
   planosDeEstudo   PlanoDeEstudos[]
   historicosEstudo HistoricoEstudo[]
   ferramentas      FerramentaPersonalizada[]
+  // Novos modelos
+  planos           Plano[]
+  disciplinas      Disciplina[]
+  ciclosPomodoro   CicloPomodoro[]
 }
 
 enum DisciplinaNome {
@@ -153,4 +157,95 @@ model HistoricoEstudo {
   @@index([userId])
   @@index([disciplina])
   @@index([dataEstudo])
+}
+
+// ========================================
+// NOVOS MODELOS - Sistema Estudei Style
+// ========================================
+
+// Plano de Estudos (novo conceito - substitui PlanoDeEstudos)
+model Plano {
+  id           String   @id @default(cuid())
+  userId       String
+  nome         String
+  emblema      String? // URL da imagem do edital
+  edital       String? // Nome do edital (ex: "Polícia Federal")
+  cargo        String? // Nome do cargo (ex: "Agente de Polícia Federal")
+  observacoes  String?  @db.Text
+  ativo        Boolean  @default(true)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relações
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  disciplinas Disciplina[]
+
+  @@index([userId])
+  @@index([ativo])
+}
+
+// Disciplina (nova estrutura com hierarquia de tópicos)
+model Disciplina {
+  id           String         @id @default(cuid())
+  userId       String
+  planoId      String
+  nome         String
+  cor          String? // Cor personalizada em hexadecimal (ex: "#3DD9B3")
+  descricao    String?        @db.Text
+  ordem        Int            @default(0)
+  edital       String? // Badge do edital (ex: "PF", "TRF", etc)
+  cargo        String? // Cargo relacionado
+  status       StatusConteudo @default(pendente)
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+
+  // Relações
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plano          Plano           @relation(fields: [planoId], references: [id], onDelete: Cascade)
+  topicos        Topico[]
+  ciclosPomodoro CicloPomodoro[]
+
+  @@index([userId])
+  @@index([planoId])
+  @@index([status])
+}
+
+// Tópico (conteúdo dentro de uma disciplina)
+model Topico {
+  id           String         @id @default(cuid())
+  disciplinaId String
+  ordem        Int
+  titulo       String
+  conteudo     String?        @db.Text // Conteúdo detalhado do tópico
+  status       StatusConteudo @default(pendente)
+  criadoEm     DateTime       @default(now())
+  atualizadoEm DateTime       @updatedAt
+
+  // Relações
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+
+  @@index([disciplinaId])
+  @@index([status])
+}
+
+// Ciclo Pomodoro (sistema de planejamento de estudos por tempo)
+model CicloPomodoro {
+  id           String   @id @default(cuid())
+  userId       String
+  disciplinaId String
+  duracao      Int // Duração em minutos
+  ordem        Int // Ordem no ciclo de estudos
+  completo     Boolean  @default(false)
+  data         DateTime @default(now()) // Data do ciclo
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  // Relações
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  disciplina Disciplina @relation(fields: [disciplinaId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([disciplinaId])
+  @@index([data])
+  @@index([completo])
 }
