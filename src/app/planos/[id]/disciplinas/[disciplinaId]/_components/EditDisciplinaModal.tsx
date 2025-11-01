@@ -13,7 +13,15 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
-import { ChevronUp, ChevronDown, Pencil, Trash2, X, Plus } from 'lucide-react'
+import {
+  ChevronUp,
+  ChevronDown,
+  Pencil,
+  Trash2,
+  X,
+  Plus,
+  Check,
+} from 'lucide-react'
 import { ColorPicker } from '@/components/ui/color-picker'
 import type { DisciplinaComTopicos, TopicoFromDB } from '@/types/plano'
 import {
@@ -151,209 +159,237 @@ export function EditDisciplinaModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0">
-        {/* Header */}
-        <DialogHeader className="px-6 pt-6 pb-4 border-b">
-          <div className="flex items-start justify-between gap-8">
-            <div className="flex-1 space-y-2">
-              <DialogTitle className="text-2xl font-bold text-gray-900">
-                {nome}
-              </DialogTitle>
-              <div className="space-y-1">
-                <Label className="text-xs font-medium text-gray-500 uppercase">
-                  Nome
-                </Label>
-                <Input
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  className="border-0 border-b-2 border-teal-400 rounded-none px-0 focus-visible:ring-0 focus-visible:border-teal-500 bg-transparent"
-                  placeholder="Nome da disciplina"
-                />
-              </div>
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold text-gray-900">
+            {nome}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="flex flex-col flex-1 overflow-hidden">
+          {/* Nome com Autocomplete e Cor */}
+          <div className="grid grid-cols-[1fr,auto] gap-6 mb-4">
+            {/* Nome */}
+            <div className="space-y-2">
+              <Label
+                htmlFor="nome"
+                className="text-sm font-medium text-gray-700"
+              >
+                NOME
+              </Label>
+              <Input
+                id="nome"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                placeholder="Digite o nome da disciplina"
+                className="border-0 border-b-2 border-gray-300 rounded-none px-0 focus-visible:ring-0 focus-visible:border-teal-500"
+                required
+              />
             </div>
-            <div className="space-y-1">
-              <Label className="text-xs font-medium text-gray-500 uppercase">
-                Cor
+
+            {/* Seletor de Cor */}
+            <div className="space-y-2 min-w-[200px]">
+              <Label
+                htmlFor="cor"
+                className="text-sm font-medium text-gray-700"
+              >
+                COR
               </Label>
               <ColorPicker value={cor} onChange={setCor} />
             </div>
           </div>
-        </DialogHeader>
 
-        {/* Tópicos */}
-        <div className="px-6 py-4 overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between mb-3">
-            <Label className="text-xs font-medium text-gray-500 uppercase">
-              Tópicos
-            </Label>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-teal-500 hover:text-teal-600 hover:bg-teal-50 font-medium text-xs uppercase"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Adicionar novo tópico
-            </Button>
-          </div>
+          {/* Área de Tópicos - Scrollable */}
+          <div className="flex-1 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <Label className="text-sm font-medium text-gray-700">
+                TÓPICOS
+              </Label>
+              <Button
+                type="button"
+                variant="link"
+                className="text-teal-500 hover:text-teal-600 p-0 h-auto"
+                onClick={() => {
+                  // TODO: Implementar adicionar novo tópico
+                  toast.info('Funcionalidade em breve!')
+                }}
+              >
+                + ADICIONAR NOVO TÓPICO
+              </Button>
+            </div>
 
-          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
-            {disciplina.topicos
-              .sort((a: TopicoFromDB, b: TopicoFromDB) => a.ordem - b.ordem)
-              .map((topico: TopicoFromDB) => {
-                const isExpanded = expandedTopics.has(topico.id)
-                const isEditing = editingTopicId === topico.id
+            {/* Lista de Tópicos */}
+            <div className="space-y-2">
+              {disciplina.topicos
+                .sort((a: TopicoFromDB, b: TopicoFromDB) => a.ordem - b.ordem)
+                .map((topico: TopicoFromDB) => {
+                  const isExpanded = expandedTopics.has(topico.id)
+                  const isEditing = editingTopicId === topico.id
 
-                return (
-                  <div
-                    key={topico.id}
-                    className="border border-gray-200 rounded-md overflow-hidden bg-white"
-                  >
-                    {/* Linha do tópico */}
-                    <div className="flex items-center gap-3 p-3 hover:bg-gray-50 transition-colors">
-                      <div
-                        className="w-10 h-10 rounded-md flex items-center justify-center flex-shrink-0 text-white font-bold text-xs"
-                        style={{ backgroundColor: cor }}
-                      >
-                        {disciplina.edital || 'PF'}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-800 leading-relaxed">
-                          {topico.ordem}. {topico.titulo}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center gap-0.5">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 hover:bg-gray-100"
-                          onClick={() => toggleTopic(topico.id)}
-                        >
-                          {isExpanded ? (
-                            <ChevronUp className="w-4 h-4 text-gray-600" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4 text-gray-600" />
-                          )}
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 hover:bg-gray-100"
-                          onClick={() => startEditingTopic(topico)}
-                        >
-                          <Pencil className="w-4 h-4 text-gray-600" />
-                        </Button>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-8 w-8 hover:bg-gray-100"
-                          onClick={() => handleDeleteTopic(topico.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-gray-600" />
-                        </Button>
-                      </div>
-                    </div>
-
-                    {/* Conteúdo expandido */}
-                    {isExpanded && (
-                      <div className="px-3 pb-3 bg-white border-t border-gray-100">
+                  return (
+                    <div key={topico.id}>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg group hover:bg-gray-100">
                         {isEditing ? (
-                          <div className="space-y-3 pt-3">
-                            <div>
-                              <Label className="text-xs text-muted-foreground">
-                                TÍTULO
-                              </Label>
-                              <Input
-                                value={editingTopicData.titulo}
-                                onChange={(e) =>
-                                  setEditingTopicData({
-                                    ...editingTopicData,
-                                    titulo: e.target.value,
-                                  })
+                          // Modo de Edição
+                          <>
+                            <Input
+                              value={editingTopicData.titulo}
+                              onChange={(e) =>
+                                setEditingTopicData({
+                                  ...editingTopicData,
+                                  titulo: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  e.preventDefault()
+                                  saveTopicEdit(topico.id)
                                 }
-                                className="mt-1"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">
-                                CONTEÚDO
-                              </Label>
-                              <Textarea
-                                value={editingTopicData.conteudo}
-                                onChange={(e) =>
-                                  setEditingTopicData({
-                                    ...editingTopicData,
-                                    conteudo: e.target.value,
-                                  })
+                                if (e.key === 'Escape') {
+                                  cancelEditingTopic()
                                 }
-                                className="mt-1 min-h-[100px]"
-                                placeholder="Adicione detalhes sobre o tópico..."
-                              />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={cancelEditingTopic}
+                              }}
+                              className="flex-1 text-sm mr-2"
+                              autoFocus
+                            />
+                            <div className="flex gap-1">
+                              <button
+                                type="button"
+                                onClick={() => toggleTopic(topico.id)}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                                title={isExpanded ? 'Recolher' : 'Expandir'}
                               >
-                                Cancelar
-                              </Button>
-                              <Button
-                                size="sm"
+                                {isExpanded ? (
+                                  <ChevronUp className="w-4 h-4" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4" />
+                                )}
+                              </button>
+                              <button
+                                type="button"
                                 onClick={() => saveTopicEdit(topico.id)}
-                                className="bg-teal-500 hover:bg-teal-600"
+                                className="text-teal-600 hover:text-teal-700 p-1"
+                                title="Salvar"
                               >
-                                Salvar
-                              </Button>
+                                <Check className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={cancelEditingTopic}
+                                className="text-gray-400 hover:text-gray-600 p-1"
+                                title="Cancelar"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
                             </div>
-                          </div>
+                          </>
                         ) : (
-                          <div className="pt-3">
-                            {topico.conteudo && (
-                              <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                                {topico.conteudo}
-                              </p>
-                            )}
-                            {!topico.conteudo && (
-                              <p className="text-sm text-muted-foreground italic">
-                                Nenhum conteúdo adicionado
-                              </p>
-                            )}
-                          </div>
+                          // Modo de Visualização
+                          <>
+                            <span className="text-sm text-gray-700">
+                              {topico.titulo}
+                            </span>
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button
+                                type="button"
+                                onClick={() => toggleTopic(topico.id)}
+                                className="text-gray-400 hover:text-teal-600 p-1"
+                                title={isExpanded ? 'Recolher' : 'Expandir'}
+                              >
+                                {isExpanded ? (
+                                  <ChevronUp className="w-4 h-4" />
+                                ) : (
+                                  <ChevronDown className="w-4 h-4" />
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => startEditingTopic(topico)}
+                                className="text-gray-400 hover:text-teal-600 p-1"
+                                title="Editar"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteTopic(topico.id)}
+                                className="text-gray-400 hover:text-red-600 p-1"
+                                title="Remover"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
-                    )}
-                  </div>
-                )
-              })}
+
+                      {/* Área expandida para conteúdo */}
+                      {isExpanded && !isEditing && (
+                        <div className="mt-2 p-3 bg-white border border-gray-200 rounded-lg">
+                          {topico.conteudo ? (
+                            <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                              {topico.conteudo}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-gray-400 italic">
+                              Nenhum conteúdo adicionado
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Editor de conteúdo quando expandido e editando */}
+                      {isExpanded && isEditing && (
+                        <div className="mt-2 p-3 bg-white border border-gray-200 rounded-lg space-y-2">
+                          <Label className="text-xs text-gray-500">
+                            CONTEÚDO (OPCIONAL)
+                          </Label>
+                          <Textarea
+                            value={editingTopicData.conteudo}
+                            onChange={(e) =>
+                              setEditingTopicData({
+                                ...editingTopicData,
+                                conteudo: e.target.value,
+                              })
+                            }
+                            className="min-h-[100px] text-sm"
+                            placeholder="Adicione detalhes sobre o tópico..."
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+            </div>
+
+            {/* Mensagem quando vazio */}
+            {disciplina.topicos.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <p className="text-sm">Nenhum tópico adicionado</p>
+                <p className="text-xs mt-1">
+                  Clique em &quot;+ ADICIONAR NOVO TÓPICO&quot; para começar
+                </p>
+              </div>
+            )}
           </div>
 
-          {disciplina.topicos.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-              <p>Nenhum tópico adicionado ainda</p>
-              <p className="text-sm mt-1">
-                Clique em "Adicionar Novo Tópico" para começar
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="px-6 py-4 border-t flex justify-between items-center bg-white">
-          <Button
-            variant="outline"
-            onClick={handleDeleteDisciplina}
-            className="border-teal-500 text-teal-600 hover:bg-teal-50 hover:text-teal-700"
-          >
-            Remover
-          </Button>
-          <Button
-            onClick={handleSave}
-            className="bg-teal-500 hover:bg-teal-600 text-white px-8"
-          >
-            Salvar
-          </Button>
+          {/* Botões */}
+          <div className="flex justify-between gap-3 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDeleteDisciplina}
+              className="border-teal-500 text-teal-600 hover:bg-teal-50"
+            >
+              Remover
+            </Button>
+            <Button
+              onClick={handleSave}
+              className="bg-teal-500 hover:bg-teal-600 text-white"
+            >
+              Salvar
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

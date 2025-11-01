@@ -19,6 +19,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { NovaDisciplinaModal } from './NovaDisciplinaModal'
+import { EditarPlanoModal } from './EditarPlanoModal'
 
 interface PlanoCardProps {
   plano: PlanoCardData
@@ -26,6 +28,8 @@ interface PlanoCardProps {
 
 export function PlanoCard({ plano }: PlanoCardProps) {
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const [showNovaDisciplinaModal, setShowNovaDisciplinaModal] = useState(false)
+  const [showEditarPlanoModal, setShowEditarPlanoModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
@@ -74,7 +78,7 @@ export function PlanoCard({ plano }: PlanoCardProps) {
               size="icon"
               onClick={(e) => {
                 e.stopPropagation()
-                window.location.href = `/planos/${plano.id}/editar`
+                setShowEditarPlanoModal(true)
               }}
               className="text-gray-400 hover:text-gray-600 h-8 w-8"
             >
@@ -130,7 +134,7 @@ export function PlanoCard({ plano }: PlanoCardProps) {
               <Button
                 onClick={(e) => {
                   e.preventDefault()
-                  window.location.href = `/planos/${plano.id}/nova-disciplina`
+                  setShowNovaDisciplinaModal(true)
                 }}
                 className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-6 whitespace-nowrap"
                 size="sm"
@@ -163,6 +167,20 @@ export function PlanoCard({ plano }: PlanoCardProps) {
           </div>
         </Card>
       </div>
+
+      {/* Modal Nova Disciplina */}
+      <NovaDisciplinaModal
+        open={showNovaDisciplinaModal}
+        onOpenChange={setShowNovaDisciplinaModal}
+        planoId={plano.id}
+      />
+
+      {/* Modal Editar Plano */}
+      <EditarPlanoModal
+        planoId={plano.id}
+        open={showEditarPlanoModal}
+        onOpenChange={setShowEditarPlanoModal}
+      />
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>
