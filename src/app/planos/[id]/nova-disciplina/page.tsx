@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,15 +18,16 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 interface NovaDisciplinaPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default function NovaDisciplinaPage({
   params,
 }: NovaDisciplinaPageProps) {
   const router = useRouter()
+  const [planoId, setPlanoId] = useState<string>('')
   const [nome, setNome] = useState('')
   const [cor, setCor] = useState('#3DD9B3')
   const [descricao, setDescricao] = useState('')
@@ -39,6 +40,13 @@ export default function NovaDisciplinaPage({
     Array<{ titulo: string; conteudo?: string }>
   >([])
   const [novoTopico, setNovoTopico] = useState({ titulo: '', conteudo: '' })
+
+  // Resolver params
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setPlanoId(resolvedParams.id)
+    })
+  }, [params])
 
   const adicionarTopico = () => {
     if (!novoTopico.titulo.trim()) {
@@ -73,7 +81,7 @@ export default function NovaDisciplinaPage({
     try {
       // 1. Criar disciplina
       const disciplinaCriada = await criarDisciplinaAction({
-        planoId: params.id,
+        planoId: planoId,
         nome: nome.trim(),
         cor,
         descricao: descricao.trim() || undefined,
@@ -87,7 +95,7 @@ export default function NovaDisciplinaPage({
       }
 
       toast.success('Disciplina criada com sucesso!')
-      router.push(`/planos/${params.id}`)
+      router.push(`/planos/${planoId}`)
     } catch (error) {
       toast.error('Erro ao criar disciplina')
       console.error(error)
@@ -101,7 +109,7 @@ export default function NovaDisciplinaPage({
       <div className="max-w-3xl mx-auto space-y-8">
         <div>
           <Button asChild variant="ghost" size="sm" className="mb-4">
-            <Link href={`/planos/${params.id}`}>
+            <Link href={`/planos/${planoId}`}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar para o Plano
             </Link>
@@ -173,7 +181,7 @@ export default function NovaDisciplinaPage({
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/planos/${params.id}`)}
+              onClick={() => router.push(`/planos/${planoId}`)}
               disabled={isLoading}
             >
               Cancelar

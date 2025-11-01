@@ -168,7 +168,7 @@ model Plano {
   id           String   @id @default(cuid())
   userId       String
   nome         String
-  emblema      String? // URL da imagem do edital
+  emblema      String?  @db.Text // URL da imagem ou base64
   edital       String? // Nome do edital (ex: "Polícia Federal")
   cargo        String? // Nome do cargo (ex: "Agente de Polícia Federal")
   observacoes  String?  @db.Text

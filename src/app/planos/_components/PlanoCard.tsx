@@ -1,9 +1,8 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Target, Edit, Trash2 } from 'lucide-react'
+import { Globe, Edit, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { PlanoCardData } from '@/types/plano'
@@ -45,86 +44,125 @@ export function PlanoCard({ plano }: PlanoCardProps) {
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <CardHeader className="pb-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              {plano.emblema ? (
-                <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-gray-100">
-                  <Image
-                    src={plano.emblema}
-                    alt={plano.nome}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="w-16 h-16 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Target className="w-8 h-8 text-primary" />
-                </div>
-              )}
-              <div className="flex-1">
-                <CardTitle className="text-xl">{plano.nome}</CardTitle>
-                {plano.edital && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {plano.edital}
-                  </p>
-                )}
-                {plano.cargo && (
-                  <Badge variant="secondary" className="mt-2">
-                    {plano.cargo}
-                  </Badge>
-                )}
+      <div className="flex items-stretch gap-3">
+        {/* Card 1: Imagem/Ícone */}
+        <Link href={`/planos/${plano.id}`}>
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 flex items-center justify-center bg-white h-full">
+            {plano.emblema ? (
+              <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-gray-800">
+                <Image
+                  src={plano.emblema}
+                  alt={plano.nome}
+                  fill
+                  className="object-cover"
+                />
               </div>
-            </div>
-          </div>
-        </CardHeader>
+            ) : (
+              <div className="w-32 h-32 rounded-full border-4 border-gray-800 bg-white flex items-center justify-center">
+                <Globe className="w-16 h-16 text-gray-800" strokeWidth={1.5} />
+              </div>
+            )}
+          </Card>
+        </Link>
 
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center gap-2 text-sm">
-              <BookOpen className="w-4 h-4 text-primary" />
-              <span className="font-medium">{plano.totalDisciplinas}</span>
-              <span className="text-muted-foreground">disciplinas</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Target className="w-4 h-4 text-primary" />
-              <span className="font-medium">{plano.totalTopicos}</span>
-              <span className="text-muted-foreground">tópicos</span>
-            </div>
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <Button asChild className="flex-1" size="sm">
-              <Link href={`/planos/${plano.id}`}>Abrir Plano</Link>
-            </Button>
+        {/* Card 2: Informações do Plano */}
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 flex-1 bg-white relative h-full">
+          {/* Botões de Ação - Topo Direito deste card */}
+          <div className="absolute top-4 right-4 flex gap-2 z-10">
             <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="aspect-square p-0"
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation()
+                window.location.href = `/planos/${plano.id}/editar`
+              }}
+              className="text-gray-400 hover:text-gray-600 h-8 w-8"
             >
-              <Link href={`/planos/${plano.id}/editar`}>
-                <Edit className="w-4 h-4" />
-              </Link>
+              <Edit className="w-4 h-4" />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="aspect-square p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => setShowDeleteAlert(true)}
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDeleteAlert(true)
+              }}
+              className="text-gray-400 hover:text-red-600 h-8 w-8"
             >
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
 
-          {!plano.ativo && (
-            <Badge variant="secondary" className="w-full justify-center">
-              Inativo
-            </Badge>
-          )}
-        </CardContent>
-      </Card>
+          <Link href={`/planos/${plano.id}`} className="flex h-full">
+            <div className="flex-1 flex flex-col justify-between pr-4">
+              <div className="space-y-2">
+                <h3 className="text-2xl font-bold text-teal-500">
+                  {plano.nome}
+                </h3>
+
+                <div className="space-y-1 text-sm text-gray-600">
+                  <p>
+                    <span className="font-semibold">Editais:</span>{' '}
+                    {plano.edital || 'Nenhum'}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Cargos:</span>{' '}
+                    {plano.cargo || 'Nenhum'}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Disciplinas:</span>{' '}
+                    {plano.totalDisciplinas}
+                    <span className="ml-8">
+                      <span className="font-semibold">Tópicos:</span>{' '}
+                      {plano.totalTopicos}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="font-semibold">Observações:</span>{' '}
+                    {plano.observacoes || 'Sem informações extras'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Botão Nova Disciplina - Lado Direito mais abaixo */}
+            <div className="flex items-end pb-2">
+              <Button
+                onClick={(e) => {
+                  e.preventDefault()
+                  window.location.href = `/planos/${plano.id}/nova-disciplina`
+                }}
+                className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-6 whitespace-nowrap"
+                size="sm"
+              >
+                Nova Disciplina
+              </Button>
+            </div>
+          </Link>
+        </Card>
+
+        {/* Card 3: Estatísticas */}
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 flex flex-col justify-center gap-4 bg-white w-[200px]">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-teal-500">0h00min</p>
+            <p className="text-xs text-gray-500 whitespace-nowrap">
+              Horas de Estudo
+            </p>
+          </div>
+
+          <div className="flex gap-6 justify-center">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">0</p>
+              <p className="text-xs text-gray-500">Questões</p>
+            </div>
+
+            <div className="text-center">
+              <p className="text-2xl font-bold text-gray-900">0%</p>
+              <p className="text-xs text-gray-500">Desempenho</p>
+            </div>
+          </div>
+        </Card>
+      </div>
 
       <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
         <AlertDialogContent>

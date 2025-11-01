@@ -20,16 +20,18 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
 interface EditarDisciplinaPageProps {
-  params: {
+  params: Promise<{
     id: string
     disciplinaId: string
-  }
+  }>
 }
 
 export default function EditarDisciplinaPage({
   params,
 }: EditarDisciplinaPageProps) {
   const router = useRouter()
+  const [planoId, setPlanoId] = useState<string>('')
+  const [disciplinaId, setDisciplinaId] = useState<string>('')
   const [nome, setNome] = useState('')
   const [cor, setCor] = useState('#3DD9B3')
   const [descricao, setDescricao] = useState('')
@@ -50,13 +52,23 @@ export default function EditarDisciplinaPage({
   const [novoTopico, setNovoTopico] = useState({ titulo: '', conteudo: '' })
   const [isAddingTopico, setIsAddingTopico] = useState(false)
 
+  // Resolver params
   useEffect(() => {
-    loadDisciplina()
-  }, [params.disciplinaId])
+    params.then((resolvedParams) => {
+      setPlanoId(resolvedParams.id)
+      setDisciplinaId(resolvedParams.disciplinaId)
+    })
+  }, [params])
+
+  useEffect(() => {
+    if (disciplinaId) {
+      loadDisciplina()
+    }
+  }, [disciplinaId])
 
   const loadDisciplina = async () => {
     try {
-      const disciplina = await obterDisciplinaPorIdAction(params.disciplinaId)
+      const disciplina = await obterDisciplinaPorIdAction(disciplinaId)
       setNome(disciplina.nome)
       setCor(disciplina.cor || '#3DD9B3')
       setDescricao(disciplina.descricao || '')
@@ -66,7 +78,7 @@ export default function EditarDisciplinaPage({
     } catch (error) {
       toast.error('Erro ao carregar disciplina')
       console.error(error)
-      router.push(`/planos/${params.id}`)
+      router.push(`/planos/${planoId}`)
     } finally {
       setIsLoading(false)
     }
@@ -88,7 +100,7 @@ export default function EditarDisciplinaPage({
           : 1
 
       const novoTopicoCreated = await criarTopicoAction({
-        disciplinaId: params.disciplinaId,
+        disciplinaId: disciplinaId,
         titulo: novoTopico.titulo,
         conteudo: novoTopico.conteudo || undefined,
         ordem: proximaOrdem,
@@ -127,7 +139,7 @@ export default function EditarDisciplinaPage({
     setIsSaving(true)
 
     try {
-      await atualizarDisciplinaAction(params.disciplinaId, {
+      await atualizarDisciplinaAction(disciplinaId, {
         nome: nome.trim(),
         cor,
         descricao: descricao.trim() || undefined,
@@ -136,7 +148,7 @@ export default function EditarDisciplinaPage({
       })
 
       toast.success('Disciplina atualizada com sucesso!')
-      router.push(`/planos/${params.id}`)
+      router.push(`/planos/${planoId}`)
     } catch (error) {
       toast.error('Erro ao atualizar disciplina')
       console.error(error)
@@ -158,7 +170,7 @@ export default function EditarDisciplinaPage({
       <div className="max-w-3xl mx-auto space-y-8">
         <div>
           <Button asChild variant="ghost" size="sm" className="mb-4">
-            <Link href={`/planos/${params.id}`}>
+            <Link href={`/planos/${planoId}`}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Voltar para o Plano
             </Link>
@@ -230,7 +242,7 @@ export default function EditarDisciplinaPage({
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push(`/planos/${params.id}`)}
+              onClick={() => router.push(`/planos/${planoId}`)}
               disabled={isSaving}
             >
               Cancelar

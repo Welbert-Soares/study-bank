@@ -5,7 +5,9 @@ import { ptBR } from '@clerk/localizations'
 import { Toaster } from 'sonner'
 
 import { Geist, Geist_Mono } from 'next/font/google'
-import { Navbar } from '@/components/navbar'
+import { Sidebar } from '@/components/sidebar'
+import { TopHeader } from '@/components/top-header'
+import { PageHeader } from '@/components/page-header'
 import { AuthCheck } from '@/components/auth-check'
 import './globals.css'
 
@@ -38,15 +40,15 @@ export default function RootLayout({
     >
       <html lang="pt-BR">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
         >
           <AuthCheck />
-          <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <Navbar />
-          </nav>
-          <main className="flex min-h-screen flex-col items-center p-4">
-            {children}
-          </main>
+          <Sidebar />
+          <div className="flex flex-col min-h-screen">
+            <TopHeader />
+            <PageHeader />
+            <main className="flex-1 p-6">{children}</main>
+          </div>
           <Toaster richColors position="top-right" />
         </body>
       </html>

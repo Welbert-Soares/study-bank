@@ -3,20 +3,33 @@ import { notFound } from 'next/navigation'
 import { EditDisciplinaModal } from './_components/EditDisciplinaModal'
 
 interface DisciplinaPageProps {
-  params: {
+  params: Promise<{
     id: string
     disciplinaId: string
-  }
+  }>
 }
 
 export default async function DisciplinaPage({ params }: DisciplinaPageProps) {
+  const { id, disciplinaId } = await params
+
   try {
-    const disciplina = await obterDisciplinaPorIdAction(params.disciplinaId)
+    const disciplina = await obterDisciplinaPorIdAction(disciplinaId)
+
+    // Calcular estatísticas
+    const topicosEstudados = disciplina.topicos.filter(
+      (t) => t.status === 'concluido',
+    ).length
+    const topicosTotal = disciplina.topicos.length
 
     return (
       <EditDisciplinaModal
-        disciplina={disciplina}
-        planoId={params.id}
+        disciplina={{
+          ...disciplina,
+          topicosEstudados,
+          topicosTotal,
+          questoesResolvidas: 0, // TODO: implementar sistema de questões
+        }}
+        planoId={id}
         isOpen={true}
       />
     )

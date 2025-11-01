@@ -8,14 +8,16 @@ import { DisciplinaCard } from './_components/DisciplinaCard'
 import { notFound } from 'next/navigation'
 
 interface PlanoPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function PlanoPage({ params }: PlanoPageProps) {
+  const { id } = await params
+
   try {
-    const plano = await obterPlanoPorIdAction(params.id)
+    const plano = await obterPlanoPorIdAction(id)
 
     const totalTopicos = plano.disciplinas.reduce(
       (acc, disc) => acc + disc.topicos.length,
@@ -85,7 +87,7 @@ export default async function PlanoPage({ params }: PlanoPageProps) {
                       size="sm"
                       className="bg-primary hover:bg-primary/90 ml-2"
                     >
-                      <Link href={`/planos/${params.id}/nova-disciplina`}>
+                      <Link href={`/planos/${id}/nova-disciplina`}>
                         <Plus className="w-4 h-4 mr-2" />
                         Nova Disciplina
                       </Link>
@@ -136,7 +138,7 @@ export default async function PlanoPage({ params }: PlanoPageProps) {
                       topicosTotal,
                       questoesResolvidas: 0, // TODO: implementar
                     }}
-                    planoId={params.id}
+                    planoId={id}
                     planoNome={plano.nome}
                   />
                 )
@@ -152,7 +154,7 @@ export default async function PlanoPage({ params }: PlanoPageProps) {
                 Comece adicionando disciplinas ao seu plano
               </p>
               <Button asChild>
-                <Link href={`/planos/${params.id}/nova-disciplina`}>
+                <Link href={`/planos/${id}/nova-disciplina`}>
                   <Plus className="w-4 h-4 mr-2" />
                   Adicionar Primeira Disciplina
                 </Link>

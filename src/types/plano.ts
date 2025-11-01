@@ -141,6 +141,7 @@ export interface PlanoCardData {
   emblema: string | null
   edital: string | null
   cargo: string | null
+  observacoes: string | null
   totalDisciplinas: number
   totalTopicos: number
   ativo: boolean
