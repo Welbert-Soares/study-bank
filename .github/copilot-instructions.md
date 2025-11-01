@@ -240,6 +240,58 @@ After mutations, revalidate affected routes:
 5. **Update types**: Add TypeScript types to `types/` if needed
 6. **Revalidate paths**: Add `revalidatePath()` calls for affected routes
 7. **Test auth**: Ensure `userId` validation and filtering throughout chain
+8. **Clean up redundant code**: After refactoring, always check for and remove:
+   - Unused components that were replaced
+   - Duplicate functions performing the same task
+   - Obsolete pages/routes that no longer serve a purpose
+   - Unused imports and dependencies
+   - Old files in `_components/` folders that were superseded
+   - API routes that are no longer called
+   - Redundant service functions with similar implementations
+
+## Code Maintenance & Refactoring Guidelines
+
+### Before Committing Changes
+
+**ALWAYS perform a cleanup audit:**
+
+1. **Search for unused files**:
+
+   - Check if old component files still have imports/references
+   - Look for duplicate implementations (e.g., modal vs page approach)
+   - Identify files that were replaced during refactoring
+
+2. **Remove redundant code**:
+
+   - Delete old components that were replaced with new implementations
+   - Remove duplicate utility functions
+   - Clean up unused types and interfaces
+   - Delete obsolete API routes or actions
+
+3. **Consolidate duplicates**:
+
+   - If multiple files do the same thing, keep the best implementation
+   - Update all references to use the consolidated version
+   - Document which approach is preferred (e.g., modal over page navigation)
+
+4. **Update documentation**:
+   - Remove references to deleted files in comments
+   - Update README if project structure changed significantly
+
+### Example Cleanup Scenarios
+
+- **After converting page to modal**: Delete the old page file and its `_components/` if they're not reused
+- **After creating new action**: Check if old actions in different files do the same thing
+- **After refactoring UI**: Remove old component variants that are no longer used
+- **After API route changes**: Delete routes that are superseded by new implementations
+
+### Red Flags That Indicate Cleanup Needed
+
+- Multiple files with similar names (e.g., `EditModal.tsx` and `EditPage.tsx`)
+- Components in `_components/` folders that aren't imported anywhere
+- Routes that return 404 or are never linked to
+- Functions with "old", "legacy", or "deprecated" in comments
+- Duplicate service methods across different service files
 
 ## Study Planning Context (Domain Knowledge)
 
