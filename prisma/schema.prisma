@@ -14,22 +14,23 @@ datasource db {
 }
 
 model User {
-  id               String                    @id
-  email            String                    @unique
-  name             String?
-  imageUrl         String?
-  createdAt        DateTime                  @default(now())
-  updatedAt        DateTime                  @updatedAt
+  id                    String                    @id
+  email                 String                    @unique
+  name                  String?
+  imageUrl              String?
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
   // Relações
-  materias         Materia[]
-  agendamentos     DiaDisciplinaMateria[]
-  planosDeEstudo   PlanoDeEstudos[]
-  historicosEstudo HistoricoEstudo[]
-  ferramentas      FerramentaPersonalizada[]
+  materias              Materia[]
+  agendamentos          DiaDisciplinaMateria[]
+  planosDeEstudo        PlanoDeEstudos[]
+  historicosEstudo      HistoricoEstudo[]
+  ferramentas           FerramentaPersonalizada[]
   // Novos modelos
-  planos           Plano[]
-  disciplinas      Disciplina[]
-  ciclosPomodoro   CicloPomodoro[]
+  planos                Plano[]
+  disciplinas           Disciplina[]
+  ciclosPomodoro        CicloPomodoro[]
+  planejamentosSemanais PlanejamentoSemanal[]
 }
 
 enum DisciplinaNome {
@@ -177,8 +178,9 @@ model Plano {
   atualizadoEm DateTime @updatedAt
 
   // Relações
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  disciplinas Disciplina[]
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  disciplinas           Disciplina[]
+  planejamentosSemanais PlanejamentoSemanal[]
 
   @@index([userId])
   @@index([ativo])
@@ -248,4 +250,36 @@ model CicloPomodoro {
   @@index([disciplinaId])
   @@index([data])
   @@index([completo])
+}
+
+// Planejamento Semanal (distribui disciplinas pela semana)
+model PlanejamentoSemanal {
+  id                  String   @id @default(cuid())
+  userId              String
+  planoId             String
+  nome                String // Ex: "Semana 1 - Revisão Geral"
+  dataInicio          DateTime // Início da semana (Segunda-feira)
+  dataFim             DateTime // Fim da semana (Domingo)
+  ativo               Boolean  @default(true)
+  // Configurações do wizard
+  horasPorDia         Int // Total de horas disponíveis por dia
+  tempoMinimo         Int // Tempo mínimo de estudo por sessão (em minutos)
+  tempoMaximo         Int // Tempo máximo de estudo por sessão (em minutos)
+  diasDisponiveis     String // JSON: ["Segunda", "Terca", "Quarta"...] - Dias da semana selecionados
+  horariosDisponiveis String   @db.Text // JSON: {Segunda: {inicio: "08:00", fim: "12:00"}, ...}
+  // Disciplinas e seus pesos
+  configuracoes       String   @db.Text // JSON: [{disciplinaId, nome, cor, importancia, conhecimento, percentual}]
+  // Grade semanal gerada
+  distribuicao        String   @db.Text // JSON: {Segunda: [{disciplinaId, nome, cor, inicio, fim, duracao}], ...}
+  criadoEm            DateTime @default(now())
+  atualizadoEm        DateTime @updatedAt
+
+  // Relações
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plano Plano @relation(fields: [planoId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([planoId])
+  @@index([ativo])
+  @@index([dataInicio])
 }
