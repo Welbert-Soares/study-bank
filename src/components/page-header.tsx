@@ -28,7 +28,7 @@ function getPageConfig(
           </Button>
           <Button variant="outline" className="border-teal-500 text-teal-600">
             <span className="mr-2">📚</span>
-            Plano PF
+            Plano BB
           </Button>
         </div>
       ),
@@ -62,12 +62,6 @@ function getPageConfig(
     '/planejamento': {
       title: 'Planejamento',
       actionType: 'static',
-      actions: (
-        <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Planejamento
-        </Button>
-      ),
     },
     '/revisoes': {
       title: 'Revisões',

@@ -474,6 +474,8 @@ export async function editarSessaoAction(
     fim?: string
     duracao?: number
     topico?: string
+    dataInicio?: string
+    dataFim?: string
   },
 ) {
   const session = await auth()

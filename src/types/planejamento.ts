@@ -69,6 +69,10 @@ export interface SessaoEstudo {
   inicio: string // "08:00"
   fim: string // "10:00"
   duracao: number // em minutos
+  topico?: string // Tópico opcional
+  // Controle de recorrência
+  dataInicio?: string // Data ISO para início da recorrência
+  dataFim?: string // Data ISO para fim da recorrência (opcional)
 }
 
 export interface DiaDistribuicao {

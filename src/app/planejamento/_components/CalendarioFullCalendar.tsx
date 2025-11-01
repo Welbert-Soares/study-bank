@@ -19,6 +19,8 @@ interface CalendarioFullCalendarProps {
   distribuicao: DistribuicaoSemanal
   titulo?: string
   editable?: boolean
+  dataInicio?: Date
+  dataFim?: Date
   onEventClick?: (event: any) => void
   onDateSelect?: (info: any) => void
   onEventDrop?: (info: any) => void
@@ -29,6 +31,8 @@ export function CalendarioFullCalendar({
   distribuicao,
   titulo = 'Calendário de Estudos',
   editable = true,
+  dataInicio,
+  dataFim,
   onEventClick,
   onDateSelect,
   onEventDrop,
@@ -42,26 +46,47 @@ export function CalendarioFullCalendar({
     ([diaSemana, dia]) => {
       if (!dia?.sessoes || !Array.isArray(dia.sessoes)) return []
 
-      return dia.sessoes.map((sessao, index) => ({
-        id: `${diaSemana}-${index}`,
-        title: sessao.nome,
-        // Usar daysOfWeek para eventos recorrentes
-        daysOfWeek: [getDayNumber(diaSemana)],
-        startTime: sessao.inicio, // HH:mm
-        endTime: sessao.fim, // HH:mm
-        backgroundColor: sessao.cor,
-        borderColor: sessao.cor,
-        textColor: '#ffffff',
-        extendedProps: {
-          disciplinaId: sessao.disciplinaId,
-          duracao: sessao.duracao,
-          diaSemana,
-        },
-      }))
-    },
-  )
+      return dia.sessoes.map((sessao, index) => {
+        const eventConfig: EventInput = {
+          id: `${diaSemana}-${index}`,
+          title: sessao.nome,
+          // Usar daysOfWeek para eventos recorrentes
+          daysOfWeek: [getDayNumber(diaSemana)],
+          startTime: sessao.inicio, // HH:mm
+          endTime: sessao.fim, // HH:mm
+          backgroundColor: sessao.cor,
+          borderColor: sessao.cor,
+          textColor: '#ffffff',
+          extendedProps: {
+            disciplinaId: sessao.disciplinaId,
+            duracao: sessao.duracao,
+            diaSemana,
+          },
+        }
 
-  // Debug: verificar eventos gerados
+        // Usar datas específicas da sessão se disponíveis, senão usa do planejamento
+        const startDate =
+          sessao.dataInicio ||
+          (dataInicio ? dataInicio.toISOString().split('T')[0] : undefined)
+        const endDate =
+          sessao.dataFim ||
+          (dataFim ? dataFim.toISOString().split('T')[0] : undefined)
+
+        if (startDate) {
+          eventConfig.startRecur = startDate
+        }
+
+        if (endDate) {
+          // endRecur é exclusivo, então adiciona 1 dia
+          const end = new Date(endDate)
+          end.setDate(end.getDate() + 1)
+          eventConfig.endRecur = end.toISOString().split('T')[0]
+        }
+
+        return eventConfig
+      })
+    },
+  ) // Debug: verificar eventos gerados
   console.log('📋 Eventos gerados para FullCalendar:', events.length)
   if (events.length === 0) {
     console.log('⚠️ Nenhum evento gerado. Distribuição:', distribuicao)
@@ -200,7 +225,7 @@ export function CalendarioFullCalendar({
             interactionPlugin,
             listPlugin,
           ]}
-          initialView="timeGridWeek"
+          initialView="dayGridMonth"
           locale={ptBrLocale}
           headerToolbar={{
             left: 'prev,next today',

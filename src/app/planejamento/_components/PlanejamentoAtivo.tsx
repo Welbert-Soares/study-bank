@@ -315,6 +315,8 @@ export function PlanejamentoAtivo({
         distribuicao={distribuicao}
         titulo="Calendário de Estudos"
         editable={true}
+        dataInicio={planejamento.dataInicio}
+        dataFim={planejamento.dataFim}
         onEventClick={handleEventClick}
         onDateSelect={handleDateSelect}
       />
