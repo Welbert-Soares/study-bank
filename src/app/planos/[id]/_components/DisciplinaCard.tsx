@@ -1,7 +1,6 @@
 'use client'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -70,10 +69,10 @@ export function DisciplinaCard({
 
         {/* Conteúdo do card */}
         <div className="relative z-10">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
+          <CardHeader className="pb-2 pt-3 px-4">
+            <div className="flex items-center gap-2">
               <div
-                className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
+                className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-500 ${
                   isHovered
                     ? 'bg-white/30'
                     : '[background-color:var(--disciplina-cor)]'
@@ -100,13 +99,13 @@ export function DisciplinaCard({
             </div>
           </CardHeader>
 
-          <CardContent className="pt-0 min-h-[100px] relative">
+          <CardContent className="pt-0 pb-3 px-4 min-h-[70px] relative">
             <div
-              className={`grid grid-cols-3 gap-4 text-center absolute inset-0 items-center transition-opacity duration-300 ${
+              className={`grid grid-cols-3 gap-2 text-center absolute inset-0 items-center transition-opacity duration-300 ${
                 isHovered ? 'opacity-0 pointer-events-none' : 'opacity-100'
               }`}
             >
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="text-2xl font-bold text-foreground">
                   {disciplina.topicosEstudados}
                 </p>
@@ -117,7 +116,7 @@ export function DisciplinaCard({
                 </p>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="text-2xl font-bold text-foreground">
                   {disciplina.topicosTotal}
                 </p>
@@ -128,7 +127,7 @@ export function DisciplinaCard({
                 </p>
               </div>
 
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="text-2xl font-bold text-foreground">
                   {disciplina.questoesResolvidas}
                 </p>
