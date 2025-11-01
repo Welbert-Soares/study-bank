@@ -1,15 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { Button } from './ui/button'
 import { Plus } from 'lucide-react'
 import { NovoPlanoModal } from '@/app/planos/_components/NovoPlanoModal'
+import { PlanoSelectorButton } from './plano-selector-button'
+import { listarPlanosAction } from '@/app/actions/planos.actions'
+import type { Plano } from '@prisma/client'
 
 interface PageConfig {
   title: string
-  actionType?: 'static' | 'modal'
-  actions?: React.ReactNode
+  showPlanoSelector?: boolean
+  showAddStudyButton?: boolean
+  customActions?: React.ReactNode
 }
 
 function getPageConfig(
@@ -19,24 +23,12 @@ function getPageConfig(
   const pageConfigs: Record<string, PageConfig> = {
     '/': {
       title: 'Home',
-      actionType: 'static',
-      actions: (
-        <div className="flex items-center gap-3">
-          <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Estudo
-          </Button>
-          <Button variant="outline" className="border-teal-500 text-teal-600">
-            <span className="mr-2">📚</span>
-            Plano BB
-          </Button>
-        </div>
-      ),
+      showPlanoSelector: true,
+      showAddStudyButton: true,
     },
     '/planos': {
       title: 'Planos de Estudo',
-      actionType: 'modal',
-      actions: (
+      customActions: (
         <Button
           onClick={() => setShowNovoPlanoModal(true)}
           className="bg-teal-500 hover:bg-teal-600 text-white"
@@ -48,8 +40,7 @@ function getPageConfig(
     },
     '/config': {
       title: 'Disciplinas',
-      actionType: 'static',
-      actions: (
+      customActions: (
         <Button className="bg-teal-500 hover:bg-teal-600 text-white">
           <Plus className="w-4 h-4 mr-2" />
           Nova Disciplina
@@ -61,7 +52,6 @@ function getPageConfig(
     },
     '/planejamento': {
       title: 'Planejamento',
-      actionType: 'static',
     },
     '/revisoes': {
       title: 'Revisões',
@@ -105,7 +95,27 @@ function getPageConfig(
 export function PageHeader() {
   const pathname = usePathname()
   const [showNovoPlanoModal, setShowNovoPlanoModal] = useState(false)
+  const [planos, setPlanos] = useState<Plano[]>([])
+  const [planoAtivo, setPlanoAtivo] = useState<Plano | undefined>()
+  const [isLoading, setIsLoading] = useState(true)
+
   const currentPage = getPageConfig(pathname, setShowNovoPlanoModal)
+
+  useEffect(() => {
+    async function carregarPlanos() {
+      try {
+        const planosData = await listarPlanosAction()
+        setPlanos(planosData)
+        setPlanoAtivo(planosData.find((p) => p.ativo))
+      } catch (error) {
+        console.error('Erro ao carregar planos:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    carregarPlanos()
+  }, [pathname])
 
   return (
     <>
@@ -114,8 +124,28 @@ export function PageHeader() {
           <h1 className="text-3xl font-bold text-gray-900">
             {currentPage.title}
           </h1>
-          {currentPage.actions && (
-            <div className="flex items-center gap-3">{currentPage.actions}</div>
+
+          {/* Actions customizadas ou padrão (Plano Selector + Add Study) */}
+          {(currentPage.customActions ||
+            currentPage.showPlanoSelector ||
+            currentPage.showAddStudyButton) && (
+            <div className="flex items-center gap-3">
+              {/* Botão Adicionar Estudo */}
+              {currentPage.showAddStudyButton && !isLoading && (
+                <Button className="bg-teal-500 hover:bg-teal-600 text-white">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Estudo
+                </Button>
+              )}
+
+              {/* Seletor de Plano */}
+              {currentPage.showPlanoSelector && !isLoading && (
+                <PlanoSelectorButton planos={planos} planoAtivo={planoAtivo} />
+              )}
+
+              {/* Actions customizadas */}
+              {currentPage.customActions}
+            </div>
           )}
         </div>
       </div>

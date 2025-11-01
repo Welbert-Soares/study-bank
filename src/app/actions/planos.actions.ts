@@ -70,6 +70,7 @@ export async function ativarPlanoAction(id: string) {
 
   await planosService.ativarPlano(id, session.userId)
 
+  revalidatePath('/')
   revalidatePath('/planos')
   revalidatePath('/planejamento')
 }
