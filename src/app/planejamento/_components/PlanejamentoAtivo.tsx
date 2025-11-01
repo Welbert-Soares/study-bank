@@ -9,8 +9,6 @@ import {
   Power,
   Trash2,
   BookOpen,
-  LayoutGrid,
-  CalendarDays,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,12 +18,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { CalendarioSemanal } from './CalendarioSemanal'
-import { CalendarioMensal } from './CalendarioMensal'
+import { CalendarioFullCalendar } from './CalendarioFullCalendar'
+import { AdicionarSessaoModal } from './AdicionarSessaoModal'
+import { EditarSessaoModal } from './EditarSessaoModal'
 import { toast } from 'sonner'
 import { deletarPlanejamentoAction } from '@/app/actions/planos.actions'
 import { useRouter } from 'next/navigation'
-import type { DistribuicaoSemanal } from '@/types/planejamento'
+import type { DistribuicaoSemanal, SessaoEstudo } from '@/types/planejamento'
 
 interface PlanejamentoAtivoProps {
   planejamento: {
@@ -55,9 +54,19 @@ export function PlanejamentoAtivo({
 }: PlanejamentoAtivoProps) {
   const router = useRouter()
   const [isDeleting, setIsDeleting] = useState(false)
-  const [visualizacao, setVisualizacao] = useState<'semanal' | 'mensal'>(
-    'mensal',
-  )
+
+  // Estados dos modais
+  const [showAdicionarModal, setShowAdicionarModal] = useState(false)
+  const [showEditarModal, setShowEditarModal] = useState(false)
+  const [modalData, setModalData] = useState<{
+    diaSemana: string
+    dataInicial?: string
+    horaInicial?: string
+    sessao?: SessaoEstudo
+    sessaoIndex?: number
+  }>({
+    diaSemana: 'Segunda',
+  })
 
   // Parse dos dados JSON com validação
   let distribuicao: DistribuicaoSemanal = {}
@@ -95,6 +104,13 @@ export function PlanejamentoAtivo({
     configuracoes = []
   }
 
+  // Debug: verificar conteúdo da distribuição
+  console.log('📅 Distribuição recebida:', distribuicao)
+  console.log('📊 Total de dias:', Object.keys(distribuicao).length)
+  Object.entries(distribuicao).forEach(([dia, dados]) => {
+    console.log(`  ${dia}:`, dados?.sessoes?.length || 0, 'sessões')
+  })
+
   // Calcular estatísticas com validação
   const totalSessoes = Object.values(distribuicao).reduce(
     (total, dia) => total + (dia?.sessoes?.length || 0),
@@ -128,6 +144,56 @@ export function PlanejamentoAtivo({
     } finally {
       setIsDeleting(false)
     }
+  }
+
+  // Handlers para o calendário
+  const handleEventClick = (event: any) => {
+    // Extrair informações do evento
+    const diaSemana = event.extendedProps.diaSemana
+    const sessaoId = event.id // formato: "Segunda-0"
+    const sessaoIndex = parseInt(sessaoId.split('-')[1])
+
+    // Buscar sessão na distribuição
+    const sessao = distribuicao[diaSemana]?.sessoes[sessaoIndex]
+
+    if (sessao) {
+      setModalData({
+        diaSemana,
+        sessao,
+        sessaoIndex,
+      })
+      setShowEditarModal(true)
+    }
+  }
+
+  const handleDateSelect = (info: any) => {
+    // Obter dia da semana a partir da data
+    const date = new Date(info.start)
+    const diasSemana = [
+      'Domingo',
+      'Segunda',
+      'Terça',
+      'Quarta',
+      'Quinta',
+      'Sexta',
+      'Sabado',
+    ]
+    const diaSemana = diasSemana[date.getDay()]
+
+    // Formatar hora inicial
+    const horaInicial = date.toTimeString().slice(0, 5)
+    const dataInicial = date.toISOString().split('T')[0]
+
+    setModalData({
+      diaSemana,
+      horaInicial,
+      dataInicial,
+    })
+    setShowAdicionarModal(true)
+  }
+
+  const handleModalSuccess = () => {
+    router.refresh()
   }
 
   return (
@@ -244,40 +310,37 @@ export function PlanejamentoAtivo({
         </div>
       </div>
 
-      {/* Toggle de visualização */}
-      <div className="flex items-center justify-center gap-2">
-        <Button
-          variant={visualizacao === 'semanal' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setVisualizacao('semanal')}
-          className="gap-2"
-        >
-          <LayoutGrid className="w-4 h-4" />
-          Semanal
-        </Button>
-        <Button
-          variant={visualizacao === 'mensal' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setVisualizacao('mensal')}
-          className="gap-2"
-        >
-          <CalendarDays className="w-4 h-4" />
-          Mensal
-        </Button>
-      </div>
+      {/* Calendário FullCalendar */}
+      <CalendarioFullCalendar
+        distribuicao={distribuicao}
+        titulo="Calendário de Estudos"
+        editable={true}
+        onEventClick={handleEventClick}
+        onDateSelect={handleDateSelect}
+      />
 
-      {/* Calendário - Alternância entre visualizações */}
-      {visualizacao === 'semanal' ? (
-        <CalendarioSemanal
-          distribuicao={distribuicao}
-          titulo="Distribuição Semanal"
-        />
-      ) : (
-        <CalendarioMensal
-          distribuicao={distribuicao}
-          titulo="Calendário Mensal"
-        />
-      )}
+      {/* Modais */}
+      <AdicionarSessaoModal
+        open={showAdicionarModal}
+        onOpenChange={setShowAdicionarModal}
+        planejamentoId={planejamento.id}
+        planoId={planejamento.plano.id}
+        diaSemana={modalData.diaSemana}
+        dataInicial={modalData.dataInicial}
+        horaInicial={modalData.horaInicial}
+        onSuccess={handleModalSuccess}
+      />
+
+      <EditarSessaoModal
+        open={showEditarModal}
+        onOpenChange={setShowEditarModal}
+        planejamentoId={planejamento.id}
+        planoId={planejamento.plano.id}
+        diaSemana={modalData.diaSemana}
+        sessao={modalData.sessao || null}
+        sessaoIndex={modalData.sessaoIndex || 0}
+        onSuccess={handleModalSuccess}
+      />
 
       {/* Info card */}
       <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">

@@ -328,6 +328,186 @@ export async function deletarPlanejamento(id: string, userId: string) {
   return { sucesso: true }
 }
 
+/**
+ * Adiciona uma nova sessão de estudo a um dia específico
+ */
+export async function adicionarSessao(
+  planejamentoId: string,
+  diaSemana: string,
+  sessao: {
+    disciplinaId: string
+    nome: string
+    cor: string
+    inicio: string
+    fim: string
+    duracao: number
+    topico?: string
+  },
+  userId: string,
+) {
+  // Verificar se o planejamento pertence ao usuário
+  const planejamento = await prisma.planejamentoSemanal.findFirst({
+    where: {
+      id: planejamentoId,
+      plano: {
+        userId,
+      },
+    },
+  })
+
+  if (!planejamento) {
+    throw new Error('Planejamento não encontrado')
+  }
+
+  // Parse da distribuição atual
+  const distribuicao = JSON.parse(
+    planejamento.distribuicao,
+  ) as DistribuicaoSemanal
+
+  // Adicionar sessão ao dia
+  if (!distribuicao[diaSemana]) {
+    distribuicao[diaSemana] = {
+      dia: diaSemana,
+      sessoes: [],
+      totalMinutos: 0,
+    }
+  }
+
+  distribuicao[diaSemana].sessoes.push(sessao)
+
+  // Atualizar totalMinutos
+  distribuicao[diaSemana].totalMinutos = distribuicao[diaSemana].sessoes.reduce(
+    (total, s) => total + s.duracao,
+    0,
+  )
+
+  // Atualizar planejamento
+  await prisma.planejamentoSemanal.update({
+    where: { id: planejamentoId },
+    data: {
+      distribuicao: JSON.stringify(distribuicao),
+    },
+  })
+
+  return { sucesso: true }
+}
+
+/**
+ * Edita uma sessão existente
+ */
+export async function editarSessao(
+  planejamentoId: string,
+  diaSemana: string,
+  sessaoIndex: number,
+  updates: {
+    disciplinaId?: string
+    nome?: string
+    cor?: string
+    inicio?: string
+    fim?: string
+    duracao?: number
+    topico?: string
+  },
+  userId: string,
+) {
+  // Verificar se o planejamento pertence ao usuário
+  const planejamento = await prisma.planejamentoSemanal.findFirst({
+    where: {
+      id: planejamentoId,
+      plano: {
+        userId,
+      },
+    },
+  })
+
+  if (!planejamento) {
+    throw new Error('Planejamento não encontrado')
+  }
+
+  // Parse da distribuição atual
+  const distribuicao = JSON.parse(
+    planejamento.distribuicao,
+  ) as DistribuicaoSemanal
+
+  if (
+    !distribuicao[diaSemana] ||
+    !distribuicao[diaSemana].sessoes[sessaoIndex]
+  ) {
+    throw new Error('Sessão não encontrada')
+  }
+
+  // Atualizar sessão
+  distribuicao[diaSemana].sessoes[sessaoIndex] = {
+    ...distribuicao[diaSemana].sessoes[sessaoIndex],
+    ...updates,
+  }
+
+  // Atualizar planejamento
+  await prisma.planejamentoSemanal.update({
+    where: { id: planejamentoId },
+    data: {
+      distribuicao: JSON.stringify(distribuicao),
+    },
+  })
+
+  return { sucesso: true }
+}
+
+/**
+ * Deleta uma sessão de estudo
+ */
+export async function deletarSessao(
+  planejamentoId: string,
+  diaSemana: string,
+  sessaoIndex: number,
+  userId: string,
+) {
+  // Verificar se o planejamento pertence ao usuário
+  const planejamento = await prisma.planejamentoSemanal.findFirst({
+    where: {
+      id: planejamentoId,
+      plano: {
+        userId,
+      },
+    },
+  })
+
+  if (!planejamento) {
+    throw new Error('Planejamento não encontrado')
+  }
+
+  // Parse da distribuição atual
+  const distribuicao = JSON.parse(
+    planejamento.distribuicao,
+  ) as DistribuicaoSemanal
+
+  if (
+    !distribuicao[diaSemana] ||
+    !distribuicao[diaSemana].sessoes[sessaoIndex]
+  ) {
+    throw new Error('Sessão não encontrada')
+  }
+
+  // Remover sessão
+  distribuicao[diaSemana].sessoes.splice(sessaoIndex, 1)
+
+  // Recalcular totalMinutos
+  distribuicao[diaSemana].totalMinutos = distribuicao[diaSemana].sessoes.reduce(
+    (total, s) => total + s.duracao,
+    0,
+  )
+
+  // Atualizar planejamento
+  await prisma.planejamentoSemanal.update({
+    where: { id: planejamentoId },
+    data: {
+      distribuicao: JSON.stringify(distribuicao),
+    },
+  })
+
+  return { sucesso: true }
+}
+
 // Exportar como objeto para importação consistente
 export const planejamentoService = {
   criarPlanejamento,
@@ -337,4 +517,7 @@ export const planejamentoService = {
   atualizarPlanejamento,
   ativarPlanejamento,
   deletarPlanejamento,
+  adicionarSessao,
+  editarSessao,
+  deletarSessao,
 }

@@ -426,3 +426,94 @@ export async function deletarPlanejamentoAction(id: string) {
 
   return { sucesso: true }
 }
+
+// ========================================
+// SESSÕES DE ESTUDO (CRUD Manual)
+// ========================================
+
+export async function adicionarSessaoAction(
+  planejamentoId: string,
+  diaSemana: string,
+  sessao: {
+    disciplinaId: string
+    nome: string
+    cor: string
+    inicio: string
+    fim: string
+    duracao: number
+    topico?: string
+  },
+) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  await planejamentoService.adicionarSessao(
+    planejamentoId,
+    diaSemana,
+    sessao,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  return { sucesso: true }
+}
+
+export async function editarSessaoAction(
+  planejamentoId: string,
+  diaSemana: string,
+  sessaoIndex: number,
+  updates: {
+    disciplinaId?: string
+    nome?: string
+    cor?: string
+    inicio?: string
+    fim?: string
+    duracao?: number
+    topico?: string
+  },
+) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  await planejamentoService.editarSessao(
+    planejamentoId,
+    diaSemana,
+    sessaoIndex,
+    updates,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  return { sucesso: true }
+}
+
+export async function deletarSessaoAction(
+  planejamentoId: string,
+  diaSemana: string,
+  sessaoIndex: number,
+) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  await planejamentoService.deletarSessao(
+    planejamentoId,
+    diaSemana,
+    sessaoIndex,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  return { sucesso: true }
+}

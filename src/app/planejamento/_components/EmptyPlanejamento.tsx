@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { CriarPlanejamentoModal } from './CriarPlanejamentoModal'
+import { CriarPlanejamentoSimples } from './CriarPlanejamentoSimples'
 import { useRouter } from 'next/navigation'
 
 interface EmptyPlanejamentoProps {
@@ -157,8 +157,8 @@ export function EmptyPlanejamento({ planoId }: EmptyPlanejamentoProps) {
         </Button>
       </div>
 
-      {/* Modal wizard completo */}
-      <CriarPlanejamentoModal
+      {/* Modal simplificado */}
+      <CriarPlanejamentoSimples
         open={showModal}
         onOpenChange={setShowModal}
         planoId={planoId}
