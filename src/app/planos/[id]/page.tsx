@@ -232,13 +232,16 @@ export default function PlanoPage({ params }: PlanoPageProps) {
           <p className="text-gray-500 mb-6">
             Comece adicionando disciplinas ao seu plano
           </p>
-          <Button
-            onClick={() => setShowNovaDisciplinaModal(true)}
-            className="bg-teal-500 hover:bg-teal-600"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Adicionar Primeira Disciplina
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setShowNovaDisciplinaModal(true)}
+              size="sm"
+              className="bg-teal-500 hover:bg-teal-600 w-auto"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Disciplina
+            </Button>
+          </div>
         </Card>
       )}
 

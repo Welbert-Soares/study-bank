@@ -78,7 +78,7 @@ export function DisciplinaCard({
                     : '[background-color:var(--disciplina-cor)]'
                 }`}
               >
-                <span className="font-bold text-xs text-white">
+                <span className="font-bold text-xs text-gray-900">
                   {disciplina.edital ||
                     planoNome
                       .split(' ')
@@ -152,14 +152,17 @@ export function DisciplinaCard({
                 <Eye className="w-4 h-4 mr-1" />
                 Visualizar
               </Link>
-              <Link
-                href={`/planos/${planoId}/disciplinas/${disciplina.id}/editar`}
+              <button
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-white/20 hover:bg-white/30 text-foreground border border-white/30 h-9 px-3 cursor-pointer"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  router.push(`/planos/${planoId}/disciplinas/${disciplina.id}`)
+                }}
               >
                 <Edit className="w-4 h-4 mr-1" />
                 Editar
-              </Link>
+              </button>
               <button
                 className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-white/20 hover:bg-white/30 text-foreground border border-white/30 h-9 px-3 cursor-pointer"
                 onClick={(e) => {
