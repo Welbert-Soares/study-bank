@@ -6,6 +6,7 @@ import { Button } from './ui/button'
 import { Plus } from 'lucide-react'
 import { NovoPlanoModal } from '@/app/planos/_components/NovoPlanoModal'
 import { PlanoSelectorButton } from './plano-selector-button'
+import { RegistroEstudoModal } from '@/app/_components/RegistroEstudoModal'
 import { listarPlanosAction } from '@/app/actions/planos.actions'
 import type { Plano } from '@prisma/client'
 
@@ -95,6 +96,7 @@ function getPageConfig(
 export function PageHeader() {
   const pathname = usePathname()
   const [showNovoPlanoModal, setShowNovoPlanoModal] = useState(false)
+  const [showRegistroEstudoModal, setShowRegistroEstudoModal] = useState(false)
   const [planos, setPlanos] = useState<Plano[]>([])
   const [planoAtivo, setPlanoAtivo] = useState<Plano | undefined>()
   const [isLoading, setIsLoading] = useState(true)
@@ -131,8 +133,11 @@ export function PageHeader() {
             currentPage.showAddStudyButton) && (
             <div className="flex items-center gap-3">
               {/* Botão Adicionar Estudo */}
-              {currentPage.showAddStudyButton && !isLoading && (
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white">
+              {currentPage.showAddStudyButton && !isLoading && planoAtivo && (
+                <Button
+                  onClick={() => setShowRegistroEstudoModal(true)}
+                  className="bg-teal-500 hover:bg-teal-600 text-white"
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Adicionar Estudo
                 </Button>
@@ -155,6 +160,14 @@ export function PageHeader() {
         open={showNovoPlanoModal}
         onOpenChange={setShowNovoPlanoModal}
       />
+
+      {planoAtivo && (
+        <RegistroEstudoModal
+          open={showRegistroEstudoModal}
+          onOpenChange={setShowRegistroEstudoModal}
+          planoId={planoAtivo.id}
+        />
+      )}
     </>
   )
 }
