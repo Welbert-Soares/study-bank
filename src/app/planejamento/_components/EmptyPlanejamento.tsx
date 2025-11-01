@@ -3,13 +3,19 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CriarPlanejamentoModal } from './CriarPlanejamentoModal'
+import { useRouter } from 'next/navigation'
 
 interface EmptyPlanejamentoProps {
   planoId: string
 }
 
 export function EmptyPlanejamento({ planoId }: EmptyPlanejamentoProps) {
+  const router = useRouter()
   const [showModal, setShowModal] = useState(false)
+
+  const handleSuccess = () => {
+    router.refresh()
+  }
 
   return (
     <>
@@ -156,6 +162,7 @@ export function EmptyPlanejamento({ planoId }: EmptyPlanejamentoProps) {
         open={showModal}
         onOpenChange={setShowModal}
         planoId={planoId}
+        onSuccess={handleSuccess}
       />
     </>
   )

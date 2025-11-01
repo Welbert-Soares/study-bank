@@ -72,6 +72,25 @@ export const planosService = {
    */
   async criarPlano(data: PlanoFormData, userId: string) {
     try {
+      // Verificar se já existe um plano ativo
+      const planoAtivo = await db.plano.findFirst({
+        where: {
+          userId,
+          ativo: true,
+        },
+      })
+
+      // Se já existe um plano ativo e o novo deve ser ativo, desativa os outros
+      const deveSerAtivo = data.ativo ?? !planoAtivo // Ativo se for o primeiro ou explicitamente marcado
+
+      if (deveSerAtivo && planoAtivo) {
+        // Desativar todos os planos existentes
+        await db.plano.updateMany({
+          where: { userId },
+          data: { ativo: false },
+        })
+      }
+
       return await db.plano.create({
         data: {
           nome: data.nome,
@@ -79,7 +98,7 @@ export const planosService = {
           edital: data.edital,
           cargo: data.cargo,
           observacoes: data.observacoes,
-          ativo: data.ativo ?? true,
+          ativo: deveSerAtivo,
           userId,
         },
       })
@@ -142,6 +161,70 @@ export const planosService = {
     } catch (error) {
       console.error('Erro ao deletar plano:', error)
       throw new Error('Não foi possível deletar o plano')
+    }
+  },
+
+  /**
+   * Ativa um plano e desativa todos os outros do usuário
+   */
+  async ativarPlano(id: string, userId: string) {
+    try {
+      // Verificar se o plano pertence ao usuário
+      const plano = await db.plano.findFirst({
+        where: { id, userId },
+      })
+
+      if (!plano) {
+        throw new Error('Plano não encontrado ou sem permissão')
+      }
+
+      // Desativar todos os planos do usuário
+      await db.plano.updateMany({
+        where: { userId },
+        data: { ativo: false },
+      })
+
+      // Ativar apenas o plano selecionado
+      return await db.plano.update({
+        where: { id },
+        data: { ativo: true },
+      })
+    } catch (error) {
+      console.error('Erro ao ativar plano:', error)
+      throw new Error('Não foi possível ativar o plano')
+    }
+  },
+
+  /**
+   * Corrige planos ativos - garante que apenas um esteja ativo
+   * Útil para corrigir dados existentes
+   */
+  async corrigirPlanosAtivos(userId: string) {
+    try {
+      // Buscar todos os planos do usuário
+      const planos = await db.plano.findMany({
+        where: { userId },
+        orderBy: { criadoEm: 'desc' },
+      })
+
+      if (planos.length === 0) {
+        return
+      }
+
+      // Desativar todos
+      await db.plano.updateMany({
+        where: { userId },
+        data: { ativo: false },
+      })
+
+      // Ativar apenas o mais recente
+      await db.plano.update({
+        where: { id: planos[0].id },
+        data: { ativo: true },
+      })
+    } catch (error) {
+      console.error('Erro ao corrigir planos ativos:', error)
+      throw new Error('Não foi possível corrigir os planos')
     }
   },
 

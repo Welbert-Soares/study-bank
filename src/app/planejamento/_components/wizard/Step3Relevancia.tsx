@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Slider } from '@/components/ui/slider'
 import type {
   Step3Data,
@@ -22,8 +22,8 @@ export function Step3Relevancia({
   const [relevancia, setRelevancia] = useState<DisciplinaRelevancia[]>(() => {
     if (data?.relevancia) return data.relevancia
 
-    // Inicializar com valores padrão
-    return disciplinasSelecionadas.map((disc) => ({
+    // Inicializar com valores padrão e calcular percentuais
+    const inicial = disciplinasSelecionadas.map((disc) => ({
       disciplinaId: disc.id,
       nome: disc.nome,
       cor: disc.cor,
@@ -31,40 +31,67 @@ export function Step3Relevancia({
       conhecimento: 5,
       percentual: 0,
     }))
+
+    // Calcular percentuais na inicialização
+    const total = inicial.reduce((acc, disc) => {
+      const peso = disc.importancia * (11 - disc.conhecimento)
+      return acc + peso
+    }, 0)
+
+    return inicial.map((disc) => {
+      const peso = disc.importancia * (11 - disc.conhecimento)
+      const percentual = total > 0 ? Math.round((peso / total) * 100) : 0
+      return { ...disc, percentual }
+    })
   })
 
-  // Calcular percentuais automaticamente
+  const isFirstRender = useRef(true)
+
+  // Notificar mudanças
   useEffect(() => {
-    const total = relevancia.reduce((acc, disc) => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      // Notificar apenas se não houver data inicial
+      if (!data?.relevancia) {
+        onChange({ relevancia })
+      }
+      return
+    }
+
+    onChange({ relevancia })
+  }, [relevancia])
+
+  // Função para calcular percentuais
+  const calcularPercentuais = (
+    disciplinas: DisciplinaRelevancia[],
+  ): DisciplinaRelevancia[] => {
+    const total = disciplinas.reduce((acc, disc) => {
       // Fórmula: quanto maior a importância e menor o conhecimento, maior o peso
       const peso = disc.importancia * (11 - disc.conhecimento)
       return acc + peso
     }, 0)
 
-    const novaRelevancia = relevancia.map((disc) => {
+    return disciplinas.map((disc) => {
       const peso = disc.importancia * (11 - disc.conhecimento)
       const percentual = total > 0 ? Math.round((peso / total) * 100) : 0
       return { ...disc, percentual }
     })
-
-    setRelevancia(novaRelevancia)
-    onChange({ relevancia: novaRelevancia })
-  }, [
-    relevancia
-      .map((d) => `${d.disciplinaId}-${d.importancia}-${d.conhecimento}`)
-      .join(','),
-  ])
+  }
 
   const atualizarDisciplina = (
     disciplinaId: string,
     campo: 'importancia' | 'conhecimento',
     valor: number,
   ) => {
-    setRelevancia((prev) =>
-      prev.map((disc) =>
+    setRelevancia((prev) => {
+      // Atualizar o valor da disciplina
+      const atualizada = prev.map((disc) =>
         disc.disciplinaId === disciplinaId ? { ...disc, [campo]: valor } : disc,
-      ),
-    )
+      )
+
+      // Recalcular percentuais
+      return calcularPercentuais(atualizada)
+    })
   }
 
   return (

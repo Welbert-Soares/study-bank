@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import {
@@ -52,8 +52,23 @@ export function Step4Horarios({ data, onChange }: Step4HorariosProps) {
 
   const [tempoMinimo, setTempoMinimo] = useState(data?.tempoMinimo || 60)
   const [tempoMaximo, setTempoMaximo] = useState(data?.tempoMaximo || 90)
+  const isFirstRender = useRef(true)
 
+  // Notificar mudanças sempre que os estados mudarem (exceto primeira renderização)
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      // Apenas notificar na primeira vez se não houver data inicial
+      if (!data) {
+        onChange({
+          horarios,
+          tempoMinimo,
+          tempoMaximo,
+        })
+      }
+      return
+    }
+
     onChange({
       horarios,
       tempoMinimo,
@@ -75,6 +90,14 @@ export function Step4Horarios({ data, onChange }: Step4HorariosProps) {
     setHorarios((prev) =>
       prev.map((h) => (h.dia === dia ? { ...h, [campo]: valor } : h)),
     )
+  }
+
+  const atualizarTempoMinimo = (valor: number) => {
+    setTempoMinimo(valor)
+  }
+
+  const atualizarTempoMaximo = (valor: number) => {
+    setTempoMaximo(valor)
   }
 
   const calcularHorasSemanais = () => {
@@ -192,7 +215,7 @@ export function Step4Horarios({ data, onChange }: Step4HorariosProps) {
                 </label>
                 <Select
                   value={tempoMinimo.toString()}
-                  onValueChange={(valor) => setTempoMinimo(Number(valor))}
+                  onValueChange={(valor) => atualizarTempoMinimo(Number(valor))}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione o tempo mínimo" />
@@ -220,7 +243,7 @@ export function Step4Horarios({ data, onChange }: Step4HorariosProps) {
                 </label>
                 <Select
                   value={tempoMaximo.toString()}
-                  onValueChange={(valor) => setTempoMaximo(Number(valor))}
+                  onValueChange={(valor) => atualizarTempoMaximo(Number(valor))}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Selecione o tempo máximo" />

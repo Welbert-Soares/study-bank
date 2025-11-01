@@ -2,11 +2,14 @@
 
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Globe, Edit, Trash2 } from 'lucide-react'
+import { Globe, Edit, Trash2, CheckCircle2, Circle } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { PlanoCardData } from '@/types/plano'
-import { deletarPlanoAction } from '@/app/actions/planos.actions'
+import {
+  deletarPlanoAction,
+  ativarPlanoAction,
+} from '@/app/actions/planos.actions'
 import { toast } from 'sonner'
 import { useState } from 'react'
 import {
@@ -31,6 +34,7 @@ export function PlanoCard({ plano }: PlanoCardProps) {
   const [showNovaDisciplinaModal, setShowNovaDisciplinaModal] = useState(false)
   const [showEditarPlanoModal, setShowEditarPlanoModal] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isActivating, setIsActivating] = useState(false)
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -43,6 +47,24 @@ export function PlanoCard({ plano }: PlanoCardProps) {
     } finally {
       setIsDeleting(false)
       setShowDeleteAlert(false)
+    }
+  }
+
+  const handleAtivar = async () => {
+    if (plano.ativo) {
+      toast.info('Este plano já está ativo')
+      return
+    }
+
+    setIsActivating(true)
+    try {
+      await ativarPlanoAction(plano.id)
+      toast.success(`Plano "${plano.nome}" ativado com sucesso!`)
+    } catch (error) {
+      console.error('Erro ao ativar plano:', error)
+      toast.error('Erro ao ativar plano. Tente novamente.')
+    } finally {
+      setIsActivating(false)
     }
   }
 
@@ -71,8 +93,31 @@ export function PlanoCard({ plano }: PlanoCardProps) {
 
         {/* Card 2: Informações do Plano */}
         <Card className="p-6 hover:shadow-lg transition-all duration-300 flex-1 bg-white relative h-full">
+          {/* Badge de Plano Ativo - Topo Esquerdo */}
+          {plano.ativo && (
+            <div className="absolute top-4 left-4 flex items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
+              <CheckCircle2 className="w-3 h-3" />
+              Plano Ativo
+            </div>
+          )}
+
           {/* Botões de Ação - Topo Direito deste card */}
           <div className="absolute top-4 right-4 flex gap-2 z-10">
+            {!plano.ativo && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleAtivar()
+                }}
+                disabled={isActivating}
+                className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 h-8 px-3"
+              >
+                <Circle className="w-3 h-3 mr-1.5 fill-current" />
+                {isActivating ? 'Ativando...' : 'Ativar'}
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -99,7 +144,7 @@ export function PlanoCard({ plano }: PlanoCardProps) {
 
           <Link href={`/planos/${plano.id}`} className="flex h-full">
             <div className="flex-1 flex flex-col justify-between pr-4">
-              <div className="space-y-2">
+              <div className="space-y-2 mt-8">
                 <h3 className="text-2xl font-bold text-teal-500">
                   {plano.nome}
                 </h3>

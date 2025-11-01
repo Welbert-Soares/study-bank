@@ -64,6 +64,26 @@ export async function deletarPlanoAction(id: string) {
   revalidatePath('/')
 }
 
+export async function ativarPlanoAction(id: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  await planosService.ativarPlano(id, session.userId)
+
+  revalidatePath('/planos')
+  revalidatePath('/planejamento')
+}
+
+export async function corrigirPlanosAtivosAction() {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  await planosService.corrigirPlanosAtivos(session.userId)
+
+  revalidatePath('/planos')
+  revalidatePath('/planejamento')
+}
+
 export async function obterEstatisticasPlanoAction(id: string) {
   const session = await auth()
   if (!session.userId) throw new Error('Unauthorized')
@@ -299,4 +319,110 @@ export async function atualizarStatusTopicoAction(
   revalidatePath('/historico')
 
   return topico
+}
+
+// ========================================
+// PLANEJAMENTOS SEMANAIS
+// ========================================
+
+export async function criarPlanejamentoAction(data: {
+  planoId: string
+  nome: string
+  dataInicio: Date
+  dataFim: Date
+  horasPorDia: number
+  tempoMinimo: number
+  tempoMaximo: number
+  diasDisponiveis: string[]
+  horariosDisponiveis: Record<string, { inicio: string; fim: string }>
+  configuracoes: any[]
+  distribuicao: any
+}) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  const planejamento = await planejamentoService.criarPlanejamento(
+    data,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  revalidatePath('/dashboard')
+
+  return planejamento
+}
+
+export async function listarPlanejamentosAction(planoId: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  return await planejamentoService.listarPlanejamentos(planoId, session.userId)
+}
+
+export async function buscarPlanejamentoAtivoAction(planoId: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  return await planejamentoService.buscarPlanejamentoAtivo(
+    planoId,
+    session.userId,
+  )
+}
+
+export async function buscarPlanejamentoPorIdAction(id: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  return await planejamentoService.buscarPlanejamentoPorId(id, session.userId)
+}
+
+export async function ativarPlanejamentoAction(id: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  const planejamento = await planejamentoService.ativarPlanejamento(
+    id,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  revalidatePath('/dashboard')
+
+  return planejamento
+}
+
+export async function deletarPlanejamentoAction(id: string) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  await planejamentoService.deletarPlanejamento(id, session.userId)
+
+  revalidatePath('/planejamento')
+  revalidatePath('/dashboard')
+
+  return { sucesso: true }
 }

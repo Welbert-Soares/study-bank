@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,23 +8,27 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import type {
   WizardData,
   Step1Data,
   Step2Data,
   Step3Data,
   Step4Data,
+  DistribuicaoSemanal,
 } from '@/types/planejamento'
 import { Step1TipoSelecao } from './wizard/Step1TipoSelecao'
 import { Step2Disciplinas } from './wizard/Step2Disciplinas'
 import { Step3Relevancia } from './wizard/Step3Relevancia'
 import { Step4Horarios } from './wizard/Step4Horarios'
+import { criarPlanejamentoAction } from '@/app/actions/planos.actions'
 
 interface CriarPlanejamentoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   planoId: string // ID do plano ativo
+  onSuccess?: () => void
 }
 
 const STEPS = [
@@ -42,18 +46,20 @@ export function CriarPlanejamentoModal({
   open,
   onOpenChange,
   planoId,
+  onSuccess,
 }: CriarPlanejamentoModalProps) {
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [wizardData, setWizardData] = useState<Partial<WizardData>>({
     step1: { tipo: 'semanal' }, // Fixo em semanal por enquanto
   })
 
-  const updateStepData = <T extends keyof WizardData>(
-    step: T,
-    data: WizardData[T],
-  ) => {
-    setWizardData((prev) => ({ ...prev, [step]: data }))
-  }
+  const updateStepData = useCallback(
+    <T extends keyof WizardData>(step: T, data: WizardData[T]) => {
+      setWizardData((prev) => ({ ...prev, [step]: data }))
+    },
+    [],
+  )
 
   const handleNext = () => {
     if (currentStep < STEPS.length) {
@@ -68,9 +74,61 @@ export function CriarPlanejamentoModal({
   }
 
   const handleFinish = async () => {
-    // TODO: Implementar criação do planejamento
-    console.log('Dados do wizard:', wizardData)
-    onOpenChange(false)
+    if (!wizardData.step3 || !wizardData.step4) {
+      toast.error('Dados incompletos para criar planejamento')
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      // Calcular dados para salvar
+      const horariosAtivos = wizardData.step4.horarios.filter((h) => h.ativo)
+      const horariosMap = horariosAtivos.reduce((acc, h) => {
+        acc[h.dia] = { inicio: h.inicio, fim: h.fim }
+        return acc
+      }, {} as Record<string, { inicio: string; fim: string }>)
+
+      // Criar distribuição vazia para todos os dias
+      const distribuicaoVazia: DistribuicaoSemanal = {}
+      horariosAtivos.forEach((h) => {
+        distribuicaoVazia[h.dia] = {
+          dia: h.dia,
+          sessoes: [],
+          totalMinutos: 0,
+        }
+      })
+
+      // Criar planejamento VAZIO (sem sessões automáticas)
+      await criarPlanejamentoAction({
+        planoId,
+        nome: `Planejamento ${new Date().toLocaleDateString('pt-BR')}`,
+        dataInicio: new Date(),
+        dataFim: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // +7 dias
+        horasPorDia: 0, // Sem cálculo automático
+        tempoMinimo: wizardData.step4.tempoMinimo,
+        tempoMaximo: wizardData.step4.tempoMaximo,
+        diasDisponiveis: horariosAtivos.map((h) => h.dia),
+        horariosDisponiveis: horariosMap,
+        configuracoes: wizardData.step3.relevancia,
+        distribuicao: distribuicaoVazia, // Distribuição VAZIA
+      })
+
+      toast.success(
+        'Planejamento vazio criado! Adicione suas sessões manualmente.',
+      )
+      onOpenChange(false)
+      onSuccess?.()
+
+      // Reset wizard
+      setCurrentStep(1)
+      setWizardData({ step1: { tipo: 'semanal' } })
+    } catch (error) {
+      console.error('Erro ao criar planejamento:', error)
+      toast.error('Erro ao criar planejamento. Tente novamente.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const canGoNext = () => {
@@ -172,7 +230,7 @@ export function CriarPlanejamentoModal({
           <Button
             variant="outline"
             onClick={handleBack}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || isSubmitting}
             className="px-6 py-5 text-sm font-medium border-2 border-teal-500 text-teal-600 hover:bg-teal-50"
           >
             Voltar
@@ -181,7 +239,7 @@ export function CriarPlanejamentoModal({
           {currentStep < STEPS.length ? (
             <Button
               onClick={handleNext}
-              disabled={!canGoNext()}
+              disabled={!canGoNext() || isSubmitting}
               className="px-6 py-5 text-sm font-medium bg-teal-500 hover:bg-teal-600"
             >
               Próximo
@@ -189,10 +247,17 @@ export function CriarPlanejamentoModal({
           ) : (
             <Button
               onClick={handleFinish}
-              disabled={!canGoNext()}
+              disabled={!canGoNext() || isSubmitting}
               className="px-6 py-5 text-sm font-medium bg-teal-500 hover:bg-teal-600"
             >
-              Concluir
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Criando...
+                </>
+              ) : (
+                'Criar Planejamento'
+              )}
             </Button>
           )}
         </div>
