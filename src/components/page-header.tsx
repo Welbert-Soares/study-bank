@@ -96,9 +96,6 @@ function getPageConfig(
     if (pathname.includes('/disciplinas/')) {
       return { title: 'Detalhes da Disciplina' }
     }
-    if (pathname.endsWith('/nova-disciplina')) {
-      return { title: 'Nova Disciplina' }
-    }
     return { title: 'Detalhes do Plano' }
   }
 
