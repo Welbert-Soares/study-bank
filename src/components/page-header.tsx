@@ -39,35 +39,12 @@ function getPageConfig(
         </Button>
       ),
     },
-    '/config': {
-      title: 'Disciplinas',
-      customActions: (
-        <Button className="bg-teal-500 hover:bg-teal-600 text-white">
-          <Plus className="w-4 h-4 mr-2" />
-          Nova Disciplina
-        </Button>
-      ),
-    },
-    '/edital': {
-      title: 'Edital',
-    },
     '/planejamento': {
-      title: 'Planejamento',
-    },
-    '/revisoes': {
-      title: 'Revisões',
-    },
-    '/historico': {
-      title: 'Histórico de Estudos',
-    },
-    '/metricas': {
-      title: 'Estatísticas',
+      title: 'Planejamento Semanal',
+      showPlanoSelector: true,
     },
     '/simulados': {
       title: 'Simulados',
-    },
-    '/dashboard': {
-      title: 'Meta Diária',
     },
   }
 
@@ -82,11 +59,6 @@ function getPageConfig(
       return { title: 'Detalhes da Disciplina' }
     }
     return { title: 'Detalhes do Plano' }
-  }
-
-  // Verifica se é uma rota dinâmica de histórico
-  if (pathname.startsWith('/historico/')) {
-    return { title: 'Histórico de Estudos' }
   }
 
   // Página padrão

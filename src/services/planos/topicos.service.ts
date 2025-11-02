@@ -60,26 +60,40 @@ export const topicosService = {
    */
   async criarTopico(data: TopicoFormData, userId: string) {
     try {
+      console.log('🔍 Service criarTopico - Início:', { data, userId })
+
       // Verificar se a disciplina pertence ao usuário
       const disciplina = await db.disciplina.findFirst({
         where: { id: data.disciplinaId, userId },
       })
 
       if (!disciplina) {
+        console.log('❌ Disciplina não encontrada ou sem permissão')
         throw new Error('Disciplina não encontrada ou sem permissão')
       }
 
-      // Se não forneceu ordem, usar a próxima disponível
+      console.log('✅ Disciplina encontrada:', disciplina.nome)
+
+      // Se não forneceu ordem ou é 0, usar a próxima disponível
       let ordem = data.ordem
-      if (ordem === 0) {
+      if (!ordem || ordem === 0) {
+        console.log('⚠️ Ordem não fornecida ou zero, buscando última ordem...')
         const ultimoTopico = await db.topico.findFirst({
           where: { disciplinaId: data.disciplinaId },
           orderBy: { ordem: 'desc' },
         })
         ordem = (ultimoTopico?.ordem ?? 0) + 1
+        console.log(
+          '📊 Ordem calculada:',
+          ordem,
+          'Último tópico:',
+          ultimoTopico?.titulo,
+        )
+      } else {
+        console.log('✅ Usando ordem fornecida:', ordem)
       }
 
-      return await db.topico.create({
+      const novoTopico = await db.topico.create({
         data: {
           disciplinaId: data.disciplinaId,
           titulo: data.titulo,
@@ -88,8 +102,12 @@ export const topicosService = {
           status: data.status || 'pendente',
         },
       })
+
+      console.log('✅ Tópico criado com sucesso:', novoTopico)
+
+      return novoTopico
     } catch (error) {
-      console.error('Erro ao criar tópico:', error)
+      console.error('❌ Erro ao criar tópico:', error)
       if (error instanceof Error) {
         throw error
       }

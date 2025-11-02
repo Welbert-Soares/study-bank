@@ -4,18 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
-import {
-  Home,
-  FolderKanban,
-  GraduationCap,
-  BookOpen,
-  Calendar,
-  History,
-  BarChart3,
-  ListChecks,
-  Menu,
-  X,
-} from 'lucide-react'
+import { Home, FolderKanban, ListChecks, Menu, X, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { Sheet, SheetContent } from './ui/sheet'
@@ -30,12 +19,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: 'Home', href: '/', icon: Home },
   { title: 'Planos', href: '/planos', icon: FolderKanban },
-  { title: 'Disciplinas', href: '/config', icon: GraduationCap },
-  { title: 'Edital', href: '/edital', icon: BookOpen },
   { title: 'Planejamento', href: '/planejamento', icon: Calendar },
-  { title: 'Revisões', href: '/revisoes', icon: History },
-  { title: 'Histórico', href: '/historico', icon: History },
-  { title: 'Estatísticas', href: '/metricas', icon: BarChart3 },
   { title: 'Simulados', href: '/simulados', icon: ListChecks, badge: 'BREVE' },
 ]
 

@@ -94,24 +94,38 @@ export default function EditarDisciplinaPage({
 
     try {
       // Calcular a próxima ordem
-      const proximaOrdem =
-        topicos.length > 0
-          ? Math.max(...topicos.map((t) => t.ordem || 0)) + 1
-          : 1
+      const ordens = topicos.map((t) => t.ordem)
+      const proximaOrdem = ordens.length > 0 ? Math.max(...ordens) + 1 : 1
+
+      console.log('🔍 Debug adicionarTopico:', {
+        topicosAtuais: topicos.length,
+        ordens,
+        proximaOrdem,
+        novoTopico: {
+          disciplinaId,
+          titulo: novoTopico.titulo.trim(),
+          conteudo: novoTopico.conteudo.trim() || undefined,
+          ordem: proximaOrdem,
+        },
+      })
 
       const novoTopicoCreated = await criarTopicoAction({
         disciplinaId: disciplinaId,
-        titulo: novoTopico.titulo,
-        conteudo: novoTopico.conteudo || undefined,
+        titulo: novoTopico.titulo.trim(),
+        conteudo: novoTopico.conteudo.trim() || undefined,
         ordem: proximaOrdem,
       })
 
+      console.log('✅ Tópico criado:', novoTopicoCreated)
+
       setTopicos([...topicos, novoTopicoCreated])
       setNovoTopico({ titulo: '', conteudo: '' })
-      toast.success('Tópico adicionado!')
+      toast.success('Tópico adicionado com sucesso!')
     } catch (error) {
-      toast.error('Erro ao adicionar tópico')
-      console.error(error)
+      console.error('❌ Erro ao adicionar tópico:', error)
+      toast.error(
+        error instanceof Error ? error.message : 'Erro ao adicionar tópico',
+      )
     } finally {
       setIsAddingTopico(false)
     }

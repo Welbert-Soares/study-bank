@@ -29,6 +29,7 @@ import {
   deletarDisciplinaAction,
   atualizarTopicoAction,
   deletarTopicoAction,
+  criarTopicoAction,
 } from '@/app/actions/planos.actions'
 import { toast } from 'sonner'
 
@@ -53,6 +54,11 @@ export function EditDisciplinaModal({
     titulo: string
     conteudo: string
   }>({ titulo: '', conteudo: '' })
+  const [isAddingNew, setIsAddingNew] = useState(false)
+  const [newTopicData, setNewTopicData] = useState({
+    titulo: '',
+    conteudo: '',
+  })
 
   const handleClose = () => {
     router.push(`/planos/${planoId}`)
@@ -157,6 +163,42 @@ export function EditDisciplinaModal({
     }
   }
 
+  const handleAddNewTopic = async () => {
+    if (!newTopicData.titulo.trim()) {
+      toast.error('Digite o título do tópico')
+      return
+    }
+
+    try {
+      const ordens = disciplina.topicos.map((t) => t.ordem)
+      const proximaOrdem = ordens.length > 0 ? Math.max(...ordens) + 1 : 1
+
+      const novoTopico = await criarTopicoAction({
+        disciplinaId: disciplina.id,
+        titulo: newTopicData.titulo.trim(),
+        conteudo: newTopicData.conteudo.trim() || undefined,
+        ordem: proximaOrdem,
+      })
+
+      setDisciplina({
+        ...disciplina,
+        topicos: [...disciplina.topicos, novoTopico],
+      })
+
+      setNewTopicData({ titulo: '', conteudo: '' })
+      setIsAddingNew(false)
+      toast.success('Tópico adicionado com sucesso!')
+    } catch (error) {
+      toast.error('Erro ao adicionar tópico')
+      console.error(error)
+    }
+  }
+
+  const cancelAddNewTopic = () => {
+    setIsAddingNew(false)
+    setNewTopicData({ titulo: '', conteudo: '' })
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-hidden flex flex-col">
@@ -209,14 +251,78 @@ export function EditDisciplinaModal({
                 type="button"
                 variant="link"
                 className="text-teal-500 hover:text-teal-600 p-0 h-auto"
-                onClick={() => {
-                  // TODO: Implementar adicionar novo tópico
-                  toast.info('Funcionalidade em breve!')
-                }}
+                onClick={() => setIsAddingNew(true)}
               >
                 + ADICIONAR NOVO TÓPICO
               </Button>
             </div>
+
+            {/* Formulário de Novo Tópico */}
+            {isAddingNew && (
+              <div className="mb-4 p-4 bg-teal-50 border border-teal-200 rounded-lg space-y-3">
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-700">
+                    TÍTULO DO TÓPICO
+                  </Label>
+                  <Input
+                    value={newTopicData.titulo}
+                    onChange={(e) =>
+                      setNewTopicData({
+                        ...newTopicData,
+                        titulo: e.target.value,
+                      })
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        handleAddNewTopic()
+                      }
+                      if (e.key === 'Escape') {
+                        cancelAddNewTopic()
+                      }
+                    }}
+                    placeholder="Ex: Conceitos básicos"
+                    className="text-sm"
+                    autoFocus
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-gray-700">
+                    CONTEÚDO (OPCIONAL)
+                  </Label>
+                  <Textarea
+                    value={newTopicData.conteudo}
+                    onChange={(e) =>
+                      setNewTopicData({
+                        ...newTopicData,
+                        conteudo: e.target.value,
+                      })
+                    }
+                    placeholder="Adicione detalhes sobre o tópico..."
+                    className="min-h-[80px] text-sm resize-none"
+                  />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={cancelAddNewTopic}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleAddNewTopic}
+                    className="bg-teal-500 hover:bg-teal-600"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Adicionar
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Lista de Tópicos */}
             <div className="space-y-2">

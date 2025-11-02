@@ -195,20 +195,37 @@ export async function obterTopicoPorIdAction(id: string) {
 }
 
 export async function criarTopicoAction(data: TopicoFormData) {
+  console.log('🔍 Action criarTopicoAction - Início:', data)
+
   const session = await auth()
-  if (!session.userId) throw new Error('Unauthorized')
+  if (!session.userId) {
+    console.log('❌ Usuário não autenticado')
+    throw new Error('Unauthorized')
+  }
+
+  console.log('✅ Usuário autenticado:', session.userId)
 
   const topico = await topicosService.criarTopico(data, session.userId)
+
+  console.log('✅ Tópico criado, buscando disciplina para revalidação...')
 
   const disciplina = await disciplinasService.obterDisciplinaPorId(
     data.disciplinaId,
     session.userId,
   )
 
+  console.log('✅ Disciplina obtida, revalidando paths...', {
+    planoId: disciplina.planoId,
+    disciplinaId: data.disciplinaId,
+  })
+
   revalidatePath(`/planos/${disciplina.planoId}`)
   revalidatePath(
     `/planos/${disciplina.planoId}/disciplinas/${data.disciplinaId}`,
   )
+
+  console.log('✅ Ação concluída com sucesso!')
+
   return topico
 }
 

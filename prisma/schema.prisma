@@ -21,29 +21,12 @@ model User {
   createdAt             DateTime                  @default(now())
   updatedAt             DateTime                  @updatedAt
   // Relações
-  materias              Materia[]
-  agendamentos          DiaDisciplinaMateria[]
-  planosDeEstudo        PlanoDeEstudos[]
-  historicosEstudo      HistoricoEstudo[]
   ferramentas           FerramentaPersonalizada[]
-  // Novos modelos
   planos                Plano[]
   disciplinas           Disciplina[]
   ciclosPomodoro        CicloPomodoro[]
   planejamentosSemanais PlanejamentoSemanal[]
-}
-
-enum DisciplinaNome {
-  TI
-  Ingles
-  Portugues
-  Estatistica
-  Atualidades
-  Bancarios
-  Matematica
-  Simulado
-  Revisoes
-  Redacao
+  estudosRealizados     EstudoRealizado[]
 }
 
 enum DiaDaSemana {
@@ -62,47 +45,6 @@ enum StatusConteudo {
   concluido
 }
 
-model Materia {
-  id           String         @id @default(cuid())
-  userId       String // Relação com o usuário
-  titulo       String
-  descricao    String?
-  status       StatusConteudo @default(pendente)
-  ordem        Int
-  disciplina   DisciplinaNome
-  criadoEm     DateTime       @default(now())
-  atualizadoEm DateTime       @updatedAt
-
-  // Relações
-  user         User                   @relation(fields: [userId], references: [id])
-  agendamentos DiaDisciplinaMateria[]
-
-  @@index([userId])
-}
-
-model DiaDisciplinaMateria {
-  id            String          @id @default(cuid())
-  userId        String // Relação com o usuário
-  dia           DiaDaSemana
-  materiaId     String
-  materia       Materia         @relation(fields: [materiaId], references: [id])
-  planoId       String? // Opcional para manter compatibilidade com registros existentes
-  plano         PlanoDeEstudos? @relation(fields: [planoId], references: [id])
-  status        StatusConteudo  @default(pendente)
-  tempoEstudado Int? // Em minutos
-  anotacoes     String?
-  progresso     Int             @default(0) // Progresso em porcentagem
-  criadoEm      DateTime        @default(now())
-  atualizadoEm  DateTime        @updatedAt
-
-  // Relações
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([materiaId])
-  @@index([planoId])
-}
-
 model FerramentaPersonalizada {
   id           String   @id @default(cuid())
   userId       String // Relação com o usuário
@@ -119,45 +61,6 @@ model FerramentaPersonalizada {
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
-}
-
-model PlanoDeEstudos {
-  id             String                 @id @default(cuid())
-  userId         String // Relação com o usuário
-  titulo         String
-  dataInicio     DateTime
-  dataFim        DateTime?
-  ativo          Boolean                @default(true)
-  progressoGeral Int                    @default(0) // Progresso geral do plano em porcentagem
-  registros      DiaDisciplinaMateria[] // Relação com os registros de estudo
-  criadoEm       DateTime               @default(now())
-  atualizadoEm   DateTime               @updatedAt
-
-  // Relações
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-}
-
-// Tabela para armazenar o histórico de estudos de matérias deletadas
-model HistoricoEstudo {
-  id              String         @id @default(cuid())
-  userId          String // Relação com o usuário
-  tituloDaMateria String // Nome da matéria quando foi deletada
-  disciplina      DisciplinaNome
-  dataEstudo      DateTime
-  tempoEstudado   Int // Em minutos
-  anotacoes       String?
-  progresso       Int            @default(0) // Progresso que tinha sido alcançado
-  planoId         String? // Referência opcional ao plano de estudos, caso existisse 
-  criadoEm        DateTime       @default(now())
-
-  // Relações
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
-  @@index([disciplina])
-  @@index([dataEstudo])
 }
 
 // ========================================
@@ -270,7 +173,7 @@ model PlanejamentoSemanal {
   // Disciplinas e seus pesos
   configuracoes       String   @db.Text // JSON: [{disciplinaId, nome, cor, importancia, conhecimento, percentual}]
   // Grade semanal gerada
-  distribuicao        String   @db.Text // JSON: {Segunda: [{disciplinaId, nome, cor, inicio, fim, duracao}], ...}
+  distribuicao        String   @db.Text // JSON: {Segunda: [{disciplinaId, nome, cor, inicio, fim, duracao, estudoRealizadoId}], ...}
   criadoEm            DateTime @default(now())
   atualizadoEm        DateTime @updatedAt
 
@@ -282,4 +185,31 @@ model PlanejamentoSemanal {
   @@index([planoId])
   @@index([ativo])
   @@index([dataInicio])
+}
+
+// Estudo Realizado (registro de estudos concluídos)
+model EstudoRealizado {
+  id                    String   @id @default(cuid())
+  userId                String
+  planoId               String
+  disciplinaId          String
+  topicoId              String?
+  planejamentoSemanalId String? // ID do planejamento semanal (se vier de um agendamento)
+  agendamentoKey        String? // Chave única do agendamento (ex: "Segunda_0" para identificar a sessão específica)
+  dataEstudo            DateTime
+  tempoEstudado         Int // Em minutos
+  categoria             String // "teoria", "exercicios", "revisao"
+  material              String? // Material estudado
+  teoriaFinalizada      Boolean  @default(false)
+  anotacoes             String?  @db.Text // JSON com questões, páginas, vídeos, comentários
+  criadoEm              DateTime @default(now())
+  atualizadoEm          DateTime @updatedAt
+
+  // Relações
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([planoId])
+  @@index([disciplinaId])
+  @@index([dataEstudo])
 }

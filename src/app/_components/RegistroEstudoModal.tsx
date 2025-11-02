@@ -20,16 +20,27 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Calendar, Plus, Minus } from 'lucide-react'
-import {
-  listarDisciplinasAction,
-  listarTopicosAction,
-} from '@/app/actions/planos.actions'
-import type { Disciplina, Topico } from '@prisma/client'
+
+interface Disciplina {
+  id: string
+  nome: string
+  cor: string | null
+}
 
 interface RegistroEstudoModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   planoId: string
+  // Dados pré-preenchidos vindos do cronômetro
+  dadosIniciais?: {
+    disciplinaId?: string
+    disciplinaNome?: string
+    tempoDecorrido?: number // em minutos
+    categoria?: 'teoria' | 'exercicios' | 'revisao'
+    material?: string
+    planejamentoSemanalId?: string
+    agendamentoKey?: string
+  }
 }
 
 type TipoRegistro = 'HOJE' | 'ONTEM' | 'OUTRO'
@@ -44,21 +55,16 @@ export function RegistroEstudoModal({
   const [categoria, setCategoria] = useState('')
   const [disciplina, setDisciplina] = useState('')
   const [topico, setTopico] = useState('')
-  const [tempoEstudo, setTempoEstudo] = useState('00:00')
+  const [tempoEstudo, setTempoEstudo] = useState('00:00:00')
   const [material, setMaterial] = useState('')
   const [teoriaFinalizada, setTeoriaFinalizada] = useState(false)
   const [programarRevisoes, setProgramarRevisoes] = useState(false)
-  const [intervalosRevisao, setIntervalosRevisao] = useState<number[]>([
-    1, 7, 30,
-  ])
-  const [novoIntervalo, setNovoIntervalo] = useState('')
-  const [mostrarInputIntervalo, setMostrarInputIntervalo] = useState(false)
   const [questoesAcertos, setQuestoesAcertos] = useState(0)
   const [questoesErros, setQuestoesErros] = useState(0)
   const [paginasInicio, setPaginasInicio] = useState(0)
   const [paginasFim, setPaginasFim] = useState(0)
   const [videoAulas, setVideoAulas] = useState([
-    { titulo: '', inicio: '00:00', fim: '00:00' },
+    { titulo: '', inicio: '00:00:00', fim: '00:00:00' },
   ])
   const [comentarios, setComentarios] = useState('')
   const [salvarCriarNovo, setSalvarCriarNovo] = useState(false)
@@ -67,10 +73,6 @@ export function RegistroEstudoModal({
   const [disciplinas, setDisciplinas] = useState<Disciplina[]>([])
   const [isLoadingDisciplinas, setIsLoadingDisciplinas] = useState(true)
 
-  // Estado para tópicos
-  const [topicos, setTopicos] = useState<Topico[]>([])
-  const [isLoadingTopicos, setIsLoadingTopicos] = useState(false)
-
   // Carregar disciplinas do plano
   useEffect(() => {
     async function carregarDisciplinas() {
@@ -78,7 +80,9 @@ export function RegistroEstudoModal({
 
       try {
         setIsLoadingDisciplinas(true)
-        const disciplinasData = await listarDisciplinasAction(planoId)
+        const response = await fetch(`/api/planos/${planoId}/disciplinas`)
+        if (!response.ok) throw new Error('Erro ao carregar disciplinas')
+        const disciplinasData = await response.json()
         setDisciplinas(disciplinasData)
       } catch (error) {
         console.error('Erro ao carregar disciplinas:', error)
@@ -89,29 +93,6 @@ export function RegistroEstudoModal({
 
     carregarDisciplinas()
   }, [open, planoId])
-
-  // Carregar tópicos quando a disciplina mudar
-  useEffect(() => {
-    async function carregarTopicos() {
-      if (!disciplina) {
-        setTopicos([])
-        return
-      }
-
-      try {
-        setIsLoadingTopicos(true)
-        const topicosData = await listarTopicosAction(disciplina)
-        setTopicos(topicosData)
-      } catch (error) {
-        console.error('Erro ao carregar tópicos:', error)
-        setTopicos([])
-      } finally {
-        setIsLoadingTopicos(false)
-      }
-    }
-
-    carregarTopicos()
-  }, [disciplina])
 
   // Função para obter a data baseada no tipo de registro
   const getDataEstudo = (): string => {
@@ -131,7 +112,7 @@ export function RegistroEstudoModal({
   const handleAddVideoaula = () => {
     setVideoAulas([
       ...videoAulas,
-      { titulo: '', inicio: '00:00', fim: '00:00' },
+      { titulo: '', inicio: '00:00:00', fim: '00:00:00' },
     ])
   }
 
@@ -263,170 +244,73 @@ export function RegistroEstudoModal({
                 type="time"
                 value={tempoEstudo}
                 onChange={(e) => setTempoEstudo(e.target.value)}
+                step="1"
                 className="h-10 border-0 border-b-2 border-teal-400 rounded-none focus-visible:ring-0 focus-visible:border-teal-500"
               />
             </div>
           </div>
 
-          {/* Tópico e Material */}
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase">
-                Tópico
-              </Label>
-              <Select
-                value={topico}
-                onValueChange={setTopico}
-                disabled={!disciplina}
+          {/* Tópico */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-gray-600 uppercase">
+              Tópico
+            </Label>
+            <Select value={topico} onValueChange={setTopico}>
+              <SelectTrigger className="h-10 border-0 border-b-2 border-gray-300 rounded-none focus:ring-0 focus:border-teal-400">
+                <SelectValue placeholder="Selecione..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="topico1">Tópico 1</SelectItem>
+                <SelectItem value="topico2">Tópico 2</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Material */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-gray-600 uppercase">
+              Material
+            </Label>
+            <Input
+              placeholder="Ex.: Aula 01"
+              value={material}
+              onChange={(e) => setMaterial(e.target.value)}
+              className="h-10 border-0 border-b-2 border-teal-400 rounded-none focus-visible:ring-0 focus-visible:border-teal-500"
+            />
+          </div>
+
+          {/* Checkboxes */}
+          <div className="flex gap-8">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="teoria"
+                checked={teoriaFinalizada}
+                onCheckedChange={(checked) =>
+                  setTeoriaFinalizada(checked as boolean)
+                }
+              />
+              <Label
+                htmlFor="teoria"
+                className="cursor-pointer text-sm font-normal text-gray-700"
               >
-                <SelectTrigger className="h-10 border-0 border-b-2 border-gray-300 rounded-none focus:ring-0 focus:border-teal-400">
-                  <SelectValue
-                    placeholder={
-                      !disciplina
-                        ? 'Selecione uma disciplina primeiro'
-                        : 'Selecione...'
-                    }
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  {isLoadingTopicos ? (
-                    <SelectItem value="loading" disabled>
-                      Carregando...
-                    </SelectItem>
-                  ) : topicos.length === 0 ? (
-                    <SelectItem value="empty" disabled>
-                      Nenhum tópico cadastrado
-                    </SelectItem>
-                  ) : (
-                    topicos.map((top) => (
-                      <SelectItem key={top.id} value={top.id}>
-                        {top.titulo}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-gray-600 uppercase">
-                Material
+                TEORIA FINALIZADA
               </Label>
-              <Input
-                placeholder="Ex.: Aula 01"
-                value={material}
-                onChange={(e) => setMaterial(e.target.value)}
-                className="h-10 border-0 border-b-2 border-teal-400 rounded-none focus-visible:ring-0 focus-visible:border-teal-500"
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="revisoes"
+                checked={programarRevisoes}
+                onCheckedChange={(checked) =>
+                  setProgramarRevisoes(checked as boolean)
+                }
               />
+              <Label
+                htmlFor="revisoes"
+                className="cursor-pointer text-sm font-normal text-gray-700"
+              >
+                PROGRAMAR REVISÕES
+              </Label>
             </div>
-          </div>
-
-          {/* Checkboxes e Intervalos de Revisão */}
-          <div className="space-y-4">
-            <div className="flex gap-8">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="teoria"
-                  checked={teoriaFinalizada}
-                  onCheckedChange={(checked) =>
-                    setTeoriaFinalizada(checked as boolean)
-                  }
-                />
-                <Label
-                  htmlFor="teoria"
-                  className="cursor-pointer text-sm font-normal text-gray-700"
-                >
-                  TEORIA FINALIZADA
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="revisoes"
-                  checked={programarRevisoes}
-                  onCheckedChange={(checked) => {
-                    setProgramarRevisoes(checked as boolean)
-                    if (!checked) {
-                      setIntervalosRevisao([])
-                    } else {
-                      setIntervalosRevisao([1, 7, 30])
-                    }
-                  }}
-                />
-                <Label
-                  htmlFor="revisoes"
-                  className="cursor-pointer text-sm font-normal text-gray-700"
-                >
-                  PROGRAMAR REVISÕES
-                </Label>
-              </div>
-            </div>
-
-            {/* Intervalos de Revisão */}
-            {programarRevisoes && (
-              <div className="pl-6 space-y-2">
-                <div className="flex flex-wrap gap-2 items-center">
-                  {intervalosRevisao.map((dias) => (
-                    <button
-                      key={dias}
-                      type="button"
-                      onClick={() => {
-                        setIntervalosRevisao(
-                          intervalosRevisao.filter((d) => d !== dias),
-                        )
-                      }}
-                      className="px-3 py-1 rounded-md text-xs font-medium transition-colors bg-teal-500 text-white hover:bg-teal-600"
-                    >
-                      {dias}d<span className="ml-1 text-xs">×</span>
-                    </button>
-                  ))}
-
-                  {/* Campo para adicionar intervalo customizado */}
-                  {mostrarInputIntervalo ? (
-                    <Input
-                      type="number"
-                      min="1"
-                      placeholder="Dias"
-                      value={novoIntervalo}
-                      autoFocus
-                      onChange={(e) => setNovoIntervalo(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && novoIntervalo) {
-                          e.preventDefault()
-                          const dias = parseInt(novoIntervalo)
-                          if (dias > 0 && !intervalosRevisao.includes(dias)) {
-                            setIntervalosRevisao(
-                              [...intervalosRevisao, dias].sort(
-                                (a, b) => a - b,
-                              ),
-                            )
-                          }
-                          setNovoIntervalo('')
-                          setMostrarInputIntervalo(false)
-                        } else if (e.key === 'Escape') {
-                          setNovoIntervalo('')
-                          setMostrarInputIntervalo(false)
-                        }
-                      }}
-                      onBlur={() => {
-                        setNovoIntervalo('')
-                        setMostrarInputIntervalo(false)
-                      }}
-                      className="h-7 w-16 text-xs text-center border-gray-300 focus-visible:border-teal-400"
-                    />
-                  ) : (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setMostrarInputIntervalo(true)}
-                      className="h-7 w-7 p-0 text-teal-500 hover:text-teal-600 hover:bg-teal-50"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Questões, Páginas e Vídeoaulas */}
@@ -533,6 +417,7 @@ export function RegistroEstudoModal({
                           newVideos[index].inicio = e.target.value
                           setVideoAulas(newVideos)
                         }}
+                        step="1"
                         className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
                       />
                       <Input
@@ -543,6 +428,7 @@ export function RegistroEstudoModal({
                           newVideos[index].fim = e.target.value
                           setVideoAulas(newVideos)
                         }}
+                        step="1"
                         className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
                       />
                     </div>
