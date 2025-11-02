@@ -75,9 +75,11 @@ export function RegistroEstudoModal({
   const [comentarios, setComentarios] = useState('')
   const [salvarCriarNovo, setSalvarCriarNovo] = useState(false)
 
-  // Estado para disciplinas
+  // Estado para disciplinas e tópicos
   const [disciplinas, setDisciplinas] = useState<Disciplina[]>([])
   const [isLoadingDisciplinas, setIsLoadingDisciplinas] = useState(true)
+  const [topicos, setTopicos] = useState<{ id: string; titulo: string }[]>([])
+  const [isLoadingTopicos, setIsLoadingTopicos] = useState(false)
 
   // Carregar disciplinas do plano
   useEffect(() => {
@@ -99,6 +101,32 @@ export function RegistroEstudoModal({
 
     carregarDisciplinas()
   }, [open, planoId])
+
+  // Carregar tópicos quando disciplina mudar
+  useEffect(() => {
+    async function carregarTopicos() {
+      if (!disciplina) {
+        setTopicos([])
+        setTopico('')
+        return
+      }
+
+      try {
+        setIsLoadingTopicos(true)
+        const response = await fetch(`/api/disciplinas/${disciplina}/topicos`)
+        if (!response.ok) throw new Error('Erro ao carregar tópicos')
+        const topicosData = await response.json()
+        setTopicos(topicosData)
+      } catch (error) {
+        console.error('Erro ao carregar tópicos:', error)
+        setTopicos([])
+      } finally {
+        setIsLoadingTopicos(false)
+      }
+    }
+
+    carregarTopicos()
+  }, [disciplina])
 
   // Preencher dados iniciais vindos do cronômetro
   useEffect(() => {
@@ -382,13 +410,34 @@ export function RegistroEstudoModal({
               <Label className="text-xs font-semibold text-gray-600 uppercase">
                 Tópico
               </Label>
-              <Select value={topico} onValueChange={setTopico}>
+              <Select
+                value={topico}
+                onValueChange={setTopico}
+                disabled={!disciplina || isLoadingTopicos}
+              >
                 <SelectTrigger className="h-10 border-0 border-b-2 border-gray-300 rounded-none focus:ring-0 focus:border-teal-400">
-                  <SelectValue placeholder="Selecione..." />
+                  <SelectValue
+                    placeholder={
+                      !disciplina
+                        ? 'Selecione uma disciplina primeiro'
+                        : isLoadingTopicos
+                        ? 'Carregando...'
+                        : 'Selecione...'
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="topico1">Tópico 1</SelectItem>
-                  <SelectItem value="topico2">Tópico 2</SelectItem>
+                  {topicos.length === 0 ? (
+                    <SelectItem value="empty" disabled>
+                      Nenhum tópico cadastrado
+                    </SelectItem>
+                  ) : (
+                    topicos.map((top) => (
+                      <SelectItem key={top.id} value={top.id}>
+                        {top.titulo}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
