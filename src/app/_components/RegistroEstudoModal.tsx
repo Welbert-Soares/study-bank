@@ -65,6 +65,11 @@ export function RegistroEstudoModal({
   const [material, setMaterial] = useState('')
   const [teoriaFinalizada, setTeoriaFinalizada] = useState(false)
   const [programarRevisoes, setProgramarRevisoes] = useState(false)
+  const [intervalosRevisao, setIntervalosRevisao] = useState<number[]>([
+    1, 7, 14,
+  ])
+  const [novoIntervalo, setNovoIntervalo] = useState('')
+  const [mostrarInputIntervalo, setMostrarInputIntervalo] = useState(false)
   const [questoesAcertos, setQuestoesAcertos] = useState(0)
   const [questoesErros, setQuestoesErros] = useState(0)
   const [paginasInicio, setPaginasInicio] = useState(0)
@@ -176,6 +181,28 @@ export function RegistroEstudoModal({
     setVideoAulas(videoAulas.filter((_, i) => i !== index))
   }
 
+  const handleAddIntervaloRevisao = () => {
+    setMostrarInputIntervalo(true)
+  }
+
+  const handleConfirmarNovoIntervalo = () => {
+    const valor = parseInt(novoIntervalo)
+    if (valor > 0 && !intervalosRevisao.includes(valor)) {
+      setIntervalosRevisao([...intervalosRevisao, valor].sort((a, b) => a - b))
+    }
+    setNovoIntervalo('')
+    setMostrarInputIntervalo(false)
+  }
+
+  const handleCancelarNovoIntervalo = () => {
+    setNovoIntervalo('')
+    setMostrarInputIntervalo(false)
+  }
+
+  const handleRemoveIntervaloRevisao = (index: number) => {
+    setIntervalosRevisao(intervalosRevisao.filter((_, i) => i !== index))
+  }
+
   const handleSalvar = async () => {
     // Validações básicas
     if (!categoria) {
@@ -208,7 +235,7 @@ export function RegistroEstudoModal({
         material,
         teoriaFinalizada,
         programarRevisoes,
-        intervalosRevisao: programarRevisoes ? [7, 15, 30] : [], // Intervalos padrão
+        intervalosRevisao: programarRevisoes ? intervalosRevisao : [],
         questoes:
           questoesAcertos > 0 || questoesErros > 0
             ? Array.from(
@@ -273,6 +300,9 @@ export function RegistroEstudoModal({
     setMaterial('')
     setTeoriaFinalizada(false)
     setProgramarRevisoes(false)
+    setIntervalosRevisao([1, 7, 14])
+    setNovoIntervalo('')
+    setMostrarInputIntervalo(false)
     setQuestoesAcertos(0)
     setQuestoesErros(0)
     setPaginasInicio(0)
@@ -456,37 +486,105 @@ export function RegistroEstudoModal({
           </div>
 
           {/* Checkboxes */}
-          <div className="flex gap-8">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="teoria"
-                checked={teoriaFinalizada}
-                onCheckedChange={(checked) =>
-                  setTeoriaFinalizada(checked as boolean)
-                }
-              />
-              <Label
-                htmlFor="teoria"
-                className="cursor-pointer text-sm font-normal text-gray-700"
-              >
-                TEORIA FINALIZADA
-              </Label>
+          <div className="space-y-3">
+            <div className="flex gap-8">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="teoria"
+                  checked={teoriaFinalizada}
+                  onCheckedChange={(checked) =>
+                    setTeoriaFinalizada(checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="teoria"
+                  className="cursor-pointer text-sm font-normal text-gray-700"
+                >
+                  TEORIA FINALIZADA
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="revisoes"
+                  checked={programarRevisoes}
+                  onCheckedChange={(checked) =>
+                    setProgramarRevisoes(checked as boolean)
+                  }
+                />
+                <Label
+                  htmlFor="revisoes"
+                  className="cursor-pointer text-sm font-normal text-gray-700"
+                >
+                  PROGRAMAR REVISÕES
+                </Label>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="revisoes"
-                checked={programarRevisoes}
-                onCheckedChange={(checked) =>
-                  setProgramarRevisoes(checked as boolean)
-                }
-              />
-              <Label
-                htmlFor="revisoes"
-                className="cursor-pointer text-sm font-normal text-gray-700"
-              >
-                PROGRAMAR REVISÕES
-              </Label>
-            </div>
+
+            {/* Intervalos de Revisão - só aparece se "Programar Revisões" estiver marcado */}
+            {programarRevisoes && (
+              <div className="flex items-center gap-2 flex-wrap pl-7">
+                {intervalosRevisao.map((intervalo, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 bg-teal-500 text-white rounded-full px-3 py-1"
+                  >
+                    <span className="text-sm font-medium">{intervalo}d</span>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveIntervaloRevisao(index)}
+                      className="ml-1 text-white hover:text-gray-200 transition-colors"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+
+                {/* Input para novo intervalo */}
+                {mostrarInputIntervalo ? (
+                  <div className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1">
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="Ex: 30"
+                      value={novoIntervalo}
+                      onChange={(e) => setNovoIntervalo(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleConfirmarNovoIntervalo()
+                        } else if (e.key === 'Escape') {
+                          handleCancelarNovoIntervalo()
+                        }
+                      }}
+                      className="w-16 h-6 text-center bg-white border border-gray-300 rounded text-sm focus-visible:ring-1 focus-visible:ring-teal-400 p-0"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={handleConfirmarNovoIntervalo}
+                      className="text-teal-600 hover:text-teal-700 font-bold"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCancelarNovoIntervalo}
+                      className="text-red-600 hover:text-red-700 font-bold"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleAddIntervaloRevisao}
+                    className="flex items-center justify-center w-8 h-8 bg-teal-500 text-white rounded-full hover:bg-teal-600 transition-colors"
+                  >
+                    +
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Questões, Páginas e Vídeoaulas */}
