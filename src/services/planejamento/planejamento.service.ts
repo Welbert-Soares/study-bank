@@ -509,13 +509,14 @@ export async function deletarSessao(
 }
 
 /**
- * Marca uma sessão como concluída vinculando-a ao EstudoRealizado
+ * Marca uma sessão como concluída vinculando-a ao EstudoRealizado em uma data específica
  */
 export async function marcarSessaoConcluida(
   planejamentoId: string,
   diaSemana: string,
   sessaoIndex: number,
   estudoRealizadoId: string,
+  dataEstudo: string, // Data ISO "2025-11-02"
   userId: string,
 ) {
   // Verificar se o planejamento pertence ao usuário
@@ -544,9 +545,12 @@ export async function marcarSessaoConcluida(
     throw new Error('Sessão não encontrada')
   }
 
-  // Adicionar estudoRealizadoId à sessão
-  distribuicao[diaSemana].sessoes[sessaoIndex].estudoRealizadoId =
-    estudoRealizadoId
+  // Adicionar estudoRealizadoId ao mapa de conclusões por data
+  const sessao = distribuicao[diaSemana].sessoes[sessaoIndex]
+  if (!sessao.conclusoesPorData) {
+    sessao.conclusoesPorData = {}
+  }
+  sessao.conclusoesPorData[dataEstudo] = estudoRealizadoId
 
   // Atualizar planejamento
   await prisma.planejamentoSemanal.update({

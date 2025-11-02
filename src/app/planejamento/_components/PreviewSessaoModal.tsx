@@ -15,6 +15,7 @@ interface PreviewSessaoModalProps {
   onOpenChange: (open: boolean) => void
   sessao: SessaoEstudo | null
   diaSemana: string
+  eventDate?: string // Data específica da ocorrência
   onIniciar: () => void
   onEditar: () => void
 }
@@ -24,12 +25,16 @@ export function PreviewSessaoModal({
   onOpenChange,
   sessao,
   diaSemana,
+  eventDate,
   onIniciar,
   onEditar,
 }: PreviewSessaoModalProps) {
   if (!sessao) return null
 
-  const isConcluida = !!sessao.estudoRealizadoId
+  // Verificar se a data específica foi concluída
+  const isConcluida = eventDate
+    ? !!sessao.conclusoesPorData?.[eventDate]
+    : false
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

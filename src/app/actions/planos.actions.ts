@@ -542,6 +542,7 @@ export async function marcarSessaoConcluidaAction(
   planejamentoId: string,
   agendamentoKey: string,
   estudoRealizadoId: string,
+  dataEstudo: string, // Data ISO "2025-11-02"
 ) {
   const session = await auth()
   if (!session.userId) throw new Error('Unauthorized')
@@ -559,6 +560,7 @@ export async function marcarSessaoConcluidaAction(
     diaSemana,
     sessaoIndex,
     estudoRealizadoId,
+    dataEstudo,
     session.userId,
   )
 

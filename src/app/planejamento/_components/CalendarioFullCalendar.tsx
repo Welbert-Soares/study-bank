@@ -41,36 +41,13 @@ export function CalendarioFullCalendar({
   const calendarRef = useRef<FullCalendar>(null)
 
   // Converter distribuição para eventos do FullCalendar
-  // Usando eventos recorrentes semanais com daysOfWeek
+  // Gerar eventos individuais por data (não usar recorrência)
   const events: EventInput[] = Object.entries(distribuicao).flatMap(
     ([diaSemana, dia]) => {
       if (!dia?.sessoes || !Array.isArray(dia.sessoes)) return []
 
-      return dia.sessoes.map((sessao, index) => {
-        // Determinar cor baseado no status de conclusão
-        const isConcluida = !!sessao.estudoRealizadoId
-        const backgroundColor = isConcluida ? '#9ca3af' : sessao.cor // gray-400 se concluída
-        const borderColor = isConcluida ? '#6b7280' : sessao.cor // gray-500 se concluída
-
-        const eventConfig: EventInput = {
-          id: `${diaSemana}-${index}`,
-          title: isConcluida ? `✓ ${sessao.nome}` : sessao.nome,
-          // Usar daysOfWeek para eventos recorrentes
-          daysOfWeek: [getDayNumber(diaSemana)],
-          startTime: sessao.inicio, // HH:mm
-          endTime: sessao.fim, // HH:mm
-          backgroundColor,
-          borderColor,
-          textColor: '#ffffff',
-          extendedProps: {
-            disciplinaId: sessao.disciplinaId,
-            duracao: sessao.duracao,
-            diaSemana,
-            concluida: isConcluida,
-          },
-        }
-
-        // Usar datas específicas da sessão se disponíveis, senão usa do planejamento
+      return dia.sessoes.flatMap((sessao, index) => {
+        // Determinar intervalo de datas
         const startDate =
           sessao.dataInicio ||
           (dataInicio ? dataInicio.toISOString().split('T')[0] : undefined)
@@ -78,21 +55,60 @@ export function CalendarioFullCalendar({
           sessao.dataFim ||
           (dataFim ? dataFim.toISOString().split('T')[0] : undefined)
 
-        if (startDate) {
-          eventConfig.startRecur = startDate
+        if (!startDate || !endDate) {
+          console.warn(
+            `⚠️ Sessão ${sessao.nome} sem datas definidas, pulando...`,
+          )
+          return []
         }
 
-        if (endDate) {
-          // endRecur é exclusivo, então adiciona 1 dia
-          const end = new Date(endDate)
-          end.setDate(end.getDate() + 1)
-          eventConfig.endRecur = end.toISOString().split('T')[0]
+        // Gerar um evento para cada ocorrência da sessão
+        const dayNumber = getDayNumber(diaSemana)
+        const individualEvents: EventInput[] = []
+
+        const current = new Date(startDate)
+        const end = new Date(endDate)
+
+        // Iterar por todas as datas no intervalo
+        while (current <= end) {
+          // Verificar se é o dia da semana correto
+          if (current.getDay() === dayNumber) {
+            const eventDate = current.toISOString().split('T')[0]
+
+            // Verificar se essa data específica foi concluída
+            const isConcluida = !!sessao.conclusoesPorData?.[eventDate]
+            const backgroundColor = isConcluida ? '#9ca3af' : sessao.cor // gray-400 se concluída
+            const borderColor = isConcluida ? '#6b7280' : sessao.cor // gray-500 se concluída
+
+            individualEvents.push({
+              id: `${diaSemana}-${index}-${eventDate}`,
+              title: isConcluida ? `✓ ${sessao.nome}` : sessao.nome,
+              start: `${eventDate}T${sessao.inicio}:00`,
+              end: `${eventDate}T${sessao.fim}:00`,
+              backgroundColor,
+              borderColor,
+              textColor: '#ffffff',
+              extendedProps: {
+                disciplinaId: sessao.disciplinaId,
+                duracao: sessao.duracao,
+                diaSemana,
+                sessaoIndex: index,
+                eventDate,
+                concluida: isConcluida,
+              },
+            })
+          }
+
+          // Avançar para o próximo dia
+          current.setDate(current.getDate() + 1)
         }
 
-        return eventConfig
+        return individualEvents
       })
     },
-  ) // Debug: verificar eventos gerados
+  )
+
+  // Debug: verificar eventos gerados
   console.log('📋 Eventos gerados para FullCalendar:', events.length)
   if (events.length === 0) {
     console.log('⚠️ Nenhum evento gerado. Distribuição:', distribuicao)
@@ -117,11 +133,14 @@ export function CalendarioFullCalendar({
   const handleEventClick = useCallback(
     (clickInfo: EventClickArg) => {
       if (onEventClick) {
+        // Passar a data específica do evento
+        const eventDate = clickInfo.event.extendedProps.eventDate
         onEventClick({
           id: clickInfo.event.id,
           title: clickInfo.event.title,
           start: clickInfo.event.start,
           end: clickInfo.event.end,
+          eventDate, // Data específica da ocorrência
           extendedProps: clickInfo.event.extendedProps,
         })
       } else {

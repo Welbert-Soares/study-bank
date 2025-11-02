@@ -84,6 +84,7 @@ export function PlanejamentoAtivo({
     agendamentoKey: string
     categoria: 'TEORIA' | 'EXERCICIOS' | 'REVISAO'
     material: string
+    dataEstudo: string // Data específica da sessão
   } | null>(null)
 
   // Parse dos dados JSON com validação
@@ -168,29 +169,35 @@ export function PlanejamentoAtivo({
   const handleEventClick = (event: any) => {
     // Extrair informações do evento
     const diaSemana = event.extendedProps.diaSemana
-    const sessaoId = event.id // formato: "Segunda-0"
-    const sessaoIndex = parseInt(sessaoId.split('-')[1])
+    const sessaoIndex = event.extendedProps.sessaoIndex
+    const eventDate = event.extendedProps.eventDate // Data específica da ocorrência
 
     // Buscar sessão na distribuição
     const sessao = distribuicao[diaSemana]?.sessoes[sessaoIndex]
 
     if (sessao) {
-      // Salvar dados da sessão e abrir modal de preview
+      // Salvar dados da sessão (incluindo data específica) e abrir modal de preview
       setModalData({
         diaSemana,
         sessao,
         sessaoIndex,
+        dataInicial: eventDate, // Armazenar data específica
       })
       setShowPreviewModal(true)
     }
   }
 
   const handleIniciarSessao = () => {
-    if (!modalData.sessao) return
+    if (!modalData.sessao || !modalData.dataInicial) return
 
     // Fechar preview e iniciar sessão
     setShowPreviewModal(false)
-    iniciarSessao(modalData.sessao, modalData.diaSemana, modalData.sessaoIndex!)
+    iniciarSessao(
+      modalData.sessao,
+      modalData.diaSemana,
+      modalData.sessaoIndex!,
+      modalData.dataInicial, // Passar data específica
+    )
   }
 
   const handleEditarSessao = () => {
@@ -203,6 +210,7 @@ export function PlanejamentoAtivo({
     sessao: SessaoEstudo,
     diaSemana: string,
     sessaoIndex: number,
+    dataEstudo: string, // Nova parameter: data específica
   ) => {
     const agendamentoKey = `${diaSemana}_${sessaoIndex}`
 
@@ -213,6 +221,7 @@ export function PlanejamentoAtivo({
       agendamentoKey,
       categoria: 'TEORIA', // Default, pode ser alterado no modal
       material: '', // Será preenchido no modal
+      dataEstudo, // Armazenar data específica
     })
 
     setShowCronometro(true)
@@ -396,6 +405,7 @@ export function PlanejamentoAtivo({
         onOpenChange={setShowPreviewModal}
         sessao={modalData.sessao || null}
         diaSemana={modalData.diaSemana}
+        eventDate={modalData.dataInicial} // Passar data específica
         onIniciar={handleIniciarSessao}
         onEditar={handleEditarSessao}
       />
@@ -447,6 +457,7 @@ export function PlanejamentoAtivo({
             material: sessaoEmAndamento.material,
             planejamentoSemanalId: planejamento.id,
             agendamentoKey: sessaoEmAndamento.agendamentoKey,
+            dataEstudo: sessaoEmAndamento.dataEstudo, // Passar data específica
           }}
           onSuccess={handleRegistroSuccess}
         />

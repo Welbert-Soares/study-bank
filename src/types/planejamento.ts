@@ -73,8 +73,9 @@ export interface SessaoEstudo {
   // Controle de recorrência
   dataInicio?: string // Data ISO para início da recorrência
   dataFim?: string // Data ISO para fim da recorrência (opcional)
-  // Vinculação com estudo realizado
-  estudoRealizadoId?: string // ID do EstudoRealizado quando completado
+  // Vinculação com estudos realizados por data específica
+  // Formato: { "2025-11-02": "estudoRealizadoId", "2025-11-09": "estudoRealizadoId2" }
+  conclusoesPorData?: Record<string, string>
 }
 
 export interface DiaDistribuicao {

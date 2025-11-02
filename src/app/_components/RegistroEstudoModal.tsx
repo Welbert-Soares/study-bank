@@ -43,6 +43,7 @@ interface RegistroEstudoModalProps {
     material?: string
     planejamentoSemanalId?: string
     agendamentoKey?: string
+    dataEstudo?: string // Data específica da sessão (formato ISO)
   }
   onSuccess?: () => void
 }
@@ -219,7 +220,8 @@ export function RegistroEstudoModal({
     }
 
     try {
-      const dataEstudo = getDataEstudo()
+      // Usar data específica se fornecida, senão calcular
+      const dataEstudo = dadosIniciais?.dataEstudo || getDataEstudo()
 
       // Preparar dados do estudo
       const estudoData = {
@@ -269,6 +271,7 @@ export function RegistroEstudoModal({
           dadosIniciais.planejamentoSemanalId,
           dadosIniciais.agendamentoKey,
           resultado.id,
+          dataEstudo, // Passar a data do estudo
         )
       }
 
