@@ -376,33 +376,34 @@ export function RegistroEstudoModal({
             </div>
           </div>
 
-          {/* Tópico */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase">
-              Tópico
-            </Label>
-            <Select value={topico} onValueChange={setTopico}>
-              <SelectTrigger className="h-10 border-0 border-b-2 border-gray-300 rounded-none focus:ring-0 focus:border-teal-400">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="topico1">Tópico 1</SelectItem>
-                <SelectItem value="topico2">Tópico 2</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Tópico e Material na mesma linha */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-600 uppercase">
+                Tópico
+              </Label>
+              <Select value={topico} onValueChange={setTopico}>
+                <SelectTrigger className="h-10 border-0 border-b-2 border-gray-300 rounded-none focus:ring-0 focus:border-teal-400">
+                  <SelectValue placeholder="Selecione..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="topico1">Tópico 1</SelectItem>
+                  <SelectItem value="topico2">Tópico 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Material */}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-semibold text-gray-600 uppercase">
-              Material
-            </Label>
-            <Input
-              placeholder="Ex.: Aula 01"
-              value={material}
-              onChange={(e) => setMaterial(e.target.value)}
-              className="h-10 border-0 border-b-2 border-teal-400 rounded-none focus-visible:ring-0 focus-visible:border-teal-500"
-            />
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-gray-600 uppercase">
+                Material
+              </Label>
+              <Input
+                placeholder="Ex.: Aula 01"
+                value={material}
+                onChange={(e) => setMaterial(e.target.value)}
+                className="h-10 border-0 border-b-2 border-teal-400 rounded-none focus-visible:ring-0 focus-visible:border-teal-500"
+              />
+            </div>
           </div>
 
           {/* Checkboxes */}
