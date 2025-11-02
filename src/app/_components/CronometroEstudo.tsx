@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { VisuallyHidden } from '@/components/ui/visually-hidden'
 import { Button } from '@/components/ui/button'
 import { Pause, Play, Square } from 'lucide-react'
 
@@ -105,6 +106,10 @@ export function CronometroEstudo({
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-4xl h-[600px] p-0 bg-gradient-to-b from-gray-900 to-gray-800 border-none">
+        <VisuallyHidden>
+          <DialogTitle>Cronômetro de Estudo - {disciplinaNome}</DialogTitle>
+        </VisuallyHidden>
+
         <div className="flex flex-col items-center justify-center h-full text-white relative">
           {/* Logo */}
           <div className="absolute top-8 left-1/2 transform -translate-x-1/2">

@@ -47,20 +47,26 @@ export function CalendarioFullCalendar({
       if (!dia?.sessoes || !Array.isArray(dia.sessoes)) return []
 
       return dia.sessoes.map((sessao, index) => {
+        // Determinar cor baseado no status de conclusão
+        const isConcluida = !!sessao.estudoRealizadoId
+        const backgroundColor = isConcluida ? '#9ca3af' : sessao.cor // gray-400 se concluída
+        const borderColor = isConcluida ? '#6b7280' : sessao.cor // gray-500 se concluída
+
         const eventConfig: EventInput = {
           id: `${diaSemana}-${index}`,
-          title: sessao.nome,
+          title: isConcluida ? `✓ ${sessao.nome}` : sessao.nome,
           // Usar daysOfWeek para eventos recorrentes
           daysOfWeek: [getDayNumber(diaSemana)],
           startTime: sessao.inicio, // HH:mm
           endTime: sessao.fim, // HH:mm
-          backgroundColor: sessao.cor,
-          borderColor: sessao.cor,
+          backgroundColor,
+          borderColor,
           textColor: '#ffffff',
           extendedProps: {
             disciplinaId: sessao.disciplinaId,
             duracao: sessao.duracao,
             diaSemana,
+            concluida: isConcluida,
           },
         }
 

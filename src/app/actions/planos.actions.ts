@@ -537,3 +537,31 @@ export async function deletarSessaoAction(
   revalidatePath('/planejamento')
   return { sucesso: true }
 }
+
+export async function marcarSessaoConcluidaAction(
+  planejamentoId: string,
+  agendamentoKey: string,
+  estudoRealizadoId: string,
+) {
+  const session = await auth()
+  if (!session.userId) throw new Error('Unauthorized')
+
+  const { planejamentoService } = await import(
+    '@/services/planejamento/planejamento.service'
+  )
+
+  // Extrair diaSemana e sessaoIndex do agendamentoKey (formato: "Segunda_0")
+  const [diaSemana, sessaoIndexStr] = agendamentoKey.split('_')
+  const sessaoIndex = parseInt(sessaoIndexStr)
+
+  await planejamentoService.marcarSessaoConcluida(
+    planejamentoId,
+    diaSemana,
+    sessaoIndex,
+    estudoRealizadoId,
+    session.userId,
+  )
+
+  revalidatePath('/planejamento')
+  return { sucesso: true }
+}

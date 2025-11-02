@@ -9,6 +9,7 @@ import {
   Power,
   Trash2,
   BookOpen,
+  Play,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -21,6 +22,9 @@ import {
 import { CalendarioFullCalendar } from './CalendarioFullCalendar'
 import { AdicionarSessaoModal } from './AdicionarSessaoModal'
 import { EditarSessaoModal } from './EditarSessaoModal'
+import { PreviewSessaoModal } from './PreviewSessaoModal'
+import { CronometroEstudo } from '@/app/_components/CronometroEstudo'
+import { RegistroEstudoModal } from '@/app/_components/RegistroEstudoModal'
 import { toast } from 'sonner'
 import { deletarPlanejamentoAction } from '@/app/actions/planos.actions'
 import { useRouter } from 'next/navigation'
@@ -58,6 +62,10 @@ export function PlanejamentoAtivo({
   // Estados dos modais
   const [showAdicionarModal, setShowAdicionarModal] = useState(false)
   const [showEditarModal, setShowEditarModal] = useState(false)
+  const [showPreviewModal, setShowPreviewModal] = useState(false)
+  const [showCronometro, setShowCronometro] = useState(false)
+  const [showRegistroModal, setShowRegistroModal] = useState(false)
+
   const [modalData, setModalData] = useState<{
     diaSemana: string
     dataInicial?: string
@@ -67,6 +75,16 @@ export function PlanejamentoAtivo({
   }>({
     diaSemana: 'Segunda',
   })
+
+  // Dados da sessão de estudo em andamento
+  const [sessaoEmAndamento, setSessaoEmAndamento] = useState<{
+    disciplinaId: string
+    disciplinaNome: string
+    duracao: number
+    agendamentoKey: string
+    categoria: 'TEORIA' | 'EXERCICIOS' | 'REVISAO'
+    material: string
+  } | null>(null)
 
   // Parse dos dados JSON com validação
   let distribuicao: DistribuicaoSemanal = {}
@@ -157,13 +175,63 @@ export function PlanejamentoAtivo({
     const sessao = distribuicao[diaSemana]?.sessoes[sessaoIndex]
 
     if (sessao) {
+      // Salvar dados da sessão e abrir modal de preview
       setModalData({
         diaSemana,
         sessao,
         sessaoIndex,
       })
-      setShowEditarModal(true)
+      setShowPreviewModal(true)
     }
+  }
+
+  const handleIniciarSessao = () => {
+    if (!modalData.sessao) return
+
+    // Fechar preview e iniciar sessão
+    setShowPreviewModal(false)
+    iniciarSessao(modalData.sessao, modalData.diaSemana, modalData.sessaoIndex!)
+  }
+
+  const handleEditarSessao = () => {
+    // Fechar preview e abrir modal de edição
+    setShowPreviewModal(false)
+    setShowEditarModal(true)
+  }
+
+  const iniciarSessao = (
+    sessao: SessaoEstudo,
+    diaSemana: string,
+    sessaoIndex: number,
+  ) => {
+    const agendamentoKey = `${diaSemana}_${sessaoIndex}`
+
+    setSessaoEmAndamento({
+      disciplinaId: sessao.disciplinaId,
+      disciplinaNome: sessao.nome,
+      duracao: sessao.duracao,
+      agendamentoKey,
+      categoria: 'TEORIA', // Default, pode ser alterado no modal
+      material: '', // Será preenchido no modal
+    })
+
+    setShowCronometro(true)
+  }
+
+  const handleCronometroFinalizar = (tempoDecorrido: number) => {
+    setShowCronometro(false)
+
+    if (sessaoEmAndamento) {
+      // Preparar dados para preencher o modal de registro
+      setShowRegistroModal(true)
+    }
+  }
+
+  const handleRegistroSuccess = () => {
+    setShowRegistroModal(false)
+    setSessaoEmAndamento(null)
+    toast.success('Estudo registrado com sucesso!')
+    router.refresh()
   }
 
   const handleDateSelect = (info: any) => {
@@ -322,6 +390,16 @@ export function PlanejamentoAtivo({
       />
 
       {/* Modais */}
+      {/* Preview da Sessão */}
+      <PreviewSessaoModal
+        open={showPreviewModal}
+        onOpenChange={setShowPreviewModal}
+        sessao={modalData.sessao || null}
+        diaSemana={modalData.diaSemana}
+        onIniciar={handleIniciarSessao}
+        onEditar={handleEditarSessao}
+      />
+
       <AdicionarSessaoModal
         open={showAdicionarModal}
         onOpenChange={setShowAdicionarModal}
@@ -343,6 +421,36 @@ export function PlanejamentoAtivo({
         sessaoIndex={modalData.sessaoIndex || 0}
         onSuccess={handleModalSuccess}
       />
+
+      {/* Cronômetro de Estudo */}
+      {showCronometro && sessaoEmAndamento && (
+        <CronometroEstudo
+          open={showCronometro}
+          onOpenChange={setShowCronometro}
+          disciplinaNome={sessaoEmAndamento.disciplinaNome}
+          duracaoMinutos={sessaoEmAndamento.duracao}
+          onFinalizar={handleCronometroFinalizar}
+        />
+      )}
+
+      {/* Modal de Registro */}
+      {showRegistroModal && sessaoEmAndamento && (
+        <RegistroEstudoModal
+          open={showRegistroModal}
+          onOpenChange={setShowRegistroModal}
+          planoId={planejamento.plano.id}
+          dadosIniciais={{
+            disciplinaId: sessaoEmAndamento.disciplinaId,
+            disciplinaNome: sessaoEmAndamento.disciplinaNome,
+            tempoDecorrido: sessaoEmAndamento.duracao, // Tempo total da sessão
+            categoria: sessaoEmAndamento.categoria,
+            material: sessaoEmAndamento.material,
+            planejamentoSemanalId: planejamento.id,
+            agendamentoKey: sessaoEmAndamento.agendamentoKey,
+          }}
+          onSuccess={handleRegistroSuccess}
+        />
+      )}
 
       {/* Info card */}
       <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4">

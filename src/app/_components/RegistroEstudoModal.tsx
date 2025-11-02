@@ -20,6 +20,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Calendar, Plus, Minus } from 'lucide-react'
+import { toast } from 'sonner'
+import { registrarEstudoAction } from '@/app/actions/estudos.actions'
+import { marcarSessaoConcluidaAction } from '@/app/actions/planos.actions'
 
 interface Disciplina {
   id: string
@@ -36,11 +39,12 @@ interface RegistroEstudoModalProps {
     disciplinaId?: string
     disciplinaNome?: string
     tempoDecorrido?: number // em minutos
-    categoria?: 'teoria' | 'exercicios' | 'revisao'
+    categoria?: 'TEORIA' | 'EXERCICIOS' | 'REVISAO'
     material?: string
     planejamentoSemanalId?: string
     agendamentoKey?: string
   }
+  onSuccess?: () => void
 }
 
 type TipoRegistro = 'HOJE' | 'ONTEM' | 'OUTRO'
@@ -49,6 +53,8 @@ export function RegistroEstudoModal({
   open,
   onOpenChange,
   planoId,
+  dadosIniciais,
+  onSuccess,
 }: RegistroEstudoModalProps) {
   const [tipoRegistro, setTipoRegistro] = useState<TipoRegistro>('HOJE')
   const [dataOutro, setDataOutro] = useState('')
@@ -64,7 +70,7 @@ export function RegistroEstudoModal({
   const [paginasInicio, setPaginasInicio] = useState(0)
   const [paginasFim, setPaginasFim] = useState(0)
   const [videoAulas, setVideoAulas] = useState([
-    { titulo: '', inicio: '00:00:00', fim: '00:00:00' },
+    { titulo: '', duracao: '00:00' },
   ])
   const [comentarios, setComentarios] = useState('')
   const [salvarCriarNovo, setSalvarCriarNovo] = useState(false)
@@ -94,6 +100,31 @@ export function RegistroEstudoModal({
     carregarDisciplinas()
   }, [open, planoId])
 
+  // Preencher dados iniciais vindos do cronômetro
+  useEffect(() => {
+    if (open && dadosIniciais) {
+      if (dadosIniciais.disciplinaId) {
+        setDisciplina(dadosIniciais.disciplinaId)
+      }
+      if (dadosIniciais.tempoDecorrido) {
+        const horas = Math.floor(dadosIniciais.tempoDecorrido / 60)
+        const minutos = dadosIniciais.tempoDecorrido % 60
+        setTempoEstudo(
+          `${String(horas).padStart(2, '0')}:${String(minutos).padStart(
+            2,
+            '0',
+          )}:00`,
+        )
+      }
+      if (dadosIniciais.categoria) {
+        setCategoria(dadosIniciais.categoria.toLowerCase())
+      }
+      if (dadosIniciais.material) {
+        setMaterial(dadosIniciais.material)
+      }
+    }
+  }, [open, dadosIniciais])
+
   // Função para obter a data baseada no tipo de registro
   const getDataEstudo = (): string => {
     const hoje = new Date()
@@ -110,10 +141,7 @@ export function RegistroEstudoModal({
   }
 
   const handleAddVideoaula = () => {
-    setVideoAulas([
-      ...videoAulas,
-      { titulo: '', inicio: '00:00:00', fim: '00:00:00' },
-    ])
+    setVideoAulas([...videoAulas, { titulo: '', duracao: '00:00' }])
   }
 
   const handleRemoveVideoaula = (index: number) => {
@@ -121,10 +149,108 @@ export function RegistroEstudoModal({
   }
 
   const handleSalvar = async () => {
-    // TODO: Implementar lógica de salvamento
-    const dataEstudo = getDataEstudo()
-    console.log('Salvando estudo...', { dataEstudo, tipoRegistro })
-    onOpenChange(false)
+    // Validações básicas
+    if (!categoria) {
+      toast.error('Selecione uma categoria')
+      return
+    }
+    if (!disciplina) {
+      toast.error('Selecione uma disciplina')
+      return
+    }
+    if (!tempoEstudo || tempoEstudo === '00:00:00') {
+      toast.error('Informe o tempo de estudo')
+      return
+    }
+
+    try {
+      const dataEstudo = getDataEstudo()
+
+      // Preparar dados do estudo
+      const estudoData = {
+        planoId,
+        disciplinaId: disciplina,
+        topicoId: topico || undefined,
+        dataEstudo,
+        tempoEstudo, // HH:MM format
+        categoria: categoria.toLowerCase() as
+          | 'teoria'
+          | 'exercicios'
+          | 'revisao',
+        material,
+        teoriaFinalizada,
+        programarRevisoes,
+        intervalosRevisao: programarRevisoes ? [7, 15, 30] : [], // Intervalos padrão
+        questoes:
+          questoesAcertos > 0 || questoesErros > 0
+            ? Array.from(
+                { length: questoesAcertos + questoesErros },
+                (_, i) => ({
+                  numero: i + 1,
+                  acertou: i < questoesAcertos,
+                }),
+              )
+            : [],
+        paginas:
+          paginasInicio > 0 && paginasFim >= paginasInicio
+            ? [{ inicio: paginasInicio, fim: paginasFim }]
+            : [],
+        videoAulas: videoAulas.filter((v) => v.titulo.trim() !== ''),
+        comentarios,
+        planejamentoSemanalId: dadosIniciais?.planejamentoSemanalId,
+        agendamentoKey: dadosIniciais?.agendamentoKey,
+      }
+
+      // Salvar estudo
+      const resultado = await registrarEstudoAction(estudoData)
+
+      // Se veio de um planejamento, marcar sessão como concluída
+      if (
+        dadosIniciais?.planejamentoSemanalId &&
+        dadosIniciais?.agendamentoKey &&
+        resultado.id
+      ) {
+        await marcarSessaoConcluidaAction(
+          dadosIniciais.planejamentoSemanalId,
+          dadosIniciais.agendamentoKey,
+          resultado.id,
+        )
+      }
+
+      toast.success('Estudo registrado com sucesso!')
+
+      // Fechar modal ou limpar para novo registro
+      if (salvarCriarNovo) {
+        // Limpar campos mas manter modal aberto
+        resetForm()
+      } else {
+        onOpenChange(false)
+        if (onSuccess) {
+          onSuccess()
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao salvar estudo:', error)
+      toast.error('Erro ao registrar estudo. Tente novamente.')
+    }
+  }
+
+  const resetForm = () => {
+    setTipoRegistro('HOJE')
+    setDataOutro('')
+    setCategoria('')
+    setDisciplina('')
+    setTopico('')
+    setTempoEstudo('00:00:00')
+    setMaterial('')
+    setTeoriaFinalizada(false)
+    setProgramarRevisoes(false)
+    setQuestoesAcertos(0)
+    setQuestoesErros(0)
+    setPaginasInicio(0)
+    setPaginasFim(0)
+    setVideoAulas([{ titulo: '', duracao: '00:00' }])
+    setComentarios('')
   }
 
   return (
@@ -394,7 +520,7 @@ export function RegistroEstudoModal({
               </Label>
               <div>
                 <Label className="text-[11px] text-gray-500 uppercase">
-                  Título / Início / Fim
+                  Título / Duração (MM:SS)
                 </Label>
                 {videoAulas.map((video, index) => (
                   <div key={index} className="space-y-2 mt-2">
@@ -408,30 +534,16 @@ export function RegistroEstudoModal({
                       }}
                       className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
                     />
-                    <div className="flex gap-2">
-                      <Input
-                        type="time"
-                        value={video.inicio}
-                        onChange={(e) => {
-                          const newVideos = [...videoAulas]
-                          newVideos[index].inicio = e.target.value
-                          setVideoAulas(newVideos)
-                        }}
-                        step="1"
-                        className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
-                      />
-                      <Input
-                        type="time"
-                        value={video.fim}
-                        onChange={(e) => {
-                          const newVideos = [...videoAulas]
-                          newVideos[index].fim = e.target.value
-                          setVideoAulas(newVideos)
-                        }}
-                        step="1"
-                        className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
-                      />
-                    </div>
+                    <Input
+                      placeholder="15:30"
+                      value={video.duracao}
+                      onChange={(e) => {
+                        const newVideos = [...videoAulas]
+                        newVideos[index].duracao = e.target.value
+                        setVideoAulas(newVideos)
+                      }}
+                      className="text-xs h-9 bg-white border-0 border-b-2 border-gray-300 rounded-none focus-visible:ring-0 focus-visible:border-teal-400"
+                    />
                   </div>
                 ))}
               </div>

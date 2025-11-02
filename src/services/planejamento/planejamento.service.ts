@@ -508,6 +508,57 @@ export async function deletarSessao(
   return { sucesso: true }
 }
 
+/**
+ * Marca uma sessão como concluída vinculando-a ao EstudoRealizado
+ */
+export async function marcarSessaoConcluida(
+  planejamentoId: string,
+  diaSemana: string,
+  sessaoIndex: number,
+  estudoRealizadoId: string,
+  userId: string,
+) {
+  // Verificar se o planejamento pertence ao usuário
+  const planejamento = await prisma.planejamentoSemanal.findFirst({
+    where: {
+      id: planejamentoId,
+      plano: {
+        userId,
+      },
+    },
+  })
+
+  if (!planejamento) {
+    throw new Error('Planejamento não encontrado')
+  }
+
+  // Parse da distribuição atual
+  const distribuicao = JSON.parse(
+    planejamento.distribuicao,
+  ) as DistribuicaoSemanal
+
+  if (
+    !distribuicao[diaSemana] ||
+    !distribuicao[diaSemana].sessoes[sessaoIndex]
+  ) {
+    throw new Error('Sessão não encontrada')
+  }
+
+  // Adicionar estudoRealizadoId à sessão
+  distribuicao[diaSemana].sessoes[sessaoIndex].estudoRealizadoId =
+    estudoRealizadoId
+
+  // Atualizar planejamento
+  await prisma.planejamentoSemanal.update({
+    where: { id: planejamentoId },
+    data: {
+      distribuicao: JSON.stringify(distribuicao),
+    },
+  })
+
+  return { sucesso: true }
+}
+
 // Exportar como objeto para importação consistente
 export const planejamentoService = {
   criarPlanejamento,
@@ -520,4 +571,5 @@ export const planejamentoService = {
   adicionarSessao,
   editarSessao,
   deletarSessao,
+  marcarSessaoConcluida,
 }

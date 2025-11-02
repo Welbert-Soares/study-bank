@@ -73,6 +73,8 @@ export interface SessaoEstudo {
   // Controle de recorrência
   dataInicio?: string // Data ISO para início da recorrência
   dataFim?: string // Data ISO para fim da recorrência (opcional)
+  // Vinculação com estudo realizado
+  estudoRealizadoId?: string // ID do EstudoRealizado quando completado
 }
 
 export interface DiaDistribuicao {

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { disciplinaId: string } },
+  { params }: { params: Promise<{ disciplinaId: string }> },
 ) {
   try {
     const session = await auth()
@@ -12,9 +12,12 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Await params in Next.js 15
+    const { disciplinaId } = await params
+
     const topicos = await prisma.topico.findMany({
       where: {
-        disciplinaId: params.disciplinaId,
+        disciplinaId: disciplinaId,
         disciplina: {
           userId: session.userId,
         },
